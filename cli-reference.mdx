@@ -1,0 +1,275 @@
+---
+title: "CLI Reference"
+description: "Every command, flag, and option"
+---
+
+## Authentication
+
+### ardent login
+
+Opens your browser to authenticate with GitHub or email.
+
+```bash
+ardent login
+```
+
+### ardent logout
+
+Clears stored credentials.
+
+```bash
+ardent logout
+```
+
+### ardent status
+
+Check your authentication status.
+
+```bash
+ardent status
+```
+
+<Accordion title="Example output">
+```
+✓ Logged in as vikram@tryardent.com
+  Organization: Ardent
+```
+</Accordion>
+
+## Connectors
+
+### ardent connector create
+
+Connect a Postgres database. Ardent replicates your data during initial setup — this may take a few minutes depending on data size. After setup, branches create in under 6 seconds regardless of data size.
+
+```bash
+ardent connector create postgresql postgresql://user:password@host:5432/mydb
+```
+
+<Accordion title="Example output">
+```
+✓ Connector created
+  Replicating database... this may take a few minutes depending on data size.
+  Once complete, branches will create in under 6 seconds.
+```
+</Accordion>
+
+**BYOC (Neon):**
+
+```bash
+ardent connector create postgresql --byoc neon --api-key <key> --project-id <id>
+```
+
+### ardent connector list
+
+List all connected databases.
+
+```bash
+ardent connector list
+```
+
+<Accordion title="Example output">
+```
+ID          TYPE         STATUS     HOST
+conn_01     postgresql   healthy    db.example.com:5432
+```
+</Accordion>
+
+### ardent connector delete
+
+Remove a connected database.
+
+```bash
+ardent connector delete conn_01
+```
+
+<Accordion title="Example output">
+```
+✓ Connector deleted
+```
+</Accordion>
+
+## Branches
+
+### ardent branch create
+
+Create a new isolated database branch. Automatically switches to it and returns the connection URL.
+
+```bash
+ardent branch create my-feature
+```
+
+<Accordion title="Example output">
+```
+✓ Branch created
+  Name:   my-feature
+  URL:    postgresql://user:pass@my-feature-postgres.routing.tryardent.com:5432/db
+  Status: active
+```
+</Accordion>
+
+### ardent branch list
+
+List all branches. The current branch is marked with `*`.
+
+```bash
+ardent branch list
+```
+
+<Accordion title="Example output">
+```
+NAME          STATUS      CREATED
+* my-feature  active      2 minutes ago
+  staging     suspended   3 hours ago
+```
+</Accordion>
+
+### ardent branch info
+
+Show details and connection URL for a branch.
+
+```bash
+ardent branch info my-feature
+```
+
+<Accordion title="Example output">
+```
+Name:    my-feature
+URL:     postgresql://user:pass@my-feature-postgres.routing.tryardent.com:5432/db
+Status:  active
+Created: 2 minutes ago
+```
+</Accordion>
+
+### ardent branch switch
+
+Switch to a different branch.
+
+```bash
+ardent branch switch staging
+```
+
+<Accordion title="Example output">
+```
+✓ Switched to staging
+```
+</Accordion>
+
+### ardent branch diff
+
+See what changed since the branch was created.
+
+```bash
+ardent branch diff
+```
+
+<Accordion title="Example output">
+```
+Tables modified: 2
+  users    +15 rows, -0 rows, ~3 modified
+  orders   +0 rows, -2 rows, ~0 modified
+```
+</Accordion>
+
+### ardent branch delete
+
+Delete a branch. Note: branches auto-suspend after 5 minutes of inactivity, so cleanup is optional.
+
+```bash
+ardent branch delete my-feature
+```
+
+<Accordion title="Example output">
+```
+✓ Branch deleted: my-feature
+```
+</Accordion>
+
+## Team management
+
+### ardent invite
+
+Invite a user to your organization.
+
+```bash
+ardent invite alice@company.com
+```
+
+<Accordion title="Example output">
+```
+✓ Invite sent to alice@company.com
+```
+</Accordion>
+
+### ardent invite list
+
+List pending invites.
+
+```bash
+ardent invite list
+```
+
+<Accordion title="Example output">
+```
+EMAIL                STATUS     SENT
+alice@company.com    pending    1 hour ago
+```
+</Accordion>
+
+### ardent invite delete
+
+Revoke a pending invite.
+
+```bash
+ardent invite delete alice@company.com
+```
+
+<Accordion title="Example output">
+```
+✓ Invite revoked for alice@company.com
+```
+</Accordion>
+
+### ardent org members
+
+List organization members.
+
+```bash
+ardent org members
+```
+
+<Accordion title="Example output">
+```
+NAME     EMAIL                ROLE
+Vikram   vikram@company.com   admin
+Alice    alice@company.com    member
+```
+</Accordion>
+
+### ardent org set-role
+
+Update a member's role.
+
+```bash
+ardent org set-role alice@company.com admin
+```
+
+<Accordion title="Example output">
+```
+✓ Updated alice@company.com to admin
+```
+</Accordion>
+
+### ardent org remove
+
+Remove a member from the organization.
+
+```bash
+ardent org remove alice@company.com
+```
+
+<Accordion title="Example output">
+```
+✓ Removed alice@company.com from organization
+```
+</Accordion>

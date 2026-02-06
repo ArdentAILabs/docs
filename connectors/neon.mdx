@@ -1,0 +1,44 @@
+---
+title: "Neon"
+description: "Connect your Neon database (BYOC)"
+---
+
+Neon uses a bring-your-own-cloud (BYOC) model where Ardent instruments your existing Neon project to manage branching.
+
+<Info>
+  Neon already supports copy-on-write branching natively. Ardent layers on top of this to give you a CLI-first workflow, auto-suspend, and team management.
+</Info>
+
+<Steps>
+<Step title="Get your Neon API key">
+
+In the Neon console, go to **Account Settings > API Keys** and create an API key.
+
+</Step>
+
+<Step title="Get your project ID">
+
+Go to **Project Settings** in your Neon console and copy the project ID.
+
+</Step>
+
+<Step title="Connect your database">
+
+```bash
+ardent connector create postgresql --byoc neon --api-key <your-neon-api-key> --project-id <your-neon-project-id>
+```
+
+Ardent will verify your setup and instrument your Neon project.
+
+</Step>
+
+<Step title="Create your first branch">
+
+```bash
+ardent branch create my-feature
+```
+
+Done. You now have an isolated copy of your Neon database — schema, data, and all. The CLI returns a connection URL you can use anywhere.
+
+</Step>
+</Steps>

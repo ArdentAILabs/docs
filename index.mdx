@@ -1,97 +1,74 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "Ardent — Git for your data infrastructure"
+sidebarTitle: "Introduction"
+description: ""
 ---
 
-## Setting up
+Ardent lets you create instant, isolated copies of your production Postgres database in under 6 seconds right in your terminal. 
 
-Get your documentation site up and running in minutes.
+Test migrations, run schema changes and let coding agents like Claude Code and Cursor actually test its database work — all against real data, without touching production so you know they work.
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
+No more shared staging databases. No more writing seed scripts. No more seeding environments for agents. No more hoping your migration works. 
 
-## Make it yours
+An instant database for every task.
 
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
+<CardGroup cols={3}>
+  <Card title="Instant copies" icon="bolt">
+    Full database copies in under 6 seconds.
   </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
+  <Card title="Real data" icon="database">
+    Test against production data, not stale fixtures.
   </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
+  <Card title="Any Postgres" icon="plug">
+    Supabase, RDS, Neon, or self-hosted.
   </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
-  </Card>
-</Columns>
+</CardGroup>
 
-## Create beautiful pages
+## Get started in seconds
 
-Everything you need to create world-class documentation.
+```bash
+npm install -g ardent
+ardent login
+ardent connector create postgresql <your-connection-string>
+ardent branch create my-feature
+```
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
+That's it. You can make full, isolated copies of your database — ready in under 6 seconds regardless of data size.
 
-## Need inspiration?
+## How it works
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+Ardent replicates your production database into a read replica, then creates lightweight copy-on-write forks on demand. Each fork is a fully functional Postgres database with your real data — we call them **branches**, just like git.
+
+We handle all the infrastructure under the hood so you just have to worry about building!
+
+```
+Production DB → Replication → Read replica → Instant fork → Your branch
+```
+
+The workflow mirrors what you already know from git:
+
+- **`ardent branch create`** — spin up an isolated database copy
+- **`ardent branch switch`** — switch between branches
+- **`ardent branch diff`** — see what changed
+- **`ardent branch delete`** — clean up when you're done
+
+Branches auto-suspend after 5 minutes of inactivity and spin back up instantly on reconnect. Branches will not incur any storage cost either, only changes you make on the branches.
+
+Create as many as you need, throw them away when you're done without worrying.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Up and running in 3 commands.
+  </Card>
+  <Card title="Connectors" icon="plug" href="/connectors/supabase">
+    Supabase, RDS, Neon, and self-hosted Postgres.
+  </Card>
+  <Card title="CLI Reference" icon="terminal" href="/cli-reference">
+    Every command, flag, and option.
+  </Card>
+  <Card title="FAQ" icon="circle-question" href="/faq">
+    Common questions answered.
+  </Card>
+</CardGroup>

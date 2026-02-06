@@ -1,0 +1,50 @@
+---
+title: "Supabase"
+description: "Connect your Supabase Postgres database"
+---
+
+<Steps>
+<Step title="Enable the IPv4 add-on">
+
+Ardent needs a direct connection to your database, which requires a dedicated IPv4 address.
+
+In your Supabase dashboard, go to **Project Settings > Add-ons > IPv4 Address** and enable it. This is available on Pro plans and above ($4/month). No downtime required.
+
+</Step>
+
+<Step title="Enable logical replication">
+
+Go to **Database > Replication** in your Supabase dashboard and enable replication.
+
+</Step>
+
+<Step title="Find your connection string">
+
+Go to **Settings > Database > Connection string** in your Supabase dashboard. Copy the **direct connection** URI (not the pooled connection). It looks like:
+
+```
+postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
+```
+
+</Step>
+
+<Step title="Connect your database">
+
+```bash
+ardent connector create postgresql postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
+```
+
+Ardent will verify your setup and begin replicating your database. This may take a few minutes depending on data size.
+
+</Step>
+
+<Step title="Create your first branch">
+
+```bash
+ardent branch create my-feature
+```
+
+Done. You now have an isolated copy of your Supabase database — schema, data, and all. The CLI returns a connection URL you can use anywhere.
+
+</Step>
+</Steps>
