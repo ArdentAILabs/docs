@@ -53,7 +53,12 @@
         "label": "Support",
         "href": "mailto:vikram@tryardent.com"
       }
-    ]
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Log in",
+      "href": "https://app.tryardent.com"
+    }
   },
   "footer": {}
 }
