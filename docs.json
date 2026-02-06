@@ -51,13 +51,9 @@
     "links": [
       {
         "label": "Support",
-        "href": "mailto:support@tryardent.com"
+        "href": "mailto:vikram@tryardent.com"
       }
     ]
   },
-  "footer": {
-    "socials": {
-      "github": "https://github.com/ardentai"
-    }
-  }
+  "footer": {}
 }
