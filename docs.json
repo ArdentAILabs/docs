@@ -32,8 +32,14 @@
           {
             "group": "Reference",
             "pages": [
-              "cli-reference",
-              "faq"
+              "cli-reference"
+            ]
+          },
+          {
+            "group": "Support",
+            "pages": [
+              "faq",
+              "contact"
             ]
           }
         ]
