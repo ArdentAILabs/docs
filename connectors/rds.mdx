@@ -1,0 +1,58 @@
+---
+title: "AWS RDS"
+description: "Connect your RDS Postgres database"
+---
+
+<Steps>
+<Step title="Enable logical replication">
+
+Create or modify a parameter group with `rds.logical_replication = 1` and apply it to your RDS instance.
+
+<Warning>
+  This requires a reboot of your RDS instance. Plan accordingly.
+</Warning>
+
+</Step>
+
+<Step title="Grant replication permissions">
+
+Connect to your RDS instance and grant the replication role to your user:
+
+```sql
+GRANT rds_replication TO your_user;
+```
+
+</Step>
+
+<Step title="Get your connection string">
+
+Your RDS connection string looks like:
+
+```
+postgresql://user:password@your-instance.region.rds.amazonaws.com:5432/mydb
+```
+
+You can find the hostname in the **RDS Console > Databases > your instance > Connectivity & security**.
+
+</Step>
+
+<Step title="Connect your database">
+
+```bash
+ardent connector create postgresql postgresql://user:password@your-instance.region.rds.amazonaws.com:5432/mydb
+```
+
+Ardent will verify your setup and begin replicating your database. This may take a few minutes depending on data size.
+
+</Step>
+
+<Step title="Create your first branch">
+
+```bash
+ardent branch create my-feature
+```
+
+Done. You now have an isolated copy of your RDS database — schema, data, and all. The CLI returns a connection URL you can use anywhere.
+
+</Step>
+</Steps>

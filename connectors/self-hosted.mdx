@@ -1,0 +1,64 @@
+---
+title: "Self-hosted Postgres"
+description: "Connect any Postgres database with logical replication"
+---
+
+Any Postgres instance with logical replication enabled works with Ardent.
+
+<Steps>
+<Step title="Enable logical replication">
+
+Set `wal_level = logical` in your `postgresql.conf`:
+
+```sql
+ALTER SYSTEM SET wal_level = 'logical';
+```
+
+Then restart Postgres for the change to take effect.
+
+</Step>
+
+<Step title="Check replication slots">
+
+Make sure you have at least 1 available replication slot:
+
+```sql
+SELECT * FROM pg_replication_slots;
+```
+
+</Step>
+
+<Step title="Grant replication permissions">
+
+Ensure your user has the `REPLICATION` privilege:
+
+```sql
+ALTER USER your_user WITH REPLICATION;
+```
+
+</Step>
+
+<Step title="Connect your database">
+
+```bash
+ardent connector create postgresql postgresql://user:password@your-host:5432/mydb
+```
+
+Ardent will verify your setup and begin replicating your database. This may take a few minutes depending on data size.
+
+<Tip>
+  Not sure if your database is ready? Just run the command — Ardent checks all prerequisites during setup and tells you what's missing.
+</Tip>
+
+</Step>
+
+<Step title="Create your first branch">
+
+```bash
+ardent branch create my-feature
+```
+
+Done. You now have an isolated copy of your database — schema, data, and all. The CLI returns a connection URL you can use anywhere.
+
+</Step>
+</Steps>

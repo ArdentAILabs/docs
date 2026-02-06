@@ -1,0 +1,46 @@
+---
+title: "FAQ"
+description: "Common questions answered"
+---
+
+<AccordionGroup>
+
+<Accordion title="What databases does Ardent support?">
+  Postgres — including Supabase, AWS RDS, Neon, and self-hosted. More databases coming soon.
+</Accordion>
+
+<Accordion title="How long does it take to create a branch?">
+  Under 6 seconds, regardless of database size. The initial connector setup takes longer depending on data size, but after that every branch is instant.
+</Accordion>
+
+<Accordion title="Does branching affect my production database?">
+  No. Ardent uses logical replication to sync your data. Your production database is never written to or modified.
+</Accordion>
+
+<Accordion title="What happens to idle branches?">
+  They auto-suspend after 5 minutes of inactivity. When you reconnect, they spin back up instantly.
+</Accordion>
+
+<Accordion title="Can I use branches with AI agents?">
+  Yes. Create a branch and pass the connection URL to Claude Code, Cursor, or any agent. They can read, write, and run migrations without touching production.
+
+  Ardent generates a unique connection string for each branch — your real database credentials are never exposed. If a branch URL is ever compromised, your production data stays safe because the branch connection string has no access to the original database. An LLM will never see or have access to your real credentials.
+</Accordion>
+
+<Accordion title="Do branches stay in sync with production?">
+  Branches are created from a continuously synced replica of your production database. Once a branch is created, it's a snapshot from that point — changes you make on the branch are isolated.
+</Accordion>
+
+<Accordion title="How many branches can I create?">
+  As many as you need. Branches are lightweight copy-on-write forks — they only use additional storage for data you change.
+</Accordion>
+
+<Accordion title="Does my team share branches?">
+  Yes — just like git. Everyone on your team can see, switch to, and collaborate on branches. Use `ardent invite` to add people to your org.
+</Accordion>
+
+<Accordion title="What Postgres features work on branches?">
+  Everything. Branches are full Postgres databases — extensions, triggers, RLS, functions, all of it.
+</Accordion>
+
+</AccordionGroup>
