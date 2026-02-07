@@ -43,6 +43,10 @@ description: "Common questions answered"
   Everything. Branches are full Postgres databases — extensions, triggers, RLS, functions, all of it.
 </Accordion>
 
+<Accordion title="Can I build this myself?">
+  Yes. You'd need to set up logical replication (WAL configuration, replication slots, schema drift, failure recovery — database replication is a nightmare), build a branching engine, build a connection proxy that routes to the right branch, handle auto-suspend and resume, manage credential isolation, and build a CLI on top of all of it. We've spent thousands of engineering hours building and maintaining this infrastructure. Ardent gives you all of it in one `npm install`.
+</Accordion>
+
 <Accordion title="Is my production data safe?">
   Yes — see our [Security](/security) page for full details.
 </Accordion>
