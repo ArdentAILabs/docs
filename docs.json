@@ -32,7 +32,8 @@
           {
             "group": "Reference",
             "pages": [
-              "cli-reference"
+              "cli-reference",
+              "security"
             ]
           },
           {

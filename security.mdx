@@ -1,0 +1,30 @@
+---
+title: "Security"
+description: "How Ardent keeps your data safe"
+---
+
+Ardent is designed to never put your production data at risk. Here's how.
+
+## Production is read-only
+
+Ardent uses logical replication to sync your data — it only reads from your production database. It never writes to it or modifies it.
+
+## Credentials are never exposed
+
+Every branch gets its own generated connection string. Your real database credentials are never shared — not with agents, not with team members, not with Ardent itself.
+
+If a branch URL is ever compromised, it has zero access to your original database. This makes it safe to hand branch URLs to AI agents like Claude Code or Cursor without worrying about your production credentials leaking.
+
+Branches are also controlled by Ardent's layer which allows you to intantly de-provision a branch given 
+
+## Branches are isolated
+
+Each branch is a fully independent copy. Changes on one branch don't affect production or any other branch. When you're done, delete it or let it auto-suspend — nothing persists unless you want it to.
+
+## Enterprise / VPC deployments
+
+For teams with data residency or compliance requirements, Ardent can be deployed inside your VPC. The read replica and all branches live on your infrastructure — your data never leaves your network. Ardent acts as the orchestration layer only.
+
+<Card title="Talk to us about enterprise" icon="building" href="mailto:vikram@tryardent.com" horizontal>
+  Contact vikram@tryardent.com for VPC and on-prem deployments.
+</Card>
