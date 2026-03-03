@@ -7,7 +7,7 @@
     "light": "#07C983",
     "dark": "#15803D"
   },
-  "favicon": "/favicon.png",
+  "favicon": "/favicon.svg",
   "navigation": {
     "tabs": [
       {
@@ -33,7 +33,8 @@
             "group": "Reference",
             "pages": [
               "cli-reference",
-              "security"
+              "security",
+              "pricing"
             ]
           },
           {
