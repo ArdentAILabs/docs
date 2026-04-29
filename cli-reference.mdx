@@ -7,15 +7,42 @@ description: "Every command, flag, and option"
 
 ### ardent login
 
-Opens your browser to authenticate with GitHub or email.
+Opens your browser to authenticate with GitHub or email. After login, Ardent automatically selects your project and connector if you only have one of each — so you can go straight to `ardent branch create`.
 
 ```bash
 ardent login
 ```
 
+Use `--token` to authenticate non-interactively (CI, scripts):
+
+```bash
+ardent login --token <your-token>
+```
+
+<Accordion title="Example output (single project + connector)">
+```
+✓ Logged in as vikram@tryardent.com
+
+  Auto-selected project 'my-app'
+  Auto-selected connector 'my-app-db'
+  Ready to branch:
+  ardent branch create <name>
+```
+</Accordion>
+
+<Accordion title="Example output (multiple projects)">
+```
+✓ Logged in as vikram@tryardent.com
+
+3 projects found.
+Next step: select a project: ardent project switch <name>
+List your projects: ardent project list
+```
+</Accordion>
+
 ### ardent logout
 
-Clears stored credentials.
+Clears all stored credentials and cached data.
 
 ```bash
 ardent logout
@@ -23,7 +50,7 @@ ardent logout
 
 ### ardent status
 
-Check your authentication status.
+Check your current authentication, project, and connector.
 
 ```bash
 ardent status
@@ -36,7 +63,85 @@ ardent status
 ```
 </Accordion>
 
+---
+
+## Projects
+
+Projects are the top-level grouping for your connectors and branches. Most users start with one project; the project commands become useful when you're managing multiple environments or teams.
+
+### ardent project create
+
+```bash
+ardent project create <name>
+```
+
+<Accordion title="Example output">
+```
+✓ Project 'staging' created
+```
+</Accordion>
+
+### ardent project list
+
+```bash
+ardent project list
+```
+
+The current project is marked with `*`.
+
+<Accordion title="Example output">
+```
+Projects:
+* my-app
+  staging
+  internal-tools
+```
+</Accordion>
+
+### ardent project switch
+
+Switch to a different project. Ardent clears your current connector selection and automatically selects the new project's connector if it has exactly one.
+
+```bash
+ardent project switch staging
+```
+
+<Accordion title="Example output (single connector in new project)">
+```
+Switched to project 'staging'
+
+  Auto-selected connector 'staging-db'
+```
+</Accordion>
+
+<Accordion title="Example output (multiple connectors in new project)">
+```
+Switched from 'my-app' to 'staging'
+
+  No connectors found.
+  Create one with: ardent connector create postgresql <url>
+```
+</Accordion>
+
+### ardent project delete
+
+```bash
+ardent project delete staging
+```
+
+<Accordion title="Example output">
+```
+Deleting project...
+✓ Project deleted
+  Name: staging
+```
+</Accordion>
+
+---
+
 ## Connectors
+
+A connector links Ardent to one of your Postgres databases. You need at least one before creating branches.
 
 ### ardent connector create
 
@@ -46,23 +151,41 @@ Connect a Postgres database. Ardent replicates your data during initial setup �
 ardent connector create postgresql postgresql://user:password@host:5432/mydb
 ```
 
+Give it a name with `-n`:
+
+```bash
+ardent connector create postgresql postgresql://user:password@host:5432/mydb -n prod-db
+```
+
 <Accordion title="Example output">
 ```
-✓ Connector created
-  Replicating database... this may take a few minutes depending on data size.
-  Once complete, branches will create in under 6 seconds.
+✓ Connector created and ready
+  ID: conn_abc123
+  Ready to branch:
+  ardent branch create <name>
 ```
 </Accordion>
 
-**BYOC (Neon):**
+**BYOC (Neon) — bring your own cloud:**
 
 ```bash
 ardent connector create postgresql --byoc neon --api-key <key> --project-id <id>
 ```
 
+**Self-hosted / customer-cloud deployment:**
+
+```bash
+ardent connector create postgresql <url> \
+  --deployment-model customer-cloud \
+  --aws-role-arn <arn> \
+  --aws-external-id <id> \
+  --aws-region us-east-1 \
+  --aws-cluster-name <cluster>
+```
+
 ### ardent connector list
 
-List all connected databases.
+List all connectors in the current project. The active connector is marked with `*`.
 
 ```bash
 ardent connector list
@@ -70,17 +193,32 @@ ardent connector list
 
 <Accordion title="Example output">
 ```
-ID          TYPE         STATUS     HOST
-conn_01     postgresql   healthy    db.example.com:5432
+Connectors:
+* ● prod-db
+  postgresql
+  ○ staging-db
+  postgresql
+```
+</Accordion>
+
+### ardent connector switch
+
+Switch the active connector without changing projects.
+
+```bash
+ardent connector switch staging-db
+```
+
+<Accordion title="Example output">
+```
+Switched from 'prod-db' to 'staging-db'
 ```
 </Accordion>
 
 ### ardent connector delete
 
-Remove a connected database.
-
 ```bash
-ardent connector delete conn_01
+ardent connector delete staging-db
 ```
 
 <Accordion title="Example output">
@@ -89,11 +227,13 @@ ardent connector delete conn_01
 ```
 </Accordion>
 
+---
+
 ## Branches
 
 ### ardent branch create
 
-Create a new isolated database branch. Automatically switches to it and returns the connection URL.
+Create a new isolated database branch. Automatically checks it out and returns the connection URL.
 
 ```bash
 ardent branch create my-feature
@@ -101,10 +241,9 @@ ardent branch create my-feature
 
 <Accordion title="Example output">
 ```
-✓ Branch created
-  Name:   my-feature
-  URL:    postgresql://user:pass@my-feature-postgres.routing.tryardent.com:5432/db
-  Status: active
+✓ Branch 'my-feature' created and checked out in 4.2s
+
+postgresql://user:pass@my-feature-postgres.routing.tryardent.com:5432/db
 ```
 </Accordion>
 
@@ -118,15 +257,16 @@ ardent branch list
 
 <Accordion title="Example output">
 ```
-NAME          STATUS      CREATED
-* my-feature  active      2 minutes ago
-  staging     suspended   3 hours ago
+* ● my-feature
+  postgresql://...my-feature...tryardent.com/db
+  ○ staging
+  postgresql://...staging...tryardent.com/db
 ```
 </Accordion>
 
 ### ardent branch info
 
-Show details and connection URL for a branch.
+Show details and connection URL for a branch. Defaults to the current branch if no name is given.
 
 ```bash
 ardent branch info my-feature
@@ -155,25 +295,9 @@ ardent branch switch staging
 ```
 </Accordion>
 
-### ardent branch diff
-
-See what changed since the branch was created.
-
-```bash
-ardent branch diff
-```
-
-<Accordion title="Example output">
-```
-Tables modified: 2
-  users    +15 rows, -0 rows, ~3 modified
-  orders   +0 rows, -2 rows, ~0 modified
-```
-</Accordion>
-
 ### ardent branch delete
 
-Delete a branch. Note: branches auto-suspend after 5 minutes of inactivity, so cleanup is optional.
+Delete a branch. Branches auto-suspend after 5 minutes of inactivity, so cleanup is optional.
 
 ```bash
 ardent branch delete my-feature
@@ -185,14 +309,72 @@ ardent branch delete my-feature
 ```
 </Accordion>
 
+---
+
+## Settings
+
+Connector-scoped settings that apply to every branch created from the active connector.
+
+| Key | Description |
+|-----|-------------|
+| `default_db` | Default database name used in branch connection strings |
+| `branch_sql` | SQL (or `@path/to/file.sql`) executed automatically on each new branch |
+
+### ardent settings list
+
+```bash
+ardent settings list
+```
+
+<Accordion title="Example output">
+```
+Connector: prod-db
+  default_db   myapp
+  branch_sql   (not set)  — SQL run on every new branch
+```
+</Accordion>
+
+### ardent settings set
+
+```bash
+ardent settings set default_db myapp
+```
+
+Pass a file for `branch_sql`:
+
+```bash
+ardent settings set branch_sql @./seed.sql
+```
+
+<Accordion title="Example output">
+```
+✓ Set default_db → myapp
+```
+</Accordion>
+
+### ardent settings remove
+
+```bash
+ardent settings remove branch_sql
+```
+
+<Accordion title="Example output">
+```
+✓ Removed branch_sql
+```
+</Accordion>
+
+---
+
 ## Team management
 
 ### ardent invite
 
-Invite a user to your organization.
+Invite a user to your organization. Default role is `member`.
 
 ```bash
 ardent invite alice@company.com
+ardent invite alice@company.com admin
 ```
 
 <Accordion title="Example output">
@@ -202,8 +384,6 @@ ardent invite alice@company.com
 </Accordion>
 
 ### ardent invite list
-
-List pending invites.
 
 ```bash
 ardent invite list
@@ -218,21 +398,17 @@ alice@company.com    pending    1 hour ago
 
 ### ardent invite delete
 
-Revoke a pending invite.
-
 ```bash
 ardent invite delete alice@company.com
 ```
 
 <Accordion title="Example output">
 ```
-✓ Invite revoked for alice@company.com
+✓ Invite for alice@company.com deleted
 ```
 </Accordion>
 
 ### ardent org members
-
-List organization members.
 
 ```bash
 ardent org members
@@ -248,7 +424,7 @@ Alice    alice@company.com    member
 
 ### ardent org set-role
 
-Update a member's role.
+Available roles: `owner`, `admin`, `member`, `viewer`.
 
 ```bash
 ardent org set-role alice@company.com admin
@@ -261,8 +437,6 @@ ardent org set-role alice@company.com admin
 </Accordion>
 
 ### ardent org remove
-
-Remove a member from the organization.
 
 ```bash
 ardent org remove alice@company.com
