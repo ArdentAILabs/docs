@@ -21,11 +21,11 @@
             ]
           },
           {
-            "group": "Connectors",
+            "group": "PostgreSQL",
             "pages": [
               "connectors/supabase",
               "connectors/rds",
-              "connectors/neon",
+              "connectors/planetscale",
               "connectors/self-hosted"
             ]
           },
