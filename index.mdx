@@ -26,21 +26,28 @@ An instant database for every task.
 
 ## Start making Database copies in just 4 commands
 
-```bash
-npm install -g ardent-cli
-```
-
-```bash
-ardent login
-```
-
-```bash
-ardent connector create postgresql <your-connection-string>
-```
-
-```bash
-ardent branch create my-feature
-```
+<Steps>
+  <Step title="Install the CLI">
+    ```bash
+    npm install -g ardent-cli
+    ```
+  </Step>
+  <Step title="Log in">
+    ```bash
+    ardent login
+    ```
+  </Step>
+  <Step title="Connect your database">
+    ```bash
+    ardent connector create postgresql <your-connection-string>
+    ```
+  </Step>
+  <Step title="Create a branch">
+    ```bash
+    ardent branch create my-feature
+    ```
+  </Step>
+</Steps>
 
 That's it. You can make full, isolated copies of your database — ready in under 6 seconds regardless of data size.
 
