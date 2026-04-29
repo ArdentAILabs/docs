@@ -21,12 +21,18 @@
             ]
           },
           {
-            "group": "PostgreSQL",
+            "group": "Connectors",
             "pages": [
-              "connectors/supabase",
-              "connectors/rds",
-              "connectors/planetscale",
-              "connectors/self-hosted"
+              {
+                "group": "PostgreSQL",
+                "collapsed": false,
+                "pages": [
+                  "connectors/supabase",
+                  "connectors/rds",
+                  "connectors/planetscale",
+                  "connectors/self-hosted"
+                ]
+              }
             ]
           },
           {
