@@ -15,8 +15,11 @@ Only metadata (schema structure, replication status, branch state) flows from th
 ```mermaid actions={false}
 flowchart TB
     subgraph CP["Control plane"]
-        direction LR
-        ORCH["Branch orchestration"] --- ROUTE["Connection routing"] --- HEALTH["Health and WAL monitoring"] --- POL["Policies and auth"]
+        direction TB
+        ORCH["Branch orchestration"]
+        ROUTE["Connection routing"]
+        HEALTH["Health and WAL monitoring"]
+        POL["Policies and auth"]
     end
     subgraph DP["Data plane"]
         direction LR
