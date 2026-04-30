@@ -5,34 +5,63 @@ description: "A fresh database for every PR. Isolated, production-like, torn dow
 
 Every PR gets its own fresh database cloned from production, torn down after merge. No shared staging that drifts out of sync. No test runs that corrupt each other.
 
-## GitHub Actions example
+## Setup
 
-The CLI needs to authenticate before running any commands. In CI, use `ardent login --token` with a token stored in your repo secrets. This creates a local session the same way `ardent login` does interactively.
+1. Create an API token in the [Ardent dashboard](https://app.tryardent.com) (or `POST /v1/orgs/{org_id}/api-keys`).
+2. Add the token as a repository secret called **`ARDENT_TOKEN`** in **Settings > Secrets and variables > Actions**.
 
-After login, create the branch. The CLI doesn't expose the URL as a structured output yet, so grab it from `ardent branch info` and append it to `GITHUB_ENV` so later steps (npm, pytest, your migration runner) see `DATABASE_URL`.
+## GitHub Actions workflow
+
+Copy this to `.github/workflows/ardent-branch.yml`. It creates an isolated database branch for every PR, makes `DATABASE_URL` available to your tests, and cleans up after.
 
 ```yaml
-- name: Install Ardent CLI
-  run: npm install -g ardent-cli
+name: Test with Ardent branch
 
-- name: Log in to Ardent
-  run: ardent login --token ${{ secrets.ARDENT_TOKEN }}
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
 
-- name: Create database branch
-  run: |
-    NAME="pr-${{ github.event.pull_request.number }}"
-    ardent branch create "$NAME"
-    echo "DATABASE_URL=$(ardent branch info | awk '/URL:/{print $2}')" >> "$GITHUB_ENV"
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-- name: Run migrations + tests
-  run: npm test
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
 
-- name: Delete branch
-  if: always()
-  run: ardent branch delete pr-${{ github.event.pull_request.number }}
+      - name: Install Ardent CLI
+        run: npm install -g ardent-cli
+
+      - name: Log in to Ardent
+        run: ardent login --token ${{ secrets.ARDENT_TOKEN }}
+
+      - name: Select project and connector
+        run: |
+          ardent project switch <your-project>
+          ardent connector switch <your-connector>
+
+      - name: Create database branch
+        run: |
+          BRANCH_NAME="pr-${{ github.event.pull_request.number }}-${{ github.run_id }}"
+          ardent branch create "$BRANCH_NAME"
+          echo "DATABASE_URL=$(ardent branch info | awk '/URL:/{print $2}')" >> "$GITHUB_ENV"
+          echo "ARDENT_BRANCH=$BRANCH_NAME" >> "$GITHUB_ENV"
+
+      - name: Run tests
+        run: npm test
+
+      - name: Delete database branch
+        if: always()
+        run: ardent branch delete "$ARDENT_BRANCH"
 ```
 
-Use the same `DATABASE_URL` for `pytest`, `pnpm test`, or any tool your repo already uses in CI. If your framework reads a different variable, write that name to `GITHUB_ENV` instead.
+Replace `<your-project>` and `<your-connector>` with the names from `ardent project list` and `ardent connector list`. If you only have one of each, the CLI auto-selects after login and you can skip that step.
+
+Replace `npm test` with whatever your project uses (`pytest`, `pnpm test`, `make test`, etc.). `DATABASE_URL` is available to every step after the create step. If your framework reads a different env var, change the name in the `echo` line.
+
+The branch name includes the PR number and run ID so concurrent runs and re-runs don't collide. `if: always()` on the delete step ensures cleanup even when tests fail.
 
 ## Why this beats a shared staging database
 
