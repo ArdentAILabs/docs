@@ -318,7 +318,11 @@ Connector-scoped settings that apply to every branch created from the active con
 | Key | Description |
 |-----|-------------|
 | `default_db` | Default database name used in branch connection strings |
-| `branch_sql` | SQL (or `@path/to/file.sql`) executed automatically on each new branch |
+| `branch_sql` | SQL (or `@path/to/file.sql`) run automatically on each **new** branch after creation. Use for seeds, anonymization, or policy scripts. |
+
+### Anonymization
+
+Use `branch_sql` to mask or transform data on every new branch (for example `UPDATE users SET email = 'redacted@example.com'` or hashing columns). See [Security](/security#branch-anonymization) for the full picture.
 
 ### ardent settings list
 
@@ -330,7 +334,7 @@ ardent settings list
 ```
 Connector: prod-db
   default_db   myapp
-  branch_sql   (not set)  — SQL run on every new branch
+  branch_sql   (not set)  SQL run on every new branch
 ```
 </Accordion>
 

@@ -15,9 +15,23 @@ Every branch gets its own generated connection string. Your real database creden
 
 If a branch URL is ever compromised, it has zero access to your original database. This makes it safe to hand branch URLs to AI agents like Claude Code or Cursor without worrying about your production credentials leaking.
 
-Branches are also controlled by Ardent's layer which allows you to intantly de-provision a branch given 
+Branches are controlled through Ardent's connection layer, so you can delete or de-provision them at any time.
 
-## Branches are isolated
+## Branch anonymization
+
+Branches default to a full copy of your production data. When you need realistic schema and relationships but not real PII, you can run connector-scoped SQL on **every new branch** after it is created.
+
+Set it with the CLI:
+
+```bash
+ardent settings set branch_sql @./scripts/anonymize-branch.sql
+```
+
+Or paste SQL inline (large scripts are easier as a file with `@path`).
+
+Your script might `UPDATE` columns to hashed or synthetic values, redact free-text fields, or trim tables that should never leave production. Execution is **idempotent per branch**: if Ardent re-runs the hook for that branch, successful runs are not duplicated.
+
+This is the same **`branch_sql`** setting documented in the [CLI reference](/cli-reference#settings). There is no separate anonymization toggle: you own the SQL, so you stay in control of exactly what changes.
 
 Each branch is a fully independent copy. Changes on one branch don't affect production or any other branch. When you're done, delete it or let it auto-suspend — nothing persists unless you want it to.
 
