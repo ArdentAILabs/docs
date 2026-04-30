@@ -7,6 +7,9 @@
     "light": "#07C983",
     "dark": "#15803D"
   },
+  "icons": {
+    "library": "lucide"
+  },
   "favicon": "/favicon.svg",
   "redirects": [
     {
@@ -18,16 +21,19 @@
     "tabs": [
       {
         "tab": "Documentation",
+        "icon": "book-open",
         "groups": [
           {
             "group": "Getting started",
+            "icon": "rocket",
             "pages": [
               "index",
               "quickstart"
             ]
           },
           {
-            "group": "Using Ardent",
+            "group": "Examples",
+            "icon": "waypoints",
             "pages": [
               "workflows/ai-agents",
               "workflows/local-dev",
@@ -37,9 +43,11 @@
           },
           {
             "group": "Connectors",
+            "icon": "unplug",
             "pages": [
               {
                 "group": "PostgreSQL",
+                "icon": "database",
                 "collapsed": false,
                 "pages": [
                   "connectors/supabase",
@@ -51,14 +59,16 @@
             ]
           },
           {
-            "group": "Reference",
+            "group": "Concepts",
+            "icon": "layers",
             "pages": [
               "architecture",
               "security"
             ]
           },
           {
-            "group": "Support",
+            "group": "Help",
+            "icon": "circle-help",
             "pages": [
               "faq",
               "contact"
@@ -68,22 +78,55 @@
       },
       {
         "tab": "CLI / API reference",
+        "icon": "square-terminal",
         "groups": [
           {
             "group": "CLI",
+            "icon": "terminal",
             "pages": [
               "cli/overview",
-              "cli/auth",
-              "cli/projects",
-              "cli/connectors",
-              "cli/branches",
-              "cli/settings",
-              "cli/org"
+              {
+                "group": "Workspace",
+                "icon": "folder-key",
+                "expanded": true,
+                "pages": [
+                  "cli/auth",
+                  "cli/projects"
+                ]
+              },
+              {
+                "group": "Databases",
+                "icon": "cylinder",
+                "expanded": true,
+                "pages": [
+                  "cli/connectors",
+                  "cli/branches"
+                ]
+              },
+              {
+                "group": "Policies",
+                "icon": "sliders-horizontal",
+                "expanded": true,
+                "pages": [
+                  "cli/settings"
+                ]
+              },
+              {
+                "group": "Team",
+                "icon": "users",
+                "expanded": true,
+                "pages": [
+                  "cli/org"
+                ]
+              }
             ]
           },
           {
             "group": "API",
-            "pages": ["api-reference"]
+            "icon": "braces",
+            "pages": [
+              "api-reference"
+            ]
           }
         ]
       }
