@@ -12,21 +12,20 @@ Only metadata (schema structure, replication status, branch state) flows from th
 
 ## How it works
 
-```mermaid
+```mermaid actions={false}
+%%{init: {'flowchart': {'defaultRenderer': 'elk'}}}%%
 flowchart TB
-    subgraph CP["Control Plane · Always operated by Ardent"]
+    subgraph CP["Control plane"]
         direction LR
-        ORCH["Branch orchestration"] ~~~ ROUTE["Connection routing"] ~~~ HEALTH["Health & WAL monitoring"] ~~~ POL["Policies & auth"]
+        ORCH["Branch orchestration"] --- ROUTE["Connection routing"] --- HEALTH["Health and WAL monitoring"] --- POL["Policies and auth"]
     end
-
-    subgraph DP["Data Plane · Ardent Cloud or your infrastructure"]
+    subgraph DP["Data plane"]
         direction LR
-        PROD[("Your\nproduction DB")] -->|"logical replication"| AR["Ardent Replicator\n+ Kafka pipeline"]
-        AR --> REP[("Read\nreplica")]
-        REP -->|"copy-on-write fork + compute"| BR[("Branches")]
+        PROD[("Your<br/>production DB")] -->|logical replication| AR["Ardent Replicator<br/>+ Kafka pipeline"]
+        AR --> REP[("Read<br/>replica")]
+        REP -->|copy-on-write fork + compute| BR[("Branches")]
     end
-
-    CP <-->|"metadata only"| DP
+    CP <-->|metadata only| DP
 ```
 
 ## What each layer does for you
