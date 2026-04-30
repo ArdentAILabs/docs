@@ -20,6 +20,11 @@ jobs:
       - name: Log in to Ardent
         run: ardent login --token ${{ secrets.ARDENT_TOKEN }}
 
+      - name: Select project and connector
+        run: |
+          ardent project switch newer-testing
+          ardent connector switch new-connector
+
       - name: Create database branch
         run: |
           BRANCH_NAME="pr-${{ github.event.pull_request.number }}-${{ github.run_id }}"
