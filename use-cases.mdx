@@ -1,0 +1,113 @@
+---
+title: "Use cases"
+description: "How teams use Ardent"
+---
+
+<CardGroup cols={3}>
+  <Card title="AI agents" icon="robot" href="#ai-agents">
+    Give Claude or Cursor a real database to work against. No mocks, no risk.
+  </Card>
+  <Card title="CI / CD" icon="circle-check" href="#ci-cd">
+    A fresh database for every PR. Tear it down after merge.
+  </Card>
+  <Card title="Local dev" icon="laptop" href="#local-dev">
+    Branch before every task. Break things freely. Delete when done.
+  </Card>
+</CardGroup>
+
+---
+
+## AI agents
+
+Agents are only as good as the data they can work with. Mocked data misses edge cases. Shared staging gets corrupted. Production is off-limits.
+
+Ardent gives every agent run its own isolated copy of your real database — spun up in under 6 seconds, handed off as a connection URL, thrown away when the task is done.
+
+**The pattern:**
+
+```bash
+# Create a branch for the agent task
+ardent branch create agent-task
+
+# Hand the URL to your agent
+# → postgresql://...agent-task...tryardent.com/db
+
+# Agent writes migrations, runs queries, tests against real data
+# When it's done, clean up
+ardent branch delete agent-task
+```
+
+**Want Claude to do this automatically?** Paste this into Claude Code or Cursor:
+
+```
+I'm working on [describe task]. Before making any database changes,
+create an Ardent branch with `ardent branch create <branch-name>`,
+use the returned connection URL for all database work, and delete
+the branch when we're done. Never touch the main connection string.
+```
+
+No more giving agents access to production. No more seed scripts. Just real data, safely isolated.
+
+---
+
+## CI / CD
+
+Every PR gets its own fresh database, seeded from production, torn down after merge. No shared staging that drifts out of sync. No test runs that corrupt each other.
+
+**GitHub Actions example:**
+
+```yaml
+- name: Create database branch
+  run: ardent branch create pr-${{ github.event.pull_request.number }}
+  env:
+    ARDENT_TOKEN: ${{ secrets.ARDENT_TOKEN }}
+
+- name: Run migrations + tests
+  run: npm test
+  env:
+    DATABASE_URL: ${{ steps.branch.outputs.url }}
+
+- name: Delete branch
+  if: always()
+  run: ardent branch delete pr-${{ github.event.pull_request.number }}
+  env:
+    ARDENT_TOKEN: ${{ secrets.ARDENT_TOKEN }}
+```
+
+**Why this beats a shared staging database:**
+- Each PR is isolated — tests can't interfere with each other
+- Schema is always in sync with production — no drift
+- Branches auto-suspend when idle — you're not paying for a database that sits unused between CI runs
+- Cleanup is automatic — no orphaned environments to manage
+
+---
+
+## Local dev
+
+The rule: branch before you touch the database. Every time.
+
+Takes 6 seconds. Means you can run any migration, drop any table, try any index — and if it breaks, delete the branch and start over. Your production data is never at risk.
+
+```bash
+# Starting a new feature
+ardent branch create my-feature
+
+# Work, run migrations, break things
+psql postgresql://...my-feature...tryardent.com/db
+
+# Done — or it all went wrong — either way:
+ardent branch delete my-feature
+```
+
+**Working with multiple tasks?** Keep a branch per task:
+
+```bash
+ardent branch list
+# * ● my-feature
+#   ○ auth-refactor
+#   ○ index-experiment
+
+ardent branch switch auth-refactor
+```
+
+Branches auto-suspend after 5 minutes of inactivity. You can leave them running — they won't cost you anything while idle.
