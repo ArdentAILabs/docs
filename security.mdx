@@ -17,6 +17,10 @@ If a branch URL is ever compromised, it has zero access to your original databas
 
 Branches are controlled through Ardent's connection layer, so you can delete or de-provision them at any time.
 
+## All secrets are encrypted
+
+All secrets (connection strings, credentials, API keys) are encrypted at rest. Nothing is stored unencrypted. In **managed, your cloud** deployments, secrets live in your own infrastructure (for example AWS SSM Parameter Store). Ardent reads them at runtime but never persists your credentials on Ardent infrastructure.
+
 ## Branch anonymization
 
 Branches default to a full copy of your production data. When you need realistic schema and relationships but not real PII, you can run connector-scoped SQL on **every new branch** after it is created.
@@ -35,9 +39,11 @@ This is the same **`branch_sql`** setting documented in [CLI settings](/cli/sett
 
 Each branch is a fully independent copy. Changes on one branch don't affect production or any other branch. When you're done, delete it or let it auto-suspend — nothing persists unless you want it to.
 
-## Managed, your cloud
+## Data residency
 
-For teams with data residency or compliance requirements, Ardent can deploy the data plane into your own cloud account. The read replica and all branches live on your infrastructure. Your data never leaves your network. Ardent still manages everything via the control plane.
+In **fully managed** mode, your data lives on Ardent's cloud infrastructure. In **managed, your cloud** mode, the entire data plane (read replica, branches, and secrets) lives in your own cloud account. Your data never leaves your network. Ardent still manages everything via the control plane.
+
+For teams with data residency or compliance requirements, the **managed, your cloud** deployment keeps all data and credentials inside your infrastructure while Ardent handles orchestration.
 
 <Card title="Talk to us" icon="building" href="mailto:vikram@tryardent.com" horizontal>
   Contact vikram@tryardent.com to run the data plane in your cloud.
