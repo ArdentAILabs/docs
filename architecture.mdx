@@ -1,56 +1,68 @@
 ---
 title: "Architecture"
-description: "How Ardent works under the hood — control plane, data plane, and deployment options"
+description: "How Ardent works — control plane, data plane, and deployment options"
 ---
 
-Ardent is built around two planes: a **control plane** that Ardent always manages, and a **data plane** where your data and compute live. The data plane can be hosted by Ardent or by you.
+Ardent is built around two planes: a **control plane** that Ardent always operates, and a **data plane** where your data lives and branches are computed. The data plane can be hosted by Ardent or deployed into your own infrastructure.
 
 ## The two planes
 
 ```mermaid
-flowchart LR
-    subgraph CP["Control Plane (always Ardent)"]
-        direction TB
-        CLI["CLI & API"]
+flowchart TB
+    CLI["CLI / API"] --> CP
+
+    subgraph CP["Control Plane · Always operated by Ardent"]
+        direction LR
         ORCH["Branch orchestration"]
-        META["Metadata & auth"]
-        DASH["Web dashboard"]
+        DISC["Schema discovery"]
+        HEALTH["Replication health\n& WAL monitoring"]
+        PROXY["Connection routing\n*.routing.tryardent.com"]
+        POLICY["Policies engine"]
+        AUTH["Auth & access control"]
+        BILLING["Usage & billing"]
     end
 
-    subgraph DP["Data Plane (Ardent-hosted or self-hosted)"]
-        direction TB
-        PROD[("Your production DB")]
-        REP["Replication"]
+    CP <-->|"orchestrates"| DP
+
+    subgraph DP["Data Plane · Ardent-hosted or self-hosted"]
+        direction LR
+        REP["Ardent Replicator\n(CDC + Kafka pipeline)"]
         REPLICA[("Read replica")]
         BRANCHES[("Branches")]
     end
 
-    CLI --> ORCH
-    ORCH -->|"create / delete / switch"| BRANCHES
-    PROD --> REP --> REPLICA
+    PROD[("Your production\ndatabase")] -->|"logical replication"| REP
+    REP --> REPLICA
     REPLICA -->|"copy-on-write fork"| BRANCHES
 ```
 
-### Control plane
+---
 
-The control plane is always operated by Ardent. It handles:
+## Control plane
 
-- The CLI and REST API
-- Branch lifecycle management — create, switch, delete
-- Authentication and access control
-- Your web dashboard and billing
+The control plane is always operated by Ardent. It's the brain of the platform — every CLI command, every branch operation, every health check flows through it.
 
-You never run this yourself. It's the SaaS layer that makes everything work.
+**What it manages:**
 
-### Data plane
+- **Branch orchestration** — create, suspend, delete, and switch branches on demand; enforces branch lifecycle and auto-suspend after inactivity
+- **Schema discovery** — when you connect a database, the control plane inspects your schema, validates replication prerequisites, and configures the replication pipeline
+- **Replication health & WAL monitoring** — continuously monitors replication lag, WAL slot health, and CDC pipeline status; automatically quarantines and recovers from failures
+- **Connection routing** — every branch URL (`*.routing.tryardent.com`) is resolved in real time by the routing proxy, which looks up the live branch endpoint and pipes your connection through
+- **Policies engine** — connector-scoped policies like `default_db` and `branch_sql` hooks that apply automatically to every branch on a connector
+- **Auth & access control** — JWT, API keys, org-level RBAC, invites, and role management
+- **Usage & billing** — tracks branch hours and storage, Stripe-integrated
 
-The data plane is where your data actually lives and where branches are computed. It contains:
+---
 
-- The replication layer that syncs from your production database
-- The read replica that branches fork from
-- The branch compute — each branch is a lightweight copy-on-write fork of the replica
+## Data plane
 
-**This is the layer you can choose to host yourself.**
+The data plane is where your data actually lives and where branches are computed. It has three components:
+
+**Ardent Replicator** — the replication engine that runs as a managed service inside the data plane. It connects to your production database via logical replication, processes the change stream through a Kafka pipeline, and keeps the read replica continuously in sync. This is the component you deploy into your own infrastructure on the Scale plan.
+
+**Read replica** — a continuously updated copy of your production database. Branches are forked from here, not from production directly — so your production database is never under branch load.
+
+**Branches** — lightweight copy-on-write forks of the read replica. Only the changes you make on a branch consume additional storage. Creating a branch takes under 6 seconds regardless of database size.
 
 ---
 
@@ -59,33 +71,22 @@ The data plane is where your data actually lives and where branches are computed
 | | **Ardent Cloud** | **Self-hosted** | **Enterprise** |
 |---|---|---|---|
 | **Control plane** | Ardent | Ardent | Ardent |
-| **Data plane** | Ardent | You | Custom |
+| **Ardent Replicator** | Ardent's infrastructure | Your infrastructure | Your infrastructure |
+| **Data leaves your network** | Yes | No | No |
 | **Plan** | Free / Growth | Scale ($250/mo) | Enterprise |
-| **Data leaves your infra** | Yes | No | No |
-| **Custom networking** | — | Yes | Yes |
-| **On-prem / data residency** | — | — | Yes |
+| **Data residency** | — | Yes | Yes |
+| **Custom networking / on-prem** | — | — | Yes |
 
-### Ardent Cloud (default)
+### Ardent Cloud
 
-Ardent hosts everything. You connect your database, we handle replication, storage, and branch compute in our infrastructure. Fastest way to get started — works on the free tier and Growth plan.
+Ardent hosts the entire data plane. You connect your database and we handle the Ardent Replicator, the read replica, and branch compute in our infrastructure. Works on the free tier and Growth plan — fastest way to get started.
 
 ### Self-hosted data plane (Scale)
 
-On the Scale plan, you deploy the Ardent data plane into your own cloud account. Your data never leaves your infrastructure. Ardent's control plane still orchestrates branches via API, but all compute and storage runs in your VPC.
+On the Scale plan, the Ardent Replicator deploys into your own cloud account. Your data never leaves your infrastructure. The control plane still orchestrates everything via API — branch creates, health monitoring, routing — but all replication and branch compute runs inside your network.
 
-Good for teams with data residency requirements or who need branches to run inside their own network.
+Good for teams with data residency requirements, compliance constraints, or who need branches to run inside their own VPC.
 
 ### Enterprise
 
-Custom data plane deployment — on-prem, custom regions, dedicated infrastructure, custom networking. [Talk to us.](mailto:vikram@tryardent.com)
-
----
-
-## How branching works
-
-Regardless of where the data plane runs, the branching mechanism is the same:
-
-1. **Replication** — Ardent connects to your production database via logical replication and keeps a read replica in sync
-2. **Fork** — when you run `ardent branch create`, we take a copy-on-write snapshot of the replica. No data is duplicated — only changes you make on the branch consume additional storage
-3. **Isolation** — each branch is a fully independent Postgres database. Write to it, break it, delete it — your production database is never touched
-4. **Cleanup** — delete the branch and the storage is reclaimed instantly
+Custom deployment — on-prem, custom regions, dedicated infrastructure, bespoke networking. [Talk to us.](mailto:vikram@tryardent.com)
