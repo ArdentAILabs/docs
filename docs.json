@@ -48,7 +48,6 @@
             "group": "Reference",
             "pages": [
               "architecture",
-              "cli-reference",
               "security"
             ]
           },
@@ -57,6 +56,18 @@
             "pages": [
               "faq",
               "contact"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "CLI / API reference",
+        "groups": [
+          {
+            "group": "CLI & API",
+            "pages": [
+              "cli-reference",
+              "api-reference"
             ]
           }
         ]
