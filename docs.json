@@ -95,11 +95,18 @@
                 ]
               },
               {
-                "group": "Connectors & branches",
-                "icon": "route",
+                "group": "Connectors",
+                "icon": "unplug",
                 "expanded": true,
                 "pages": [
-                  "cli/connectors",
+                  "cli/connectors"
+                ]
+              },
+              {
+                "group": "Branches",
+                "icon": "git-branch",
+                "expanded": true,
+                "pages": [
                   "cli/branches"
                 ]
               },
