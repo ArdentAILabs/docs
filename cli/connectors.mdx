@@ -42,22 +42,25 @@ ardent connector create postgresql <url> \
 
 ### ardent connector list
 
-List all connectors in the current project. In the terminal, the **active** connector is **highlighted in green** and prefixed with `*`; other rows use default/dim text. `●` means healthy, `○` means not healthy. The service type (for example `postgresql`) prints on the line below each name. Warnings appear in yellow with a count on the name line and full text indented below.
+List all connectors in the current project. In the terminal, the **active** connector is **highlighted in green** and prefixed with `*`; other rows use default/dim text. The expandable example uses green and dim styling the same way. `●` means healthy, `○` means not healthy. The service type (for example `postgresql`) prints on the line below each name. Warnings appear in yellow with a count on the name line and full text indented below.
 
 ```bash
 ardent connector list
 ```
 
-<Accordion defaultOpen={false} title="Example output (colors omitted)">
-```
-Connectors:
-* ● prod-db
-    postgresql
-
-  ○ staging-db
-    postgresql
-
-```
+<Accordion defaultOpen={false} title="Example output">
+  <div className="font-mono text-[13px] leading-normal rounded-md border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-950">
+    <div className="text-zinc-800 dark:text-zinc-200">Connectors:</div>
+    <div className="text-green-600 dark:text-green-400">
+      <div>* ● prod-db</div>
+      <div>{"    "}postgresql</div>
+    </div>
+    <div className="h-3" aria-hidden />
+    <div className="text-zinc-500 dark:text-zinc-400">
+      <div>{"  "}○ staging-db</div>
+      <div>{"    "}postgresql</div>
+    </div>
+  </div>
 </Accordion>
 
 ### ardent connector switch
