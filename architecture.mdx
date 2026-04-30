@@ -5,29 +5,33 @@ description: "How Ardent's split-plane architecture keeps your data safe and you
 
 Ardent follows a split-plane architecture where the **control plane** and **data plane** are separated:
 
-- **Control plane** — Operated by Ardent. Handles branch orchestration, replication health monitoring, connection routing, auto-scaling, and the Kafka pipeline that keeps your replica in sync.
-- **Data plane** — Where your data lives. The Ardent Replicator continuously syncs from your production database and serves instant branch forks on demand.
+- **Control plane** — Operated by Ardent. Handles branch orchestration, replication health monitoring, connection routing, auto-scaling, and policy enforcement. Spans across all deployments.
+- **Data plane** — Where your data lives. The Ardent Replicator syncs from your production database via a Kafka pipeline into a read replica. Branches are instant copy-on-write forks off that replica.
 
-Only metadata (schema structure, replication status, branch state) is sent from the data plane to the control plane. Your actual data never leaves the data plane.
+Only metadata (schema structure, replication status, branch state) flows from the data plane to the control plane. Your actual data never leaves the data plane.
+
+## How it works
+
+```mermaid
+flowchart TB
+    subgraph CP["Control Plane · Always operated by Ardent"]
+        direction LR
+        ORCH["Branch orchestration"] ~~~ ROUTE["Connection routing"] ~~~ HEALTH["Health & WAL monitoring"] ~~~ POL["Policies & auth"]
+    end
+
+    subgraph DP["Data Plane · Ardent Cloud  —or—  your infrastructure"]
+        direction LR
+        PROD[("Your\nproduction DB")] -->|"logical replication"| AR["Ardent Replicator\n+ Kafka pipeline"]
+        AR --> REP[("Read\nreplica")]
+        REP -->|"copy-on-write fork"| BR[("Branches")]
+    end
+
+    CP <-->|"metadata only"| DP
+```
 
 ## Deployment options
 
-```mermaid
-flowchart LR
-    subgraph Cloud["Ardent Cloud deployment"]
-        direction LR
-        SRC1[("Your DB")] -->|"logical replication"| AR1["Ardent Replicator\n+ Kafka pipeline"]
-        AR1 --> B1[("Branches")]
-        CP1["Control Plane\n(Ardent)"] <-->|"metadata only"| AR1
-    end
-
-    subgraph SH["Self-hosted data plane (Scale / Enterprise)"]
-        direction LR
-        SRC2[("Your DB")] -->|"logical replication"| AR2["Ardent Replicator\n+ Kafka pipeline\n(your network)"]
-        AR2 --> B2[("Branches\n(your network)")]
-        CP2["Control Plane\n(Ardent)"] <-->|"metadata only"| AR2
-    end
-```
+The control plane is always Ardent's. The data plane can be ours or yours.
 
 | | **Ardent Cloud** | **Self-hosted** | **Enterprise** |
 |---|---|---|---|
@@ -37,14 +41,8 @@ flowchart LR
 | **Plan** | Free / Growth | Scale ($250/mo) | Enterprise |
 | **Data residency / on-prem** | — | — | Yes |
 
-### Ardent Cloud
+**Ardent Cloud** — We host the entire data plane. Connect your database and we handle the Ardent Replicator, Kafka pipeline, read replica, and branch compute. Available on all plans.
 
-Ardent hosts everything. Connect your database and we handle the rest — replication, Kafka, branch compute, auto-scaling. Fastest way to get started, available on all plans.
+**Self-hosted (Scale)** — The Ardent Replicator deploys into your own cloud account. Your data never leaves your infrastructure. The control plane still orchestrates everything via API, but all replication and branch compute runs inside your network.
 
-### Self-hosted (Scale)
-
-The Ardent Replicator deploys into your own cloud account. Your data never leaves your infrastructure. The control plane orchestrates branches and manages replication health via API, but all data processing runs inside your network.
-
-### Enterprise
-
-Custom deployment, on-prem, dedicated infrastructure, custom networking. [Talk to us.](mailto:vikram@tryardent.com)
+**Enterprise** — Custom deployment, on-prem, dedicated infrastructure. [Talk to us.](mailto:vikram@tryardent.com)
