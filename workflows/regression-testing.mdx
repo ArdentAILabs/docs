@@ -25,9 +25,7 @@ npm test
 ardent branch delete regression-run
 ```
 
-**One-line alternative:** `DATABASE_URL='…' npm test` sets the variable only for that one process, which is why it looked as if the URL and `npm test` had to share a line. That is valid shell, but `export` and a separate test command are easier to read and match how most people run pytest or rerun commands.
-
-**In CI:** create the branch in the job, assign the URL to `DATABASE_URL` (or wire it into your framework), run your test command, then delete the branch. See [CI / CD](/workflows/ci-cd) for a GitHub Actions–shaped example.
+**In CI:** see [CI / CD](/workflows/ci-cd) for a full GitHub Actions workflow you can copy into your repo.
 
 ## What this unlocks
 
