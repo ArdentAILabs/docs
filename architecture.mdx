@@ -13,6 +13,7 @@ Only metadata (schema structure, replication status, branch state) flows from th
 ## How it works
 
 ```mermaid actions={false}
+%%{init: {'themeCSS': ".cluster > rect { min-width: 42rem; }"}}%%
 flowchart TB
     subgraph CP["Control plane"]
         direction TB
@@ -25,9 +26,9 @@ flowchart TB
         direction LR
         PROD[("Production DB")] -->|logical replication| AR["Ardent Replicator + Kafka"]
         AR --> REP[("Read replica")]
-        REP --> B1[("Branch one")]
-        REP --> B2[("Branch two")]
-        REP --> B3[("Branch three")]
+        REP --> B1[("Branch 1")]
+        REP --> B2[("Branch 2")]
+        REP --> B3[("Branch 3")]
     end
     CP <-->|metadata only| DP
 ```
