@@ -48,7 +48,7 @@ Where your data physically lives and where branches are served from. Runs on Ard
 
 - **Ardent Replicator**
   - Takes logical replication from production through a Kafka-backed pipeline into the read replica.
-  - Handles DDL in flight so schema changes keep streaming without stalls or silent drift.
+  - Handles DDL in flight using **custom event triggers** that detect DDL on the primary and replay it **in order** on the replica, so schema changes keep streaming without stalls or silent drift.
   - Applies changes in order across failures so retries do not leave gaps or duplicates.
   - Manages WAL and slot pressure so replication does not destabilize the primary.
   - Quarantines, resumes, and recovers broken streams without manual replay scripts.
