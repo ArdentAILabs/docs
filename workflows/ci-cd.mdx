@@ -1,0 +1,33 @@
+---
+title: "CI / CD"
+description: "A fresh database for every PR. Isolated, production-like, torn down after merge."
+---
+
+Every PR gets its own fresh database seeded from production, torn down after merge. No shared staging that drifts out of sync. No test runs that corrupt each other.
+
+## GitHub Actions example
+
+```yaml
+- name: Create database branch
+  run: ardent branch create pr-${{ github.event.pull_request.number }}
+  env:
+    ARDENT_TOKEN: ${{ secrets.ARDENT_TOKEN }}
+
+- name: Run migrations + tests
+  run: npm test
+  env:
+    DATABASE_URL: ${{ steps.branch.outputs.url }}
+
+- name: Delete branch
+  if: always()
+  run: ardent branch delete pr-${{ github.event.pull_request.number }}
+  env:
+    ARDENT_TOKEN: ${{ secrets.ARDENT_TOKEN }}
+```
+
+## Why this beats a shared staging database
+
+- **Isolation** — each PR can't interfere with other test runs
+- **Always in sync** — branched from production, no drift
+- **No idle cost** — branches auto-suspend between CI runs
+- **Auto cleanup** — `if: always()` means no orphaned environments

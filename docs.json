@@ -17,8 +17,16 @@
             "group": "Getting started",
             "pages": [
               "index",
-              "quickstart",
-              "use-cases"
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Workflows",
+            "pages": [
+              "workflows/ai-agents",
+              "workflows/local-dev",
+              "workflows/ci-cd",
+              "workflows/regression-testing"
             ]
           },
           {
