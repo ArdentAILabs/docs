@@ -1,6 +1,23 @@
 ---
 title: "PlanetScale"
-description: "Connect your PlanetScale Postgres database"
+description: "Connect your PlanetScale Postgres database to Ardent"
+---
+
+**Want Claude to handle this?** Paste this into Claude Code or Cursor:
+
+```
+Check if my PlanetScale database is ready to connect to Ardent.
+My connection string: [paste here]
+
+Verify:
+1. The host is reachable and credentials work
+2. Logical replication is enabled in the PlanetScale dashboard
+3. The user has replication privileges
+
+Tell me exactly what to fix if anything fails, then run:
+ardent connector create postgresql <connection-string>
+```
+
 ---
 
 <Steps>

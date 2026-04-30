@@ -3,6 +3,24 @@ title: "Supabase"
 description: "Connect your Supabase Postgres database to Ardent"
 ---
 
+**Want Claude to handle this?** Paste this into Claude Code or Cursor:
+
+```
+Check if my Supabase database is ready to connect to Ardent.
+My connection string: [paste here]
+
+Verify:
+1. The host is reachable and credentials work
+2. Logical replication is enabled (it should be on by default)
+3. The user has replication privileges
+4. IPv4 is enabled (check pg_hba.conf or attempt a direct connection)
+
+Tell me exactly what to fix if anything fails, then run:
+ardent connector create postgresql <connection-string>
+```
+
+---
+
 <Steps>
 <Step title="Open the Connect dialog">
 
