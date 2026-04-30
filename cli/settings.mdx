@@ -11,7 +11,7 @@ The CLI command is `ardent settings`. Under the hood Ardent persists these as co
 | Key | Description |
 |-----|-------------|
 | `default_db` | Default database name used in branch connection strings |
-| `branch_sql` | SQL (or `@path/to/file.sql`) executed once on every **new** branch after it is created. This is the flexible hook: anonymization or masking, seed data, org-specific setup, or any `ALTER` / `UPDATE` you want every branch to start with |
+| `branch_sql` | SQL (or `@path/to/file.sql`) executed once on every **new** branch after it is created. This is the flexible hook: anonymization or masking, optional fixture or baseline rows, org-specific setup, or any `ALTER` / `UPDATE` you want every branch to start with |
 
 ### Branch configuration and anonymization
 
@@ -20,7 +20,7 @@ The CLI command is `ardent settings`. Under the hood Ardent persists these as co
 Typical uses:
 
 - **Anonymization or redaction** so branches get realistic shape without real PII
-- **Seed or fixture SQL** so every branch starts from a known baseline
+- **Fixture or baseline SQL** so every branch starts from a known baseline after the clone
 - **Guardrail DDL** or reference data your app expects on every isolated copy
 
 For security-focused anonymization patterns, see [Security](/security#branch-anonymization).
@@ -50,7 +50,7 @@ ardent settings set default_db myapp
 Pass a file for `branch_sql`:
 
 ```bash
-ardent settings set branch_sql @./seed.sql
+ardent settings set branch_sql @./branch-init.sql
 ```
 
 <Accordion defaultOpen={false} title="Example output">

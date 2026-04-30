@@ -1,11 +1,11 @@
 ---
 title: "AI agents"
-description: "Give agents a real database to work against — isolated, disposable, and seeded from production"
+description: "Give agents a real database to work against: isolated, disposable, cloned from production"
 ---
 
 Agents are only as good as the data they can work with. Mocked data misses edge cases. Shared staging gets corrupted. Production is off-limits.
 
-Ardent gives every agent run its own isolated copy of your real database — spun up in under 6 seconds, handed off as a connection URL, thrown away when the task is done.
+Ardent gives every agent run its own isolated copy of your real database: spun up in under 6 seconds, handed off as a connection URL, thrown away when the task is done.
 
 ## The pattern
 
@@ -30,4 +30,4 @@ use the returned connection URL for all database work, and delete
 the branch when we're done. Never touch the main connection string.
 ```
 
-No more giving agents production access. No more seed scripts. Real data, safely isolated, every time.
+No more giving agents production access. No more hand-maintained fixtures. Real data, safely isolated, every time.
