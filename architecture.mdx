@@ -44,7 +44,7 @@ Always operated by Ardent. Orchestration, policies, routing, and visibility acro
 
 ### Data plane
 
-Where your data physically lives and where branches are served from. Runs on Ardent Cloud (managed) or in your own cloud account (customer cloud).
+Where your data physically lives and where branches are served from. Runs on Ardent's infrastructure (fully managed) or in your own cloud account (managed, your cloud).
 
 - **Ardent Replicator**
   - Takes logical replication from production through a Kafka-backed pipeline into the read replica.
@@ -64,12 +64,14 @@ You connect your database and open branches. The control plane orchestrates; the
 
 The control plane is always Ardent's. The data plane can be ours or yours.
 
-| | **Managed** | **Customer cloud** |
+| | **Fully managed** | **Managed, your cloud** |
 |---|---|---|
 | **Control plane** | Ardent | Ardent |
 | **Data plane** | Ardent's infrastructure | Your infrastructure |
 | **Data leaves your network** | Yes | No |
 
-**Managed.** We host the entire data plane. Connect your database and we handle the Ardent Replicator, Kafka pipeline, read replica, and branch compute.
+Both modes are fully managed by Ardent. The difference is where the data plane runs.
 
-**Customer cloud.** The Ardent Replicator deploys into your own cloud account. Your data never leaves your infrastructure. The control plane still orchestrates everything via API, but all replication and branch compute runs inside your network.
+**Fully managed.** We host the entire data plane. Connect your database and we handle the Ardent Replicator, Kafka pipeline, read replica, and branch compute.
+
+**Managed, your cloud.** Same managed experience, but the data plane deploys into your own cloud account. Your data never leaves your infrastructure. The control plane still orchestrates everything via API; all replication and branch compute runs inside your network.
