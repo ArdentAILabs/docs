@@ -42,19 +42,21 @@ ardent connector create postgresql <url> \
 
 ### ardent connector list
 
-List all connectors in the current project. The active connector is marked with `*`.
+List all connectors in the current project. In the terminal, the **active** connector is **highlighted in green** and prefixed with `*`; other rows use default/dim text. `●` means healthy, `○` means not healthy. The service type (for example `postgresql`) prints on the line below each name. Warnings appear in yellow with a count on the name line and full text indented below.
 
 ```bash
 ardent connector list
 ```
 
-<Accordion title="Example output">
+<Accordion title="Example output (colors omitted)">
 ```
 Connectors:
+
 * ● prod-db
-  postgresql
+    postgresql
+
   ○ staging-db
-  postgresql
+    postgresql
 ```
 </Accordion>
 
