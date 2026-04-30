@@ -1,0 +1,34 @@
+---
+title: "Local development"
+description: "Branch before you touch the database. Every time."
+---
+
+The rule: branch before you touch the database. Every time.
+
+Takes 6 seconds. Means you can run any migration, drop any table, try any index — and if it breaks, delete the branch and start over. Your production data is never at risk.
+
+## The pattern
+
+```bash
+# Starting a new feature
+ardent branch create my-feature
+
+# Work, run migrations, break things freely
+psql postgresql://...my-feature...tryardent.com/db
+
+# Done — or it all went wrong — either way:
+ardent branch delete my-feature
+```
+
+## Working across multiple tasks
+
+```bash
+ardent branch list
+# * ● my-feature
+#   ○ auth-refactor
+#   ○ index-experiment
+
+ardent branch switch auth-refactor
+```
+
+Branches auto-suspend after 5 minutes of inactivity — leave them running and they won't cost you anything while idle.

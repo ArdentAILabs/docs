@@ -7,41 +7,125 @@
     "light": "#07C983",
     "dark": "#15803D"
   },
+  "icons": {
+    "library": "lucide"
+  },
   "favicon": "/favicon.svg",
+  "redirects": [
+    {
+      "source": "/cli-reference",
+      "destination": "/cli/overview"
+    }
+  ],
   "navigation": {
     "tabs": [
       {
         "tab": "Documentation",
+        "icon": "book-open",
         "groups": [
           {
             "group": "Getting started",
+            "icon": "rocket",
             "pages": [
               "index",
               "quickstart"
             ]
           },
           {
+            "group": "Examples",
+            "icon": "waypoints",
+            "pages": [
+              "workflows/ai-agents",
+              "workflows/local-dev",
+              "workflows/ci-cd",
+              "workflows/regression-testing"
+            ]
+          },
+          {
             "group": "Connectors",
+            "icon": "unplug",
             "pages": [
-              "connectors/supabase",
-              "connectors/rds",
-              "connectors/neon",
-              "connectors/self-hosted"
+              {
+                "group": "PostgreSQL",
+                "icon": "database",
+                "collapsed": false,
+                "pages": [
+                  "connectors/supabase",
+                  "connectors/rds",
+                  "connectors/planetscale",
+                  "connectors/self-hosted"
+                ]
+              }
             ]
           },
           {
-            "group": "Reference",
+            "group": "Concepts",
+            "icon": "layers",
             "pages": [
-              "cli-reference",
-              "security",
-              "pricing"
+              "architecture",
+              "security"
             ]
           },
           {
-            "group": "Support",
+            "group": "Help",
+            "icon": "circle-question-mark",
             "pages": [
               "faq",
               "contact"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "CLI reference",
+        "icon": "square-terminal",
+        "groups": [
+          {
+            "group": "CLI",
+            "icon": "terminal",
+            "pages": [
+              "cli/overview",
+              {
+                "group": "Workspace",
+                "icon": "folder-key",
+                "expanded": true,
+                "pages": [
+                  "cli/auth",
+                  "cli/projects"
+                ]
+              },
+              {
+                "group": "Connectors",
+                "icon": "unplug",
+                "expanded": true,
+                "pages": [
+                  "cli/connectors"
+                ]
+              },
+              {
+                "group": "Branches",
+                "icon": "git-branch",
+                "expanded": true,
+                "pages": [
+                  "cli/branches"
+                ]
+              },
+              {
+                "group": "Settings",
+                "icon": "sliders-horizontal",
+                "expanded": true,
+                "pages": [
+                  "cli/settings"
+                ]
+              },
+              {
+                "group": "Team",
+                "icon": "users",
+                "expanded": true,
+                "pages": [
+                  "cli/org"
+                ]
+              }
             ]
           }
         ]

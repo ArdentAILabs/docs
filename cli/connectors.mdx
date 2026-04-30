@@ -1,0 +1,92 @@
+---
+title: "Connectors"
+sidebarTitle: "Connectors"
+description: "ardent connector create, list, switch, delete"
+---
+
+A connector links Ardent to one of your Postgres databases. You need at least one before creating branches.
+
+### ardent connector create
+
+Connect a Postgres database. Ardent replicates your data during initial setup. This may take a few minutes depending on data size. After setup, branches create in under 6 seconds regardless of data size.
+
+**Shell quoting:** Wrap the connection URL in **single quotes**. Otherwise the shell may treat characters in real strings (for example `?`, `&`, `#`, `!`, `$`, parentheses, or spaces inside passwords) as globs, history expansion, or variable substitution, and the command can fail or connect to the wrong place.
+
+```bash
+ardent connector create postgresql 'postgresql://user:password@host:5432/mydb'
+```
+
+Give it a name with `-n`:
+
+```bash
+ardent connector create postgresql 'postgresql://user:password@host:5432/mydb' -n prod-db
+```
+
+<Accordion defaultOpen={false} title="Example output">
+```
+✓ Connector created and ready
+  ID: conn_abc123
+  Ready to branch:
+  ardent branch create <name>
+```
+</Accordion>
+
+**Self-hosted / customer-cloud deployment:**
+
+```bash
+ardent connector create postgresql '<url>' \
+  --deployment-model customer-cloud \
+  --aws-role-arn <arn> \
+  --aws-external-id <id> \
+  --aws-region us-east-1 \
+  --aws-cluster-name <cluster>
+```
+
+### ardent connector list
+
+List all connectors in the current project. In the terminal, the **active** connector is **highlighted in green** and prefixed with `*`; other rows use default/dim text. The expandable example uses green and dim styling the same way. `●` means healthy, `○` means not healthy. The service type (for example `postgresql`) prints on the line below each name. Warnings appear in yellow with a count on the name line and full text indented below.
+
+```bash
+ardent connector list
+```
+
+<Accordion defaultOpen={false} title="Example output">
+  <div className="font-mono text-[13px] leading-normal rounded-md border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-950">
+    <div className="text-zinc-800 dark:text-zinc-200">Connectors:</div>
+    <div className="text-green-600 dark:text-green-400">
+      <div>* ● prod-db</div>
+      <div>{"    "}postgresql</div>
+    </div>
+    <div className="h-3" aria-hidden />
+    <div className="text-zinc-500 dark:text-zinc-400">
+      <div>{"  "}○ staging-db</div>
+      <div>{"    "}postgresql</div>
+    </div>
+  </div>
+</Accordion>
+
+### ardent connector switch
+
+Switch the active connector without changing projects.
+
+```bash
+ardent connector switch staging-db
+```
+
+<Accordion defaultOpen={false} title="Example output">
+```
+Switched from 'prod-db' to 'staging-db'
+```
+</Accordion>
+
+### ardent connector delete
+
+```bash
+ardent connector delete staging-db
+```
+
+<Accordion defaultOpen={false} title="Example output">
+```
+✓ Connector deleted
+```
+</Accordion>

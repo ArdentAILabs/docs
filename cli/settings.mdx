@@ -1,0 +1,72 @@
+---
+title: "Settings"
+sidebarTitle: "Settings"
+description: "Per-connector defaults and branch configuration (ardent settings)"
+---
+
+**Settings** are how you control what each **new branch** looks like for the currently selected connector: which database name appears in connection URLs, and what SQL runs once the branch exists.
+
+The CLI command is `ardent settings`. Under the hood Ardent persists these as connector-scoped configuration; you do not need to think about the internal policy types.
+
+| Key | Description |
+|-----|-------------|
+| `default_db` | Default database name used in branch connection strings |
+| `branch_sql` | SQL (or `@path/to/file.sql`) executed once on every **new** branch after it is created. This is the flexible hook: anonymization or masking, optional fixture or baseline rows, org-specific setup, or any `ALTER` / `UPDATE` you want every branch to start with |
+
+### Branch configuration and anonymization
+
+`branch_sql` was built for teams that need **repeatable control over branch contents** without maintaining one-off scripts per developer.
+
+Typical uses:
+
+- **Anonymization or redaction** so branches get realistic shape without real PII
+- **Fixture or baseline SQL** so every branch starts from a known baseline after the clone
+- **Guardrail DDL** or reference data your app expects on every isolated copy
+
+For security-focused anonymization patterns, see [Security](/security#branch-anonymization).
+
+### ardent settings list
+
+Plain text (no color). Keys are left-aligned in a fixed width; unset keys show `(not set)` and a short hint after an em dash, matching the CLI.
+
+```bash
+ardent settings list
+```
+
+<Accordion defaultOpen={false} title="Example output">
+```
+Connector: prod-db
+  default_db   myapp
+  branch_sql   (not set)  — SQL to run on every new branch after creation
+```
+</Accordion>
+
+### ardent settings set
+
+```bash
+ardent settings set default_db myapp
+```
+
+Pass a file for `branch_sql`:
+
+```bash
+ardent settings set branch_sql @./branch-init.sql
+```
+
+<Accordion defaultOpen={false} title="Example output">
+```
+✓ Set default_db → myapp
+```
+</Accordion>
+
+### ardent settings remove
+
+```bash
+ardent settings remove branch_sql
+```
+
+<Accordion defaultOpen={false} title="Example output">
+```
+✓ Removed branch_sql
+```
+</Accordion>

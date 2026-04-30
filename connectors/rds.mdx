@@ -1,6 +1,24 @@
 ---
 title: "AWS RDS"
-description: "Connect your RDS Postgres database"
+description: "Connect your RDS Postgres database to Ardent"
+---
+
+**Want Claude to handle this?** Paste this into Claude Code or Cursor:
+
+```
+Check if my AWS RDS Postgres database is ready to connect to Ardent.
+My connection string: [paste here]
+
+Verify:
+1. The host is reachable and credentials work
+2. Logical replication is enabled (rds.logical_replication = 1 in the parameter group)
+3. The user has the rds_replication role granted
+4. The security group allows inbound connections on port 5432
+
+Tell me exactly what to fix if anything fails, then run:
+ardent connector create postgresql '<connection-string>'
+```
+
 ---
 
 <Steps>
@@ -39,8 +57,10 @@ You can find the hostname in the **RDS Console > Databases > your instance > Con
 <Step title="Connect your database">
 
 ```bash
-ardent connector create postgresql postgresql://user:password@your-instance.region.rds.amazonaws.com:5432/mydb
+ardent connector create postgresql 'postgresql://user:password@your-instance.region.rds.amazonaws.com:5432/mydb'
 ```
+
+Use **single quotes** around the URL so the shell does not treat special characters in the password or host as syntax.
 
 Ardent will verify your setup and begin replicating your database. This may take a few minutes depending on data size.
 

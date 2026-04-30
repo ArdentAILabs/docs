@@ -1,0 +1,63 @@
+---
+title: "Authentication"
+sidebarTitle: "Authentication"
+description: "ardent login, logout, status"
+---
+
+### ardent login
+
+Opens your browser to authenticate with GitHub or email. After login, Ardent automatically selects your project and connector if you only have one of each, so you can go straight to `ardent branch create`.
+
+```bash
+ardent login
+```
+
+Use `--token` to authenticate non-interactively (CI, scripts):
+
+```bash
+ardent login --token <your-token>
+```
+
+<Accordion defaultOpen={false} title="Example output (single project + connector)">
+```
+✓ Logged in as vikram@tryardent.com
+
+  Auto-selected project 'my-app'
+  Auto-selected connector 'my-app-db'
+  Ready to branch:
+  ardent branch create <name>
+```
+</Accordion>
+
+<Accordion defaultOpen={false} title="Example output (multiple projects)">
+```
+✓ Logged in as vikram@tryardent.com
+
+3 projects found.
+Next step: select a project: ardent project switch <name>
+List your projects: ardent project list
+```
+</Accordion>
+
+### ardent logout
+
+Clears all stored credentials and cached data.
+
+```bash
+ardent logout
+```
+
+### ardent status
+
+Check your current authentication, project, and connector.
+
+```bash
+ardent status
+```
+
+<Accordion defaultOpen={false} title="Example output">
+```
+✓ Logged in as vikram@tryardent.com
+  Organization: Ardent
+```
+</Accordion>

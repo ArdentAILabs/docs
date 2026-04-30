@@ -1,0 +1,33 @@
+---
+title: "AI agents"
+description: "Give agents a real database to work against: isolated, disposable, cloned from production"
+---
+
+Agents are only as good as the data they can work with. Mocked data misses edge cases. Shared staging gets corrupted. Production is off-limits.
+
+Ardent gives every agent run its own isolated copy of your real database: spun up in under 6 seconds, handed off as a connection URL, thrown away when the task is done.
+
+## The pattern
+
+```bash
+# Create a branch for the agent task
+ardent branch create agent-task
+
+# Hand the returned URL to your agent
+# → postgresql://...agent-task...tryardent.com/db
+
+# Agent writes migrations, runs queries, tests against real data
+# When it's done, clean up
+ardent branch delete agent-task
+```
+
+## Copy this into Claude Code or Cursor
+
+```
+I'm working on [describe task]. Before making any database changes,
+create an Ardent branch with `ardent branch create <branch-name>`,
+use the returned connection URL for all database work, and delete
+the branch when we're done. Never touch the main connection string.
+```
+
+No more giving agents production access. No more hand-maintained fixtures. Real data, safely isolated, every time.

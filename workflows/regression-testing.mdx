@@ -1,0 +1,45 @@
+---
+title: "Regression testing"
+description: "Run destructive tests against real production data without touching production"
+---
+
+Unit tests with mocked data miss the bugs that only appear with real data at real scale. Ardent lets you run your full test suite, including destructive operations, against an exact copy of production.
+
+## The pattern
+
+`ardent branch create` prints a Postgres URL for the new branch. If you need it again, run `ardent branch info regression-run` (or `ardent branch info` when that branch is already checked out).
+
+Most apps and test runners read the DB from an environment variable. The usual name is `DATABASE_URL`; Django, SQLAlchemy, Prisma, and many pytest setups are already wired for that in dev, but yours might use something else (for example `PGURL` or a `.env` file you load before running tests).
+
+```bash
+# Branch from production
+ardent branch create regression-run
+
+# Use the URL from the CLI output (quoted so the shell does not mangle it)
+export DATABASE_URL='postgresql://user:pass@regression-run-postgres.routing.tryardent.com:5432/db'
+
+npm test
+# or: pytest   (if your tests read DATABASE_URL; some stacks use a different env var)
+
+# Tear it down: production was never touched
+ardent branch delete regression-run
+```
+
+**One-line alternative:** `DATABASE_URL='…' npm test` sets the variable only for that one process, which is why it looked as if the URL and `npm test` had to share a line. That is valid shell, but `export` and a separate test command are easier to read and match how most people run pytest or rerun commands.
+
+**In CI:** create the branch in the job, assign the URL to `DATABASE_URL` (or wire it into your framework), run your test command, then delete the branch. See [CI / CD](/workflows/ci-cd) for a GitHub Actions–shaped example.
+
+## What this unlocks
+
+- **Migration safety:** run `ALTER TABLE`, `DROP COLUMN`, schema changes against real data before you ship
+- **Destructive queries:** `DELETE`, `TRUNCATE`, bulk updates; test the blast radius safely
+- **Index validation:** try a new index and see if it actually speeds up your real queries
+- **Data-dependent bugs:** catch edge cases that only exist in production data, not fixtures
+
+## Copy this into Claude Code or Cursor
+
+```
+Run a regression test on [describe change] against a real copy of our database.
+Create an Ardent branch with `ardent branch create regression-test`, run the
+tests using the returned connection URL, report what broke, then delete the branch.
+```

@@ -1,0 +1,61 @@
+---
+title: "PlanetScale"
+description: "Connect your PlanetScale Postgres database to Ardent"
+---
+
+**Want Claude to handle this?** Paste this into Claude Code or Cursor:
+
+```
+Check if my PlanetScale database is ready to connect to Ardent.
+My connection string: [paste here]
+
+Verify:
+1. The host is reachable and credentials work
+2. Logical replication is enabled in the PlanetScale dashboard
+3. The user has replication privileges
+
+Tell me exactly what to fix if anything fails, then run:
+ardent connector create postgresql '<connection-string>'
+```
+
+---
+
+<Steps>
+<Step title="Enable logical replication">
+
+In your PlanetScale dashboard, go to **Settings > Integrations** and enable **Logical Replication**. This allows Ardent to replicate your data for branching.
+
+</Step>
+
+<Step title="Find your connection string">
+
+Go to **Connect > Connect with: Postgres** in your PlanetScale dashboard and copy the connection string. It looks like:
+
+```
+postgresql://user:password@aws.connect.psdb.cloud/mydb?sslmode=require
+```
+
+</Step>
+
+<Step title="Connect your database">
+
+```bash
+ardent connector create postgresql 'postgresql://user:password@aws.connect.psdb.cloud/mydb?sslmode=require'
+```
+
+Single quotes are important here: the `?sslmode=…` part must not be interpreted by the shell.
+
+Ardent will verify your setup and begin replicating your database. This may take a few minutes depending on data size.
+
+</Step>
+
+<Step title="Create your first branch">
+
+```bash
+ardent branch create my-feature
+```
+
+Done. You now have an isolated copy of your PlanetScale database — schema, data, and all. The CLI returns a connection URL you can use anywhere.
+
+</Step>
+</Steps>

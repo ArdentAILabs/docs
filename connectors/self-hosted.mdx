@@ -5,6 +5,24 @@ description: "Connect any Postgres database with logical replication"
 
 Any Postgres instance with logical replication enabled works with Ardent.
 
+**Want Claude to handle this?** Paste this into Claude Code or Cursor:
+
+```
+Check if my Postgres database is ready to connect to Ardent.
+My connection string: [paste here]
+
+Verify:
+1. The host is reachable and credentials work
+2. wal_level is set to logical (SELECT current_setting('wal_level'))
+3. The user has the REPLICATION privilege
+4. At least 1 replication slot is available (SELECT * FROM pg_replication_slots)
+
+Tell me exactly what to fix if anything fails, then run:
+ardent connector create postgresql '<connection-string>'
+```
+
+---
+
 <Steps>
 <Step title="Enable logical replication">
 
@@ -41,8 +59,10 @@ ALTER USER your_user WITH REPLICATION;
 <Step title="Connect your database">
 
 ```bash
-ardent connector create postgresql postgresql://user:password@your-host:5432/mydb
+ardent connector create postgresql 'postgresql://user:password@your-host:5432/mydb'
 ```
+
+Use **single quotes** around the URL in the shell so passwords or query parameters are not mangled.
 
 Ardent will verify your setup and begin replicating your database. This may take a few minutes depending on data size.
 

@@ -1,0 +1,79 @@
+---
+title: "Projects"
+sidebarTitle: "Projects"
+description: "ardent project create, list, switch, delete"
+---
+
+Projects are the top-level grouping for your connectors and branches. Most users start with one project; the project commands become useful when you are managing multiple environments or teams.
+
+### ardent project create
+
+```bash
+ardent project create <name>
+```
+
+<Accordion defaultOpen={false} title="Example output">
+```
+✓ Project 'staging' created
+```
+</Accordion>
+
+### ardent project list
+
+In the terminal, the **current** project row is **green** and starts with `*`; other names are plain text with a leading two-space indent. There is a **blank line** between each project. The example under **ardent project list** uses the same green highlight so it matches what you see in the shell (other list examples in this reference do the same).
+
+If you are offline and the CLI falls back to cache, you will see `⚠ Offline - showing cached data from …` above the list.
+
+```bash
+ardent project list
+```
+
+<Accordion defaultOpen={false} title="Example output">
+  <div className="font-mono text-[13px] leading-normal rounded-md border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-950">
+    <div className="text-zinc-800 dark:text-zinc-200">Projects:</div>
+    <div className="text-green-600 dark:text-green-400">* my-app</div>
+    <div className="h-3" aria-hidden />
+    <div className="text-zinc-800 dark:text-zinc-200">{"  "}staging</div>
+    <div className="h-3" aria-hidden />
+    <div className="text-zinc-800 dark:text-zinc-200">{"  "}internal-tools</div>
+  </div>
+</Accordion>
+
+### ardent project switch
+
+Switch to a different project. Ardent clears your current connector selection and automatically selects the new project's connector if it has exactly one.
+
+```bash
+ardent project switch staging
+```
+
+<Accordion defaultOpen={false} title="Example output (single connector in new project)">
+```
+Switched to project 'staging'
+
+  Auto-selected connector 'staging-db'
+```
+</Accordion>
+
+<Accordion defaultOpen={false} title="Example output (multiple connectors in new project)">
+```
+Switched from 'my-app' to 'staging'
+
+  No connectors found.
+  Create one with: ardent connector create postgresql '<url>'
+```
+</Accordion>
+
+### ardent project delete
+
+```bash
+ardent project delete staging
+```
+
+<Accordion defaultOpen={false} title="Example output">
+```
+Deleting project...
+✓ Project deleted
+  Name: staging
+```
+</Accordion>

@@ -1,0 +1,93 @@
+---
+title: "Branches"
+sidebarTitle: "Branches"
+description: "ardent branch create, list, info, switch, delete"
+---
+
+### ardent branch create
+
+Create a new isolated database branch. Automatically checks it out and returns the connection URL.
+
+```bash
+ardent branch create my-feature
+```
+
+<Accordion defaultOpen={false} title="Example output">
+```
+✓ Branch 'my-feature' created and checked out in 4.2s
+
+postgresql://user:pass@my-feature-postgres.routing.tryardent.com:5432/db
+```
+</Accordion>
+
+### ardent branch list
+
+In the terminal, the **current** branch is **green**: the `*`, health dot, name, and connection URL. Other branches use default color for the name and **dim** for the URL. The expandable example uses green for the current branch and dimmer text for the rest. `●` means **active**, `○` means not active. Each URL is indented on the line below the branch name (six spaces in the terminal). There is a **blank line** between each branch.
+
+Offline cache shows `⚠ Offline - showing cached data from …` above the list when applicable.
+
+```bash
+ardent branch list
+```
+
+<Accordion defaultOpen={false} title="Example output">
+  <div className="font-mono text-[13px] leading-normal rounded-md border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-950">
+    <div className="text-zinc-800 dark:text-zinc-200">Branches:</div>
+    <div className="text-green-600 dark:text-green-400">
+      <div>* ● my-feature</div>
+      <div>{"      "}postgresql://user:pass@my-feature-postgres.routing.tryardent.com:5432/db</div>
+    </div>
+    <div className="h-3" aria-hidden />
+    <div>
+      <div className="text-zinc-800 dark:text-zinc-200">{"  "}○ staging</div>
+      <div className="text-zinc-500 dark:text-zinc-500">
+        {"      "}postgresql://user:pass@staging-postgres.routing.tryardent.com:5432/db
+      </div>
+    </div>
+  </div>
+</Accordion>
+
+### ardent branch info
+
+Show details and connection URL for a branch. Defaults to the current branch if no name is given.
+
+```bash
+ardent branch info my-feature
+```
+
+<Accordion defaultOpen={false} title="Example output">
+```
+Name:    my-feature
+URL:     postgresql://user:pass@my-feature-postgres.routing.tryardent.com:5432/db
+Status:  active
+Created: 2 minutes ago
+```
+</Accordion>
+
+### ardent branch switch
+
+Switch to a different branch.
+
+```bash
+ardent branch switch staging
+```
+
+<Accordion defaultOpen={false} title="Example output">
+```
+✓ Switched to staging
+```
+</Accordion>
+
+### ardent branch delete
+
+Delete a branch. Branches auto-suspend after 5 minutes of inactivity, so cleanup is optional.
+
+```bash
+ardent branch delete my-feature
+```
+
+<Accordion defaultOpen={false} title="Example output">
+```
+✓ Branch deleted: my-feature
+```
+</Accordion>
