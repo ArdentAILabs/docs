@@ -63,12 +63,12 @@ Docs: https://docs.tryardent.com
 
 ## How it works
 
-Ardent replicates your production database into a read replica, then creates lightweight copy-on-write forks on demand. Each fork is a fully functional Postgres database with your real data — we call them **branches**, just like git.
+Ardent replicates your production database into a read replica, then creates isolated **branches** from that replica in seconds. Each branch is a full Postgres database with your real data, just like **branches** in git.
 
 We handle all the infrastructure under the hood so you just have to worry about building!
 
 ```
-Production DB → Replication → Read replica → Instant fork → Your branch
+Production DB → Replication → Read replica → Many branches (each in seconds)
 ```
 
 The workflow mirrors what you already know from git:

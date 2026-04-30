@@ -6,7 +6,7 @@ description: "How Ardent's split-plane architecture keeps your data safe and you
 Ardent follows a split-plane architecture where the **control plane** and **data plane** are separated:
 
 - **Control plane:** Operated by Ardent. Handles branch orchestration, replication health monitoring, connection routing, auto-scaling, and policy enforcement. Spans across all deployments.
-- **Data plane:** Where your data lives. The Ardent Replicator syncs from your production database via a Kafka pipeline into a read replica. Branches are instant copy-on-write forks off that replica, each backed by **auto-scaling compute** and copy-on-write storage.
+- **Data plane:** Where your data lives. The Ardent Replicator syncs from your production database via a Kafka pipeline into a read replica. **Branches** are isolated Postgres databases created from that replica, each with **auto-scaling compute** and its own storage.
 
 Only metadata (schema structure, replication status, branch state) flows from the data plane to the control plane. Your actual data never leaves the data plane.
 
@@ -25,7 +25,9 @@ flowchart TB
         direction LR
         PROD[("Production DB")] -->|logical replication| AR["Ardent Replicator + Kafka"]
         AR --> REP[("Read replica")]
-        REP -->|copy-on-write fork + compute| BR[("Branches")]
+        REP --> B1[("Branch · preview")]
+        REP --> B2[("Branch · CI")]
+        REP --> B3[("Branch · agents")]
     end
     CP <-->|metadata only| DP
 ```
@@ -49,8 +51,8 @@ Where your data physically lives and where branches are served from. Runs on Ard
   - Applies changes in order across failures so retries do not leave gaps or duplicates.
   - Manages WAL and slot pressure so replication does not destabilize the primary.
   - Quarantines, resumes, and recovers broken streams without manual replay scripts.
-- **Read replica:** Stays in sync with production; branches are never forked straight off production, so branch load never hits your primary.
-- **Branches (compute and storage):** Each branch is a full Postgres instance with **compute that auto-scales with load**, not just a disk snapshot. Data is served from **copy-on-write** storage off the replica, so forks stay fast to create at any size and cheap when idle, while query and connection load runs on elastic branch compute.
+- **Read replica:** Stays in sync with production; branches are always created from the replica, never from production directly, so branch load never hits your primary.
+- **Branches (compute and storage):** Each branch is a full Postgres instance with **compute that auto-scales with load**. Storage is built on the same replica snapshot so new branches stay fast to create at any data size and stay inexpensive when idle, while queries and connections run on elastic branch compute.
 - **Isolation:** Your table data stays inside this boundary. Only metadata crosses to the control plane.
 
 You connect your database and open branches. The control plane orchestrates; the data plane runs replication, the replica, and branches.
