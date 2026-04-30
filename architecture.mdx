@@ -12,8 +12,7 @@ Only metadata (schema structure, replication status, branch state) flows from th
 
 ## How it works
 
-```mermaid actions={false}
-%%{init: {'flowchart': {'defaultRenderer': 'elk'}}}%%
+```mermaid
 flowchart TB
     subgraph CP["Control plane"]
         direction LR
@@ -21,16 +20,12 @@ flowchart TB
     end
     subgraph DP["Data plane"]
         direction LR
-        PROD[("Your<br/>production DB")] -->|logical replication| AR["Ardent Replicator<br/>+ Kafka pipeline"]
-        AR --> REP[("Read<br/>replica")]
+        PROD[("Production DB")] -->|logical replication| AR["Ardent Replicator + Kafka"]
+        AR --> REP[("Read replica")]
         REP -->|copy-on-write fork + compute| BR[("Branches")]
     end
     CP <-->|metadata only| DP
 ```
-
-## What each layer does for you
-
-The split is not only where code runs, but what each layer is responsible for. Together they are why you get branches without operating a replication platform yourself.
 
 ### Control plane
 
