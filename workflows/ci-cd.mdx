@@ -7,16 +7,22 @@ Every PR gets its own fresh database cloned from production, torn down after mer
 
 ## GitHub Actions example
 
-The CLI prints the URL when you create a branch; in CI it is easier to create the branch, then read the URL with `ardent branch info` and append it to `GITHUB_ENV` so later steps (npm, pytest, your migration runner) see `DATABASE_URL`.
+The CLI needs to authenticate before running any commands. In CI, use `ardent login --token` with a token stored in your repo secrets. This creates a local session the same way `ardent login` does interactively.
+
+After login, create the branch, read the URL with `ardent branch info`, and append it to `GITHUB_ENV` so later steps (npm, pytest, your migration runner) see `DATABASE_URL`.
 
 ```yaml
+- name: Install Ardent CLI
+  run: npm install -g ardent-cli
+
+- name: Log in to Ardent
+  run: ardent login --token ${{ secrets.ARDENT_TOKEN }}
+
 - name: Create database branch
   run: |
     NAME="pr-${{ github.event.pull_request.number }}"
     ardent branch create "$NAME"
     echo "DATABASE_URL=$(ardent branch info "$NAME" | sed -n 's/^URL:[[:space:]]*//p')" >> "$GITHUB_ENV"
-  env:
-    ARDENT_TOKEN: ${{ secrets.ARDENT_TOKEN }}
 
 - name: Run migrations + tests
   run: npm test
@@ -24,8 +30,6 @@ The CLI prints the URL when you create a branch; in CI it is easier to create th
 - name: Delete branch
   if: always()
   run: ardent branch delete pr-${{ github.event.pull_request.number }}
-  env:
-    ARDENT_TOKEN: ${{ secrets.ARDENT_TOKEN }}
 ```
 
 Use the same `DATABASE_URL` for `pytest`, `pnpm test`, or any tool your repo already uses in CI. If your framework reads a different variable, write that name to `GITHUB_ENV` instead.
