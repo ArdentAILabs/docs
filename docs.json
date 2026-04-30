@@ -21,7 +21,7 @@
             ]
           },
           {
-            "group": "Workflows",
+            "group": "Using Ardent",
             "pages": [
               "workflows/ai-agents",
               "workflows/local-dev",
@@ -47,6 +47,7 @@
           {
             "group": "Reference",
             "pages": [
+              "architecture",
               "cli-reference",
               "security"
             ]
