@@ -10,14 +10,16 @@ A connector links Ardent to one of your Postgres databases. You need at least on
 
 Connect a Postgres database. Ardent replicates your data during initial setup. This may take a few minutes depending on data size. After setup, branches create in under 6 seconds regardless of data size.
 
+**Shell quoting:** Wrap the connection URL in **single quotes**. Otherwise the shell may treat characters in real strings (for example `?`, `&`, `#`, `!`, `$`, parentheses, or spaces inside passwords) as globs, history expansion, or variable substitution, and the command can fail or connect to the wrong place.
+
 ```bash
-ardent connector create postgresql postgresql://user:password@host:5432/mydb
+ardent connector create postgresql 'postgresql://user:password@host:5432/mydb'
 ```
 
 Give it a name with `-n`:
 
 ```bash
-ardent connector create postgresql postgresql://user:password@host:5432/mydb -n prod-db
+ardent connector create postgresql 'postgresql://user:password@host:5432/mydb' -n prod-db
 ```
 
 <Accordion defaultOpen={false} title="Example output">
@@ -32,7 +34,7 @@ ardent connector create postgresql postgresql://user:password@host:5432/mydb -n 
 **Self-hosted / customer-cloud deployment:**
 
 ```bash
-ardent connector create postgresql <url> \
+ardent connector create postgresql '<url>' \
   --deployment-model customer-cloud \
   --aws-role-arn <arn> \
   --aws-external-id <id> \

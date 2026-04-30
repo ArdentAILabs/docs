@@ -18,7 +18,7 @@ Verify:
 4. At least 1 replication slot is available (SELECT * FROM pg_replication_slots)
 
 Tell me exactly what to fix if anything fails, then run:
-ardent connector create postgresql <connection-string>
+ardent connector create postgresql '<connection-string>'
 ```
 
 ---
@@ -59,8 +59,10 @@ ALTER USER your_user WITH REPLICATION;
 <Step title="Connect your database">
 
 ```bash
-ardent connector create postgresql postgresql://user:password@your-host:5432/mydb
+ardent connector create postgresql 'postgresql://user:password@your-host:5432/mydb'
 ```
+
+Use **single quotes** around the URL in the shell so passwords or query parameters are not mangled.
 
 Ardent will verify your setup and begin replicating your database. This may take a few minutes depending on data size.
 

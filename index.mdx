@@ -39,8 +39,9 @@ An instant database for every task.
   </Step>
   <Step title="Connect your database">
     ```bash
-    ardent connector create postgresql <your-connection-string>
+    ardent connector create postgresql '<your-connection-string>'
     ```
+    Use single quotes around the URL so characters like `?`, `&`, or `$` in the string are not mangled by the shell.
   </Step>
   <Step title="Create a branch">
     ```bash

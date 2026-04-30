@@ -16,7 +16,7 @@ Verify:
 4. IPv4 is enabled (check pg_hba.conf or attempt a direct connection)
 
 Tell me exactly what to fix if anything fails, then run:
-ardent connector create postgresql <connection-string>
+ardent connector create postgresql '<connection-string>'
 ```
 
 ---
@@ -51,8 +51,10 @@ postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
 <Step title="Connect your database">
 
 ```bash
-ardent connector create postgresql postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
+ardent connector create postgresql 'postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres'
 ```
+
+Wrap the URI in **single quotes** in your shell so characters in the password are not interpreted.
 
 Ardent will verify your setup and begin replicating your database. This may take a few minutes depending on data size.
 

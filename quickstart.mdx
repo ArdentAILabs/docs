@@ -31,8 +31,10 @@ This opens your browser to authenticate with GitHub or email. If you only have o
 <Step title="Connect your database">
 
 ```bash
-ardent connector create postgresql postgresql://user:password@host:5432/mydb
+ardent connector create postgresql 'postgresql://user:password@host:5432/mydb'
 ```
+
+Wrap the URL in **single quotes** so special characters in the password or query string are not interpreted by the shell.
 
 Ardent replicates your database during initial setup. This may take some time depending on the size of your data — but you only do this once. After setup, every branch creates in under 6 seconds regardless of data size.
 

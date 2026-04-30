@@ -15,7 +15,7 @@ Verify:
 3. The user has replication privileges
 
 Tell me exactly what to fix if anything fails, then run:
-ardent connector create postgresql <connection-string>
+ardent connector create postgresql '<connection-string>'
 ```
 
 ---
@@ -40,8 +40,10 @@ postgresql://user:password@aws.connect.psdb.cloud/mydb?sslmode=require
 <Step title="Connect your database">
 
 ```bash
-ardent connector create postgresql "postgresql://user:password@aws.connect.psdb.cloud/mydb?sslmode=require"
+ardent connector create postgresql 'postgresql://user:password@aws.connect.psdb.cloud/mydb?sslmode=require'
 ```
+
+Single quotes are important here: the `?sslmode=…` part must not be interpreted by the shell.
 
 Ardent will verify your setup and begin replicating your database. This may take a few minutes depending on data size.
 
