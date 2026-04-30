@@ -64,16 +64,12 @@ You connect your database and open branches. The control plane orchestrates; the
 
 The control plane is always Ardent's. The data plane can be ours or yours.
 
-| | **Ardent Cloud** | **Self-hosted** | **Enterprise** |
-|---|---|---|---|
-| **Control plane** | Ardent | Ardent | Ardent |
-| **Data plane** | Ardent's infrastructure | Your infrastructure | Your infrastructure |
-| **Data leaves your network** | Yes | No | No |
-| **Plan** | Free / Growth | Scale ($250/mo) | Enterprise |
-| **Data residency / on-prem** | No | No | Yes |
+| | **Managed** | **Customer cloud** |
+|---|---|---|
+| **Control plane** | Ardent | Ardent |
+| **Data plane** | Ardent's infrastructure | Your infrastructure |
+| **Data leaves your network** | Yes | No |
 
-**Ardent Cloud.** We host the entire data plane. Connect your database and we handle the Ardent Replicator, Kafka pipeline, read replica, and branch compute. Available on all plans.
+**Managed.** We host the entire data plane. Connect your database and we handle the Ardent Replicator, Kafka pipeline, read replica, and branch compute.
 
-**Self-hosted (Scale).** The Ardent Replicator deploys into your own cloud account. Your data never leaves your infrastructure. The control plane still orchestrates everything via API, but all replication and branch compute runs inside your network.
-
-**Enterprise.** Custom deployment, on-prem, dedicated infrastructure. [Talk to us.](mailto:vikram@tryardent.com)
+**Customer cloud.** The Ardent Replicator deploys into your own cloud account. Your data never leaves your infrastructure. The control plane still orchestrates everything via API, but all replication and branch compute runs inside your network.
