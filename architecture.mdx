@@ -46,20 +46,12 @@ Always operated by Ardent. Orchestration, policies, routing, and visibility acro
 
 Where your data physically lives and where branches are served from. Runs on Ardent Cloud or in your own account on Scale and Enterprise.
 
+- **Ardent Replicator:** Owns the stream from your production database into the read replica: logical replication through a Kafka-backed pipeline. DDL-aware handling for in-flight schema changes so the stream does not stall or silently diverge; ordered application of changes so retries and replays do not produce gaps or duplicates; WAL and slot pressure managed so replication does not destabilize your primary; quarantine, resume, and recovery when something breaks. This is where most home-grown CDC stacks fall apart.
 - **Read replica:** Stays in sync with production; branches are never forked straight off production, so branch load never hits your primary.
 - **Branch storage:** Copy-on-write forks off the replica. Fast to create at any size, cheap to leave idle.
 - **Isolation:** Your table data stays inside this boundary. Only metadata crosses to the control plane.
 
-### Ardent Replicator
-
-The data plane component that owns the stream from production into the replica. This is where most products fall apart; it is where Ardent is intentionally deep.
-
-- **DDL-aware replication:** Production schema changes (adds, drops, renames, type changes) are handled in flight so the stream does not stall or silently diverge.
-- **In-flight pipeline semantics:** Changes are ordered, processed, and applied through the Kafka-backed path so retries and replays do not turn into duplicates, gaps, or corrupt application order.
-- **Operational safety on the primary:** WAL and slot pressure are managed as part of the pipeline so replication does not become a disk or availability risk on your production instance.
-- **Recovery:** When something breaks, the system knows how to quarantine, resume, and heal without you hand-writing replay scripts.
-
-You connect your database and open branches. The control plane orchestrates, the data plane hosts data and branches, and the Ardent Replicator owns the hard part: the living stream between production and replica.
+You connect your database and open branches. The control plane orchestrates; the data plane runs replication, the replica, and branches.
 
 ---
 
