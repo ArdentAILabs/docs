@@ -20,18 +20,23 @@ ardent project create <name>
 
 ### ardent project list
 
+In the terminal, the **current** project row is **green** and starts with `*`; other names are plain text with a leading two-space indent. There is a **blank line** between each project.
+
+If you are offline and the CLI falls back to cache, you will see `⚠ Offline - showing cached data from …` above the list.
+
 ```bash
 ardent project list
 ```
 
-The current project is marked with `*`.
-
-<Accordion title="Example output">
+<Accordion title="Example output (colors omitted)">
 ```
 Projects:
 * my-app
+
   staging
+
   internal-tools
+
 ```
 </Accordion>
 

@@ -22,18 +22,23 @@ postgresql://user:pass@my-feature-postgres.routing.tryardent.com:5432/db
 
 ### ardent branch list
 
-List all branches. The current branch is marked with `*`.
+In the terminal, the **current** branch is **green**: the `*`, health dot, name, and connection URL. Other branches use default color for the name and **dim** for the URL. `●` means **active**, `○` means not active. Each URL is indented on the line below the branch name (six spaces in the terminal). There is a **blank line** between each branch.
+
+Offline cache shows `⚠ Offline - showing cached data from …` above the list when applicable.
 
 ```bash
 ardent branch list
 ```
 
-<Accordion title="Example output">
+<Accordion title="Example output (colors omitted)">
 ```
+Branches:
 * ● my-feature
-  postgresql://...my-feature...tryardent.com/db
+      postgresql://user:pass@my-feature-postgres.routing.tryardent.com:5432/db
+
   ○ staging
-  postgresql://...staging...tryardent.com/db
+      postgresql://user:pass@staging-postgres.routing.tryardent.com:5432/db
+
 ```
 </Accordion>
 
