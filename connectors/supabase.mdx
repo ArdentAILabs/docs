@@ -1,29 +1,31 @@
 ---
 title: "Supabase"
-description: "Connect your Supabase Postgres database"
+description: "Connect your Supabase Postgres database to Ardent"
 ---
 
 <Steps>
-<Step title="Enable the IPv4 add-on">
+<Step title="Open the Connect dialog">
 
-Ardent needs a direct connection to your database, which requires a dedicated IPv4 address.
+In your Supabase project dashboard, click **Connect** in the top right corner.
 
-In your Supabase dashboard, go to **Project Settings > Add-ons > IPv4 Address** and enable it. This is available on Pro plans and above ($4/month). No downtime required.
-
-</Step>
-
-<Step title="Enable logical replication">
-
-Go to **Database > Replication** in your Supabase dashboard and enable replication.
+Select the **Direct** tab, then choose **Direct connection** as the connection method and set Type to **URI**.
 
 </Step>
 
-<Step title="Find your connection string">
+<Step title="Check IPv4">
 
-Go to **Settings > Database > Connection string** in your Supabase dashboard. Copy the **direct connection** URI (not the pooled connection). It looks like:
+Scroll down in the Connect dialog. You'll see an **IPv4 compatible** indicator.
+
+If it shows a checkmark, you're good. If not, click **IPv4 settings** and enable the dedicated IPv4 add-on ($4/month). Ardent needs a direct connection to your database, which requires IPv4.
+
+</Step>
+
+<Step title="Copy your connection string">
+
+Still in the Connect dialog, copy the URI. It looks like:
 
 ```
-postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
+postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
 ```
 
 </Step>
@@ -31,10 +33,12 @@ postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
 <Step title="Connect your database">
 
 ```bash
-ardent connector create postgresql postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
+ardent connector create postgresql postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
 ```
 
 Ardent will verify your setup and begin replicating your database. This may take a few minutes depending on data size.
+
+<Note>Logical replication is enabled by default on Supabase — no extra setup needed.</Note>
 
 </Step>
 
