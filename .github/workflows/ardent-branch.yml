@@ -32,15 +32,11 @@ jobs:
           echo "DATABASE_URL=$(ardent branch info | awk '/URL:/{print $2}')" >> "$GITHUB_ENV"
           echo "ARDENT_BRANCH=$BRANCH_NAME" >> "$GITHUB_ENV"
 
-      - name: Verify DATABASE_URL is set
-        run: |
-          echo "DATABASE_URL is ${#DATABASE_URL} chars"
-          test -n "$DATABASE_URL" || (echo "DATABASE_URL is empty" && exit 1)
+      - name: Install psql
+        run: sudo apt-get install -y postgresql-client
 
-      - name: Test database connection
-        run: |
-          npx pg-connection-string@2 "$DATABASE_URL" > /dev/null 2>&1 || true
-          echo "SELECT 1" | npx psql-simple "$DATABASE_URL" 2>/dev/null || echo "psql not available, skipping live query test"
+      - name: Run query against branch
+        run: psql "$DATABASE_URL" -c "SELECT 1 AS connected;"
 
       - name: Delete database branch
         if: always()
