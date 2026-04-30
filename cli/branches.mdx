@@ -12,7 +12,7 @@ Create a new isolated database branch. Automatically checks it out and returns t
 ardent branch create my-feature
 ```
 
-<Accordion title="Example output">
+<Accordion defaultOpen={false} title="Example output">
 ```
 ✓ Branch 'my-feature' created and checked out in 4.2s
 
@@ -30,7 +30,7 @@ Offline cache shows `⚠ Offline - showing cached data from …` above the list 
 ardent branch list
 ```
 
-<Accordion title="Example output (colors omitted)">
+<Accordion defaultOpen={false} title="Example output (colors omitted)">
 ```
 Branches:
 * ● my-feature
@@ -50,7 +50,7 @@ Show details and connection URL for a branch. Defaults to the current branch if 
 ardent branch info my-feature
 ```
 
-<Accordion title="Example output">
+<Accordion defaultOpen={false} title="Example output">
 ```
 Name:    my-feature
 URL:     postgresql://user:pass@my-feature-postgres.routing.tryardent.com:5432/db
@@ -67,7 +67,7 @@ Switch to a different branch.
 ardent branch switch staging
 ```
 
-<Accordion title="Example output">
+<Accordion defaultOpen={false} title="Example output">
 ```
 ✓ Switched to staging
 ```
@@ -81,7 +81,7 @@ Delete a branch. Branches auto-suspend after 5 minutes of inactivity, so cleanup
 ardent branch delete my-feature
 ```
 
-<Accordion title="Example output">
+<Accordion defaultOpen={false} title="Example output">
 ```
 ✓ Branch deleted: my-feature
 ```

@@ -20,7 +20,7 @@ Give it a name with `-n`:
 ardent connector create postgresql postgresql://user:password@host:5432/mydb -n prod-db
 ```
 
-<Accordion title="Example output">
+<Accordion defaultOpen={false} title="Example output">
 ```
 ✓ Connector created and ready
   ID: conn_abc123
@@ -48,7 +48,7 @@ List all connectors in the current project. In the terminal, the **active** conn
 ardent connector list
 ```
 
-<Accordion title="Example output (colors omitted)">
+<Accordion defaultOpen={false} title="Example output (colors omitted)">
 ```
 Connectors:
 * ● prod-db
@@ -68,7 +68,7 @@ Switch the active connector without changing projects.
 ardent connector switch staging-db
 ```
 
-<Accordion title="Example output">
+<Accordion defaultOpen={false} title="Example output">
 ```
 Switched from 'prod-db' to 'staging-db'
 ```
@@ -80,7 +80,7 @@ Switched from 'prod-db' to 'staging-db'
 ardent connector delete staging-db
 ```
 
-<Accordion title="Example output">
+<Accordion defaultOpen={false} title="Example output">
 ```
 ✓ Connector deleted
 ```

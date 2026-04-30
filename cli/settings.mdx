@@ -33,7 +33,7 @@ Plain text (no color). Keys are left-aligned in a fixed width; unset keys show `
 ardent settings list
 ```
 
-<Accordion title="Example output">
+<Accordion defaultOpen={false} title="Example output">
 ```
 Connector: prod-db
   default_db   myapp
@@ -53,7 +53,7 @@ Pass a file for `branch_sql`:
 ardent settings set branch_sql @./seed.sql
 ```
 
-<Accordion title="Example output">
+<Accordion defaultOpen={false} title="Example output">
 ```
 ✓ Set default_db → myapp
 ```
@@ -65,7 +65,7 @@ ardent settings set branch_sql @./seed.sql
 ardent settings remove branch_sql
 ```
 
-<Accordion title="Example output">
+<Accordion defaultOpen={false} title="Example output">
 ```
 ✓ Removed branch_sql
 ```

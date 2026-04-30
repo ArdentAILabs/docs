@@ -12,7 +12,7 @@ Projects are the top-level grouping for your connectors and branches. Most users
 ardent project create <name>
 ```
 
-<Accordion title="Example output">
+<Accordion defaultOpen={false} title="Example output">
 ```
 ✓ Project 'staging' created
 ```
@@ -28,7 +28,7 @@ If you are offline and the CLI falls back to cache, you will see `⚠ Offline - 
 ardent project list
 ```
 
-<Accordion title="Example output (colors omitted)">
+<Accordion defaultOpen={false} title="Example output (colors omitted)">
 ```
 Projects:
 * my-app
@@ -48,7 +48,7 @@ Switch to a different project. Ardent clears your current connector selection an
 ardent project switch staging
 ```
 
-<Accordion title="Example output (single connector in new project)">
+<Accordion defaultOpen={false} title="Example output (single connector in new project)">
 ```
 Switched to project 'staging'
 
@@ -56,7 +56,7 @@ Switched to project 'staging'
 ```
 </Accordion>
 
-<Accordion title="Example output (multiple connectors in new project)">
+<Accordion defaultOpen={false} title="Example output (multiple connectors in new project)">
 ```
 Switched from 'my-app' to 'staging'
 
@@ -71,7 +71,7 @@ Switched from 'my-app' to 'staging'
 ardent project delete staging
 ```
 
-<Accordion title="Example output">
+<Accordion defaultOpen={false} title="Example output">
 ```
 Deleting project...
 ✓ Project deleted

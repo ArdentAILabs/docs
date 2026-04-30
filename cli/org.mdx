@@ -13,7 +13,7 @@ ardent invite alice@company.com
 ardent invite alice@company.com admin
 ```
 
-<Accordion title="Example output">
+<Accordion defaultOpen={false} title="Example output">
 ```
 ✓ Invite sent to alice@company.com
 ```
@@ -27,7 +27,7 @@ Output is **not** a table: one block per invite (email, then role and sent date 
 ardent invite list
 ```
 
-<Accordion title="Example output">
+<Accordion defaultOpen={false} title="Example output">
 ```
 Pending invites:
 
@@ -43,7 +43,7 @@ Pending invites:
 ardent invite delete alice@company.com
 ```
 
-<Accordion title="Example output">
+<Accordion defaultOpen={false} title="Example output">
 ```
 ✓ Invite for alice@company.com deleted
 ```
@@ -57,7 +57,7 @@ Output is **not** a table. Each member is two lines: email, optional ` (display 
 ardent org members
 ```
 
-<Accordion title="Example output">
+<Accordion defaultOpen={false} title="Example output">
 ```
 Organization members:
 
@@ -78,7 +78,7 @@ Available roles: `owner`, `admin`, `member`, `viewer`.
 ardent org set-role alice@company.com admin
 ```
 
-<Accordion title="Example output">
+<Accordion defaultOpen={false} title="Example output">
 ```
 ✓ Updated alice@company.com to admin
 ```
@@ -90,7 +90,7 @@ ardent org set-role alice@company.com admin
 ardent org remove alice@company.com
 ```
 
-<Accordion title="Example output">
+<Accordion defaultOpen={false} title="Example output">
 ```
 ✓ Removed alice@company.com from organization
 ```
