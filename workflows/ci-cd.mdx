@@ -7,16 +7,19 @@ Every PR gets its own fresh database cloned from production, torn down after mer
 
 ## GitHub Actions example
 
+The CLI prints the URL when you create a branch; in CI it is easier to create the branch, then read the URL with `ardent branch info` and append it to `GITHUB_ENV` so later steps (npm, pytest, your migration runner) see `DATABASE_URL`.
+
 ```yaml
 - name: Create database branch
-  run: ardent branch create pr-${{ github.event.pull_request.number }}
+  run: |
+    NAME="pr-${{ github.event.pull_request.number }}"
+    ardent branch create "$NAME"
+    echo "DATABASE_URL=$(ardent branch info "$NAME" | sed -n 's/^URL:[[:space:]]*//p')" >> "$GITHUB_ENV"
   env:
     ARDENT_TOKEN: ${{ secrets.ARDENT_TOKEN }}
 
 - name: Run migrations + tests
   run: npm test
-  env:
-    DATABASE_URL: ${{ steps.branch.outputs.url }}
 
 - name: Delete branch
   if: always()
@@ -25,9 +28,11 @@ Every PR gets its own fresh database cloned from production, torn down after mer
     ARDENT_TOKEN: ${{ secrets.ARDENT_TOKEN }}
 ```
 
+Use the same `DATABASE_URL` for `pytest`, `pnpm test`, or any tool your repo already uses in CI. If your framework reads a different variable, write that name to `GITHUB_ENV` instead.
+
 ## Why this beats a shared staging database
 
-- **Isolation** — each PR can't interfere with other test runs
-- **Always in sync** — branched from production, no drift
-- **No idle cost** — branches auto-suspend between CI runs
-- **Auto cleanup** — `if: always()` means no orphaned environments
+- **Isolation:** each PR can't interfere with other test runs
+- **Always in sync:** branched from production, no drift
+- **No idle cost:** branches auto-suspend between CI runs
+- **Auto cleanup:** `if: always()` means no orphaned environments
