@@ -95,8 +95,8 @@
                 ]
               },
               {
-                "group": "Databases",
-                "icon": "cylinder",
+                "group": "Connectors & branches",
+                "icon": "route",
                 "expanded": true,
                 "pages": [
                   "cli/connectors",
@@ -104,7 +104,7 @@
                 ]
               },
               {
-                "group": "Policies",
+                "group": "Settings",
                 "icon": "sliders-horizontal",
                 "expanded": true,
                 "pages": [

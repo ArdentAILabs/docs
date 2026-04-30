@@ -1,19 +1,29 @@
 ---
 title: "Settings"
 sidebarTitle: "Settings"
-description: "ardent settings list, set, remove for connector policies"
+description: "Per-connector defaults and branch configuration (ardent settings)"
 ---
 
-Connector-scoped settings apply to every branch created from the active connector.
+**Settings** are how you control what each **new branch** looks like for the currently selected connector: which database name appears in connection URLs, and what SQL runs once the branch exists.
+
+The CLI command is `ardent settings`. Under the hood Ardent persists these as connector-scoped configuration; you do not need to think about the internal policy types.
 
 | Key | Description |
 |-----|-------------|
 | `default_db` | Default database name used in branch connection strings |
-| `branch_sql` | SQL (or `@path/to/file.sql`) run automatically on each **new** branch after creation. Use for seeds, anonymization, or policy scripts. |
+| `branch_sql` | SQL (or `@path/to/file.sql`) executed once on every **new** branch after it is created. This is the flexible hook: anonymization or masking, seed data, org-specific setup, or any `ALTER` / `UPDATE` you want every branch to start with |
 
-### Anonymization
+### Branch configuration and anonymization
 
-Use `branch_sql` to mask or transform data on every new branch (for example `UPDATE users SET email = 'redacted@example.com'` or hashing columns). See [Security](/security#branch-anonymization) for the full picture.
+`branch_sql` was built for teams that need **repeatable control over branch contents** without maintaining one-off scripts per developer.
+
+Typical uses:
+
+- **Anonymization or redaction** so branches get realistic shape without real PII
+- **Seed or fixture SQL** so every branch starts from a known baseline
+- **Guardrail DDL** or reference data your app expects on every isolated copy
+
+For security-focused anonymization patterns, see [Security](/security#branch-anonymization).
 
 ### ardent settings list
 
