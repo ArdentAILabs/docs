@@ -8,6 +8,12 @@
     "dark": "#15803D"
   },
   "favicon": "/favicon.svg",
+  "redirects": [
+    {
+      "source": "/cli-reference",
+      "destination": "/cli/overview"
+    }
+  ],
   "navigation": {
     "tabs": [
       {
@@ -64,11 +70,20 @@
         "tab": "CLI / API reference",
         "groups": [
           {
-            "group": "CLI & API",
+            "group": "CLI",
             "pages": [
-              "cli-reference",
-              "api-reference"
+              "cli/overview",
+              "cli/auth",
+              "cli/projects",
+              "cli/connectors",
+              "cli/branches",
+              "cli/settings",
+              "cli/org"
             ]
+          },
+          {
+            "group": "API",
+            "pages": ["api-reference"]
           }
         ]
       }

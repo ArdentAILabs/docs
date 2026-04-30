@@ -1,0 +1,83 @@
+---
+title: "Branches"
+sidebarTitle: "Branches"
+description: "ardent branch create, list, info, switch, delete"
+---
+
+### ardent branch create
+
+Create a new isolated database branch. Automatically checks it out and returns the connection URL.
+
+```bash
+ardent branch create my-feature
+```
+
+<Accordion title="Example output">
+```
+✓ Branch 'my-feature' created and checked out in 4.2s
+
+postgresql://user:pass@my-feature-postgres.routing.tryardent.com:5432/db
+```
+</Accordion>
+
+### ardent branch list
+
+List all branches. The current branch is marked with `*`.
+
+```bash
+ardent branch list
+```
+
+<Accordion title="Example output">
+```
+* ● my-feature
+  postgresql://...my-feature...tryardent.com/db
+  ○ staging
+  postgresql://...staging...tryardent.com/db
+```
+</Accordion>
+
+### ardent branch info
+
+Show details and connection URL for a branch. Defaults to the current branch if no name is given.
+
+```bash
+ardent branch info my-feature
+```
+
+<Accordion title="Example output">
+```
+Name:    my-feature
+URL:     postgresql://user:pass@my-feature-postgres.routing.tryardent.com:5432/db
+Status:  active
+Created: 2 minutes ago
+```
+</Accordion>
+
+### ardent branch switch
+
+Switch to a different branch.
+
+```bash
+ardent branch switch staging
+```
+
+<Accordion title="Example output">
+```
+✓ Switched to staging
+```
+</Accordion>
+
+### ardent branch delete
+
+Delete a branch. Branches auto-suspend after 5 minutes of inactivity, so cleanup is optional.
+
+```bash
+ardent branch delete my-feature
+```
+
+<Accordion title="Example output">
+```
+✓ Branch deleted: my-feature
+```
+</Accordion>

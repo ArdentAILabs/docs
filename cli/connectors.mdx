@@ -1,0 +1,91 @@
+---
+title: "Connectors"
+sidebarTitle: "Connectors"
+description: "ardent connector create, list, switch, delete"
+---
+
+A connector links Ardent to one of your Postgres databases. You need at least one before creating branches.
+
+### ardent connector create
+
+Connect a Postgres database. Ardent replicates your data during initial setup. This may take a few minutes depending on data size. After setup, branches create in under 6 seconds regardless of data size.
+
+```bash
+ardent connector create postgresql postgresql://user:password@host:5432/mydb
+```
+
+Give it a name with `-n`:
+
+```bash
+ardent connector create postgresql postgresql://user:password@host:5432/mydb -n prod-db
+```
+
+<Accordion title="Example output">
+```
+✓ Connector created and ready
+  ID: conn_abc123
+  Ready to branch:
+  ardent branch create <name>
+```
+</Accordion>
+
+**BYOC (Neon), bring your own cloud:**
+
+```bash
+ardent connector create postgresql --byoc neon --api-key <key> --project-id <id>
+```
+
+**Self-hosted / customer-cloud deployment:**
+
+```bash
+ardent connector create postgresql <url> \
+  --deployment-model customer-cloud \
+  --aws-role-arn <arn> \
+  --aws-external-id <id> \
+  --aws-region us-east-1 \
+  --aws-cluster-name <cluster>
+```
+
+### ardent connector list
+
+List all connectors in the current project. The active connector is marked with `*`.
+
+```bash
+ardent connector list
+```
+
+<Accordion title="Example output">
+```
+Connectors:
+* ● prod-db
+  postgresql
+  ○ staging-db
+  postgresql
+```
+</Accordion>
+
+### ardent connector switch
+
+Switch the active connector without changing projects.
+
+```bash
+ardent connector switch staging-db
+```
+
+<Accordion title="Example output">
+```
+Switched from 'prod-db' to 'staging-db'
+```
+</Accordion>
+
+### ardent connector delete
+
+```bash
+ardent connector delete staging-db
+```
+
+<Accordion title="Example output">
+```
+✓ Connector deleted
+```
+</Accordion>

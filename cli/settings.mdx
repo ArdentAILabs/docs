@@ -1,0 +1,60 @@
+---
+title: "Settings"
+sidebarTitle: "Settings"
+description: "ardent settings list, set, remove for connector policies"
+---
+
+Connector-scoped settings apply to every branch created from the active connector.
+
+| Key | Description |
+|-----|-------------|
+| `default_db` | Default database name used in branch connection strings |
+| `branch_sql` | SQL (or `@path/to/file.sql`) run automatically on each **new** branch after creation. Use for seeds, anonymization, or policy scripts. |
+
+### Anonymization
+
+Use `branch_sql` to mask or transform data on every new branch (for example `UPDATE users SET email = 'redacted@example.com'` or hashing columns). See [Security](/security#branch-anonymization) for the full picture.
+
+### ardent settings list
+
+```bash
+ardent settings list
+```
+
+<Accordion title="Example output">
+```
+Connector: prod-db
+  default_db   myapp
+  branch_sql   (not set)  SQL run on every new branch
+```
+</Accordion>
+
+### ardent settings set
+
+```bash
+ardent settings set default_db myapp
+```
+
+Pass a file for `branch_sql`:
+
+```bash
+ardent settings set branch_sql @./seed.sql
+```
+
+<Accordion title="Example output">
+```
+✓ Set default_db → myapp
+```
+</Accordion>
+
+### ardent settings remove
+
+```bash
+ardent settings remove branch_sql
+```
+
+<Accordion title="Example output">
+```
+✓ Removed branch_sql
+```
+</Accordion>

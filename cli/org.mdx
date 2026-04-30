@@ -1,0 +1,85 @@
+---
+title: "Team"
+sidebarTitle: "Team"
+description: "ardent invite and ardent org"
+---
+
+### ardent invite
+
+Invite a user to your organization. Default role is `member`.
+
+```bash
+ardent invite alice@company.com
+ardent invite alice@company.com admin
+```
+
+<Accordion title="Example output">
+```
+✓ Invite sent to alice@company.com
+```
+</Accordion>
+
+### ardent invite list
+
+```bash
+ardent invite list
+```
+
+<Accordion title="Example output">
+```
+EMAIL                STATUS     SENT
+alice@company.com    pending    1 hour ago
+```
+</Accordion>
+
+### ardent invite delete
+
+```bash
+ardent invite delete alice@company.com
+```
+
+<Accordion title="Example output">
+```
+✓ Invite for alice@company.com deleted
+```
+</Accordion>
+
+### ardent org members
+
+```bash
+ardent org members
+```
+
+<Accordion title="Example output">
+```
+NAME     EMAIL                ROLE
+Vikram   vikram@company.com   admin
+Alice    alice@company.com    member
+```
+</Accordion>
+
+### ardent org set-role
+
+Available roles: `owner`, `admin`, `member`, `viewer`.
+
+```bash
+ardent org set-role alice@company.com admin
+```
+
+<Accordion title="Example output">
+```
+✓ Updated alice@company.com to admin
+```
+</Accordion>
+
+### ardent org remove
+
+```bash
+ardent org remove alice@company.com
+```
+
+<Accordion title="Example output">
+```
+✓ Removed alice@company.com from organization
+```
+</Accordion>

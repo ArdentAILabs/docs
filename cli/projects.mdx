@@ -1,0 +1,75 @@
+---
+title: "Projects"
+sidebarTitle: "Projects"
+description: "ardent project create, list, switch, delete"
+---
+
+Projects are the top-level grouping for your connectors and branches. Most users start with one project; the project commands become useful when you are managing multiple environments or teams.
+
+### ardent project create
+
+```bash
+ardent project create <name>
+```
+
+<Accordion title="Example output">
+```
+✓ Project 'staging' created
+```
+</Accordion>
+
+### ardent project list
+
+```bash
+ardent project list
+```
+
+The current project is marked with `*`.
+
+<Accordion title="Example output">
+```
+Projects:
+* my-app
+  staging
+  internal-tools
+```
+</Accordion>
+
+### ardent project switch
+
+Switch to a different project. Ardent clears your current connector selection and automatically selects the new project's connector if it has exactly one.
+
+```bash
+ardent project switch staging
+```
+
+<Accordion title="Example output (single connector in new project)">
+```
+Switched to project 'staging'
+
+  Auto-selected connector 'staging-db'
+```
+</Accordion>
+
+<Accordion title="Example output (multiple connectors in new project)">
+```
+Switched from 'my-app' to 'staging'
+
+  No connectors found.
+  Create one with: ardent connector create postgresql <url>
+```
+</Accordion>
+
+### ardent project delete
+
+```bash
+ardent project delete staging
+```
+
+<Accordion title="Example output">
+```
+Deleting project...
+✓ Project deleted
+  Name: staging
+```
+</Accordion>
