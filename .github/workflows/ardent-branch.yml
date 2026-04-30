@@ -14,6 +14,9 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Install dependencies
+        run: npm ci
+
       - name: Install Ardent CLI
         run: npm install -g ardent-cli
 
@@ -32,11 +35,8 @@ jobs:
           echo "DATABASE_URL=$(ardent branch info | awk '/URL:/{print $2}')" >> "$GITHUB_ENV"
           echo "ARDENT_BRANCH=$BRANCH_NAME" >> "$GITHUB_ENV"
 
-      - name: Install psql
-        run: sudo apt-get install -y postgresql-client
-
-      - name: Run query against branch
-        run: psql "$DATABASE_URL" -c "SELECT 1 AS connected;"
+      - name: Run migration tests
+        run: npm test
 
       - name: Delete database branch
         if: always()
