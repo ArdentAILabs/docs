@@ -25,9 +25,9 @@ flowchart TB
         direction LR
         PROD[("Production DB")] -->|logical replication| AR["Ardent Replicator + Kafka"]
         AR --> REP[("Read replica")]
-        REP --> B1[("Branch · preview")]
-        REP --> B2[("Branch · CI")]
-        REP --> B3[("Branch · agents")]
+        REP --> B1[("Branch one")]
+        REP --> B2[("Branch two")]
+        REP --> B3[("Branch three")]
     end
     CP <-->|metadata only| DP
 ```
