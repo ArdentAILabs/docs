@@ -5,8 +5,8 @@ description: "How Ardent's split-plane architecture keeps your data safe and you
 
 Ardent follows a split-plane architecture where the **control plane** and **data plane** are separated:
 
-- **Control plane** — Operated by Ardent. Handles branch orchestration, replication health monitoring, connection routing, auto-scaling, and policy enforcement. Spans across all deployments.
-- **Data plane** — Where your data lives. The Ardent Replicator syncs from your production database via a Kafka pipeline into a read replica. Branches are instant copy-on-write forks off that replica.
+- **Control plane:** Operated by Ardent. Handles branch orchestration, replication health monitoring, connection routing, auto-scaling, and policy enforcement. Spans across all deployments.
+- **Data plane:** Where your data lives. The Ardent Replicator syncs from your production database via a Kafka pipeline into a read replica. Branches are instant copy-on-write forks off that replica.
 
 Only metadata (schema structure, replication status, branch state) flows from the data plane to the control plane. Your actual data never leaves the data plane.
 
@@ -19,7 +19,7 @@ flowchart TB
         ORCH["Branch orchestration"] ~~~ ROUTE["Connection routing"] ~~~ HEALTH["Health & WAL monitoring"] ~~~ POL["Policies & auth"]
     end
 
-    subgraph DP["Data Plane · Ardent Cloud  —or—  your infrastructure"]
+    subgraph DP["Data Plane · Ardent Cloud or your infrastructure"]
         direction LR
         PROD[("Your\nproduction DB")] -->|"logical replication"| AR["Ardent Replicator\n+ Kafka pipeline"]
         AR --> REP[("Read\nreplica")]
@@ -31,35 +31,35 @@ flowchart TB
 
 ## What each layer does for you
 
-The split is not just where code runs — it is what each layer is responsible for. Together they are why you get branches without operating a replication platform yourself.
+The split is not only where code runs, but what each layer is responsible for. Together they are why you get branches without operating a replication platform yourself.
 
 ### Control plane
 
-Always operated by Ardent. It is the orchestration and policy layer — not where your rows live.
+Always operated by Ardent. Orchestration, policies, routing, and visibility across every branch and connection.
 
-- **Branch lifecycle** — Create, suspend, delete, and route traffic to the right branch. Connection URLs go through Ardent so every session is tied to an account and can enforce rules, hooks, and policies.
-- **Replication coordination** — Monitors health, lag, and pipeline status from metadata; scales and manages the Kafka layer that backs replication so you are not sizing or operating brokers yourself.
-- **Connector setup** — Discovery and validation when you connect a database, plus connector-scoped policies such as default database and branch hooks.
-- **Auth, usage, and billing** — Org access, API keys, and metering — the kind of per-user visibility Postgres does not give you out of the box.
+- **Branch lifecycle:** Create, suspend, delete, and route traffic to the right branch. Connection URLs go through Ardent so every session is tied to an account and can enforce rules, hooks, and policies.
+- **Replication coordination:** Monitors health, lag, and pipeline status from metadata; scales and manages the Kafka layer that backs replication so you are not sizing or operating brokers yourself.
+- **Connector setup:** Discovery and validation when you connect a database, plus connector-scoped policies such as default database and branch hooks.
+- **Auth, usage, and billing:** Org access, API keys, and metering. Per-user and per-branch visibility Postgres does not give you out of the box.
 
 ### Data plane
 
 Where your data physically lives and where branches are served from. Runs on Ardent Cloud or in your own account on Scale and Enterprise.
 
-- **Read replica** — Stays in sync with production; branches are never forked straight off production, so branch load never hits your primary.
-- **Branch storage** — Copy-on-write forks off the replica — fast to create at any size, cheap to leave idle.
-- **Isolation** — Your table data stays inside this boundary. Only metadata crosses to the control plane.
+- **Read replica:** Stays in sync with production; branches are never forked straight off production, so branch load never hits your primary.
+- **Branch storage:** Copy-on-write forks off the replica. Fast to create at any size, cheap to leave idle.
+- **Isolation:** Your table data stays inside this boundary. Only metadata crosses to the control plane.
 
 ### Ardent Replicator
 
 The data plane component that owns the stream from production into the replica. This is where most products fall apart; it is where Ardent is intentionally deep.
 
-- **DDL-aware replication** — Production schema changes (adds, drops, renames, type changes) are handled in flight so the stream does not stall or silently diverge.
-- **In-flight pipeline semantics** — Changes are ordered, processed, and applied through the Kafka-backed path so retries and replays do not turn into duplicates, gaps, or corrupt application order.
-- **Operational safety on the primary** — WAL and slot pressure are managed as part of the pipeline so replication does not become a disk or availability risk on your production instance.
-- **Recovery** — When something breaks, the system knows how to quarantine, resume, and heal without you hand-writing replay scripts.
+- **DDL-aware replication:** Production schema changes (adds, drops, renames, type changes) are handled in flight so the stream does not stall or silently diverge.
+- **In-flight pipeline semantics:** Changes are ordered, processed, and applied through the Kafka-backed path so retries and replays do not turn into duplicates, gaps, or corrupt application order.
+- **Operational safety on the primary:** WAL and slot pressure are managed as part of the pipeline so replication does not become a disk or availability risk on your production instance.
+- **Recovery:** When something breaks, the system knows how to quarantine, resume, and heal without you hand-writing replay scripts.
 
-You connect your database and open branches. The control plane orchestrates, the data plane hosts data and branches, and the Ardent Replicator owns the hard part — the living stream between production and replica.
+You connect your database and open branches. The control plane orchestrates, the data plane hosts data and branches, and the Ardent Replicator owns the hard part: the living stream between production and replica.
 
 ---
 
@@ -73,10 +73,10 @@ The control plane is always Ardent's. The data plane can be ours or yours.
 | **Data plane** | Ardent's infrastructure | Your infrastructure | Your infrastructure |
 | **Data leaves your network** | Yes | No | No |
 | **Plan** | Free / Growth | Scale ($250/mo) | Enterprise |
-| **Data residency / on-prem** | — | — | Yes |
+| **Data residency / on-prem** | No | No | Yes |
 
-**Ardent Cloud** — We host the entire data plane. Connect your database and we handle the Ardent Replicator, Kafka pipeline, read replica, and branch compute. Available on all plans.
+**Ardent Cloud.** We host the entire data plane. Connect your database and we handle the Ardent Replicator, Kafka pipeline, read replica, and branch compute. Available on all plans.
 
-**Self-hosted (Scale)** — The Ardent Replicator deploys into your own cloud account. Your data never leaves your infrastructure. The control plane still orchestrates everything via API, but all replication and branch compute runs inside your network.
+**Self-hosted (Scale).** The Ardent Replicator deploys into your own cloud account. Your data never leaves your infrastructure. The control plane still orchestrates everything via API, but all replication and branch compute runs inside your network.
 
-**Enterprise** — Custom deployment, on-prem, dedicated infrastructure. [Talk to us.](mailto:vikram@tryardent.com)
+**Enterprise.** Custom deployment, on-prem, dedicated infrastructure. [Talk to us.](mailto:vikram@tryardent.com)
