@@ -29,26 +29,21 @@ flowchart TB
     CP <-->|"metadata only"| DP
 ```
 
-## What makes this hard to build
+## What we manage for you
 
-Database branching sounds simple. Replication plus snapshots. The reality is messier — and the failure modes are production-impacting.
+Replication and branching carry a lot of operational work. Ardent runs that layer end to end so your team is not building CDC infrastructure, babysitting slots, or writing recovery playbooks.
 
-**WAL slot management without killing your primary**
-Postgres replication slots hold WAL data until the replica has consumed it. If replication falls behind, slots grow unbounded — filling disk and eventually crashing your primary. Managing slot lag, pruning safely, and recovering without data loss is a full-time problem.
+**WAL slot health** — Replication slots can lag and grow until they threaten your primary. We monitor slot health and WAL pressure, clean up safely after disconnects, and keep replication recoverable without you tuning Postgres internals.
 
-**Schema changes mid-stream**
-When someone runs `ALTER TABLE` on production, the replication pipeline has to handle it in real time — without corrupting the replica, dropping rows, or stalling the stream. Add columns, drop columns, change types: each has different failure modes depending on where in the pipeline the change lands.
+**Schema changes in flight** — Production schema does not stand still. We keep the pipeline aligned as tables and columns change, so adds, drops, and type shifts do not leave you with a broken replica or a stalled stream.
 
-**Exactly-once delivery under failure**
-Retries, restarts, backfills, and network failures all create opportunities for duplicate writes or missing rows. Getting exactly-once semantics across a distributed pipeline — and being able to prove it — is significantly harder than getting data to flow at all.
+**Durability across restarts and failures** — Retries, restarts, and network blips are where pipelines usually duplicate or drop rows. We preserve ordering and integrity across the pipeline so your replica stays trustworthy.
 
-**Automatic recovery without manual intervention**
-CDC pipelines break. The question is whether your team gets paged at 3am or the system recovers itself from the right point in time. Knowing where to resume, when to quarantine a connector vs retry, and how to do it without data loss requires purpose-built recovery logic.
+**Recovery when something goes wrong** — When CDC hiccups, the alternative is often a manual replay or a late-night incident. We detect failures, isolate bad streams when needed, and resume from the right point — without you maintaining custom tooling.
 
-**Instant forks at any scale**
-Making `ardent branch create` return in under 6 seconds on a 10GB database is achievable. Doing it on a 500GB database requires a fundamentally different approach than "copy the data." Copy-on-write only works if the replication layer was built to support it from the start.
+**Fast branches regardless of database size** — Branches fork off the read replica with copy-on-write semantics, so `ardent branch create` stays fast even when your production database is large — without full copies or long provisioning steps.
 
-Ardent handles all of this. You just run `ardent branch create`.
+You connect your database and use branches. We operate what sits in between.
 
 ---
 
