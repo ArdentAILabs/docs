@@ -29,6 +29,29 @@ flowchart TB
     CP <-->|"metadata only"| DP
 ```
 
+## What makes this hard to build
+
+Database branching sounds simple. Replication plus snapshots. The reality is messier — and the failure modes are production-impacting.
+
+**WAL slot management without killing your primary**
+Postgres replication slots hold WAL data until the replica has consumed it. If replication falls behind, slots grow unbounded — filling disk and eventually crashing your primary. Managing slot lag, pruning safely, and recovering without data loss is a full-time problem.
+
+**Schema changes mid-stream**
+When someone runs `ALTER TABLE` on production, the replication pipeline has to handle it in real time — without corrupting the replica, dropping rows, or stalling the stream. Add columns, drop columns, change types: each has different failure modes depending on where in the pipeline the change lands.
+
+**Exactly-once delivery under failure**
+Retries, restarts, backfills, and network failures all create opportunities for duplicate writes or missing rows. Getting exactly-once semantics across a distributed pipeline — and being able to prove it — is significantly harder than getting data to flow at all.
+
+**Automatic recovery without manual intervention**
+CDC pipelines break. The question is whether your team gets paged at 3am or the system recovers itself from the right point in time. Knowing where to resume, when to quarantine a connector vs retry, and how to do it without data loss requires purpose-built recovery logic.
+
+**Instant forks at any scale**
+Making `ardent branch create` return in under 6 seconds on a 10GB database is achievable. Doing it on a 500GB database requires a fundamentally different approach than "copy the data." Copy-on-write only works if the replication layer was built to support it from the start.
+
+Ardent handles all of this. You just run `ardent branch create`.
+
+---
+
 ## Deployment options
 
 The control plane is always Ardent's. The data plane can be ours or yours.
