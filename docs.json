@@ -88,7 +88,7 @@
               {
                 "group": "Workspace",
                 "icon": "folder-key",
-                "expanded": true,
+                "expanded": false,
                 "pages": [
                   "cli/auth",
                   "cli/projects"
@@ -97,7 +97,7 @@
               {
                 "group": "Connectors",
                 "icon": "unplug",
-                "expanded": true,
+                "expanded": false,
                 "pages": [
                   "cli/connectors"
                 ]
@@ -105,7 +105,7 @@
               {
                 "group": "Branches",
                 "icon": "git-branch",
-                "expanded": true,
+                "expanded": false,
                 "pages": [
                   "cli/branches"
                 ]
@@ -113,7 +113,7 @@
               {
                 "group": "Settings",
                 "icon": "sliders-horizontal",
-                "expanded": true,
+                "expanded": false,
                 "pages": [
                   "cli/settings"
                 ]
@@ -121,7 +121,7 @@
               {
                 "group": "Team",
                 "icon": "users",
-                "expanded": true,
+                "expanded": false,
                 "pages": [
                   "cli/org"
                 ]
