@@ -5,21 +5,21 @@ description: "How Ardent keeps your data safe"
 
 Ardent is designed to never put your production data at risk. Here's how.
 
-## Production is read-only
+## Minimal production footprint
 
-Ardent uses logical replication to sync your data — it only reads from your production database. It never writes to it or modifies it.
+Ardent uses logical replication to sync your table data and does not write to your application tables. During connector setup, Ardent creates one dedicated schema for its own metadata and installs DDL event triggers there so schema changes can be detected and replayed in order on the replica.
 
-## Credentials are never exposed
+This has little to no performance impact on production. Normal application reads and writes continue against your database as usual.
 
-Every branch gets its own generated connection string. Your real database credentials are never shared — not with agents, not with team members, not with Ardent itself.
+## Encryption and secrets
 
-If a branch URL is ever compromised, it has zero access to your original database. This makes it safe to hand branch URLs to AI agents like Claude Code or Cursor without worrying about your production credentials leaking.
+Ardent encrypts source database credentials, API keys, and connection secrets at rest. Replication components read credentials only at runtime when they need to connect.
 
-Branches are controlled through Ardent's connection layer, so you can delete or de-provision them at any time.
+With **BYOC (bring your own cloud)**, secrets live in your own infrastructure (for example AWS SSM Parameter Store). Ardent reads them directly from your secret store at runtime, and your credentials never leave your network.
 
-## All secrets are encrypted
+Every branch gets its own generated connection string. If a branch URL is ever compromised, it has zero access to your original database. This makes it safe to hand branch URLs to AI agents like Claude Code or Cursor without leaking your source database credentials.
 
-All secrets (connection strings, credentials, API keys) are encrypted at rest. Nothing is stored unencrypted. In **managed, your cloud** deployments, secrets live in your own infrastructure (for example AWS SSM Parameter Store). Ardent reads them at runtime but never persists your credentials on Ardent infrastructure.
+Branches are controlled through Ardent's control plane, so you can delete or de-provision them at any time.
 
 ## Branch anonymization
 
