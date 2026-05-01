@@ -24,41 +24,46 @@ An instant database for every task.
   </Card>
 </CardGroup>
 
-## Start making Database copies in just 4 commands
+## Get started
 
-<Steps>
-  <Step title="Install the CLI">
-    ```bash
-    npm install -g ardent-cli
-    ```
-  </Step>
-  <Step title="Log in">
-    ```bash
-    ardent login
-    ```
-  </Step>
-  <Step title="Connect your database">
-    ```bash
-    ardent connector create postgresql '<your-connection-string>'
-    ```
-    Use single quotes around the URL so characters like `?`, `&`, or `$` in the string are not mangled by the shell.
-  </Step>
-  <Step title="Create a branch">
-    ```bash
-    ardent branch create my-feature
-    ```
-  </Step>
-</Steps>
+<Card title="Quickstart" icon="rocket" href="/quickstart" horizontal>
+  Up and running in 4 commands. Takes about 2 minutes.
+</Card>
 
-That's it. You can make full, isolated copies of your database — ready in under 6 seconds regardless of data size.
-
-**Rather have Claude set this up?** Copy this into Claude Code or Cursor:
+**Or have Claude walk you through it.** Paste this into Claude Code or Cursor:
 
 ```
-I want to set up Ardent for database branching.
-Install ardent-cli, log in, connect my Postgres database
-[paste connection string here], and create my first branch.
-Docs: https://docs.tryardent.com
+Set up Ardent for database branching. Act like a teammate at my keyboard:
+run the commands yourself, stop only when you need me to do something
+only I can do (browser sign-up, paste a credential). Before each step,
+give me one short line on what's happening and why — process guidance,
+not a recap afterward.
+
+Run these in order:
+
+1. Install the CLI: npm install -g ardent-cli
+
+2. ardent login → opens a browser to authenticate. Tell me to finish
+   sign-up or login and ping you when done.
+
+3. Tell me to export my Postgres connection string in this shell so
+   Ardent can connect to my database and start replicating it for
+   branching:
+   export ARDENT_DB_URL='postgres://...'
+   Then run:
+   ardent connector create postgresql "$ARDENT_DB_URL"
+   (a project gets auto-created here)
+
+4. ardent branch create my-feature → spins up an isolated copy of my
+   database I can use however I want without touching prod.
+
+5. ardent branch info → give me the connection URL. That URL is my
+   isolated branch — I connect to it like any Postgres database.
+
+Skip the after-the-fact recap. Hand me the URL at the end. If a command
+errors, fix it.
+
+Docs: https://docs.tryardent.com/quickstart
 ```
 
 ## How it works
@@ -84,10 +89,7 @@ Create as many as you need, throw them away when you're done without worrying.
 
 ## Next steps
 
-<CardGroup cols={2}>
-  <Card title="Quickstart" icon="rocket" href="/quickstart">
-    Up and running in 3 commands.
-  </Card>
+<CardGroup cols={3}>
   <Card title="Connectors" icon="plug" href="/connectors/supabase">
     Supabase, RDS, PlanetScale, and self-hosted Postgres.
   </Card>
