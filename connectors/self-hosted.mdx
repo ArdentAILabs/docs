@@ -156,6 +156,12 @@ List the roles that create tables in a schema with:
 SELECT DISTINCT tableowner FROM pg_tables WHERE schemaname = '<schema>';
 ```
 
+<Tip>
+  Once your connector is created, Ardent can generate the exact grant
+  script for the databases and schemas you selected. Your Ardent contact
+  can send it to you on request.
+</Tip>
+
 </Step>
 
 <Step title="Connect your database">
@@ -172,11 +178,12 @@ anything missing. Verification typically completes in under a minute.
 
 <Note>
   Every replicated table needs a way to identify rows in WAL: a
-  `PRIMARY KEY`, a single-column `UNIQUE NOT NULL` index, or
-  `REPLICA IDENTITY FULL`. If any table lacks all three, the CLI
-  surfaces a per-table prompt during setup so you can exclude the
-  table, add a key on source, or set `REPLICA IDENTITY FULL`. Ardent
-  never runs DDL on your source.
+  `PRIMARY KEY`, a single-column `UNIQUE NOT NULL` index,
+  `REPLICA IDENTITY FULL`, or `REPLICA IDENTITY USING INDEX <idx>`. If
+  any table has none of these, the CLI surfaces a per-table prompt
+  during setup so you can exclude the table, add a primary key on
+  source, or set `REPLICA IDENTITY FULL`. Ardent never runs DDL on
+  your source.
 </Note>
 
 </Step>
