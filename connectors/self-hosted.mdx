@@ -157,9 +157,11 @@ SELECT DISTINCT tableowner FROM pg_tables WHERE schemaname = '<schema>';
 ```
 
 <Tip>
-  Once your connector is created, Ardent can generate the exact grant
-  script for the databases and schemas you selected. Your Ardent contact
-  can send it to you on request.
+  Once your connector exists, Ardent can generate the exact grant
+  script for the databases and schemas you selected. Fetch it from
+  `POST /v1/connectors/{connector_id}/grant-script` (returns the
+  ready-to-run psql artifact in the `sql` field) or ask your Ardent
+  contact to send it.
 </Tip>
 
 </Step>
