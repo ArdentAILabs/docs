@@ -32,7 +32,7 @@ ardent connector preflight postgresql '<connection-string>' --schemas public
 Then verify these source requirements and tell me exactly what to fix:
 1. The host is reachable from Ardent over TLS on the Postgres port.
 2. pg_hba.conf allows both normal and replication connections from Ardent's egress IP.
-3. wal_level is logical, max_wal_senders and max_replication_slots are high enough, and at least one replication slot is free.
+3. wal_level is logical, max_wal_senders >= 10, max_replication_slots >= 10 (or higher if already higher, since these are minimums Ardent expects), and at least one replication slot is free.
 4. wal2json is available. If you create a temporary slot to test it, immediately drop it; if the drop fails, stop and run SELECT pg_drop_replication_slot('ardent_probe'); before doing anything else.
 5. The connection is to a writable primary, not a read replica: SELECT pg_is_in_recovery(); must return false.
 6. The Ardent role has the grants from the preflight Grant script.
@@ -60,6 +60,14 @@ hostssl all          ardent_replication  <egress_ip>/32  scram-sha-256
 hostssl replication  ardent_replication  <egress_ip>/32  scram-sha-256
 ```
 
+After editing `pg_hba.conf`, reload Postgres so the new rules take effect. A reload is enough — no restart is needed for `pg_hba.conf` changes:
+
+```sql
+SELECT pg_reload_conf();
+```
+
+Or from the shell: `pg_ctl reload -D <datadir>` (or `sudo systemctl reload postgresql` on systemd installs).
+
 Hostnames must resolve to an IPv4 address. IPv6-only hosts are not supported today.
 
 </Step>
@@ -76,12 +84,29 @@ SHOW max_replication_slots;
 
 Ardent needs `wal_level = logical`, at least one free replication slot, and enough WAL sender capacity for Ardent plus anything else already replicating from your database. If your existing values are higher than Ardent's minimums, keep the higher values.
 
+`ALTER SYSTEM SET` only accepts a literal value, not an expression, so running `ALTER SYSTEM SET max_wal_senders = 10` on a server that already has `max_wal_senders = 20` (for example, to support existing standbys) will lower it to 10 on the next restart and can start refusing connections from those standbys. The block below raises each parameter only when the current value is below Ardent's minimum:
+
 ```sql
-ALTER SYSTEM SET wal_level = 'logical';
--- Use at least 10, but do not lower an existing higher value.
-ALTER SYSTEM SET max_wal_senders = 10;
-ALTER SYSTEM SET max_replication_slots = 10;
+DO $$
+DECLARE
+  v_wal_level  text := current_setting('wal_level');
+  v_senders    int  := current_setting('max_wal_senders')::int;
+  v_slots      int  := current_setting('max_replication_slots')::int;
+BEGIN
+  IF v_wal_level <> 'logical' THEN
+    EXECUTE 'ALTER SYSTEM SET wal_level = ''logical''';
+  END IF;
+  IF v_senders < 10 THEN
+    EXECUTE format('ALTER SYSTEM SET max_wal_senders = %s', 10);
+  END IF;
+  IF v_slots < 10 THEN
+    EXECUTE format('ALTER SYSTEM SET max_replication_slots = %s', 10);
+  END IF;
+END
+$$;
 ```
+
+If you prefer to manage these by hand, run the `SHOW` queries above first and only `ALTER SYSTEM SET` the parameters whose current values are below 10.
 
 <Warning>
   These changes require a Postgres restart. Plan a maintenance window before continuing.
