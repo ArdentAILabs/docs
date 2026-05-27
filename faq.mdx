@@ -10,11 +10,11 @@ description: "Common questions answered"
 </Accordion>
 
 <Accordion title="How long does it take to create a branch?">
-  Under 6 seconds, regardless of database size. The initial connector setup takes longer depending on data size, but after that every branch is instant.
+  There are two clocks. The first connector setup has to preflight, snapshot, and catch up replication; that can take minutes to hours depending on data size, write rate, and network throughput. After the connector is healthy, branch creation is usually seconds and is independent of source database size.
 </Accordion>
 
 <Accordion title="Does branching affect my production database?">
-  No. Ardent uses logical replication to sync your data. Your production database is never written to or modified.
+  Branch writes never touch production. Connector setup does create Ardent-owned replication metadata on the source, and for some Postgres sources installs DDL tracking triggers so schema changes can be replicated. Ardent does not write to your application tables.
 </Accordion>
 
 <Accordion title="What happens to idle branches?">
@@ -40,7 +40,7 @@ description: "Common questions answered"
 </Accordion>
 
 <Accordion title="What Postgres features work on branches?">
-  Everything. Branches are full Postgres databases — extensions, triggers, RLS, functions, all of it.
+  Ardent aims for full-fidelity branches: schema, data, grants, RLS, functions, and supported extensions. Some source features may need explicit setup decisions or support help, such as unsupported extensions, tables without replication identity, UNLOGGED tables, cron jobs, external webhooks, or provider-specific objects. Connector setup and status surface known exceptions before you rely on a branch.
 </Accordion>
 
 <Accordion title="Can I build this myself?">

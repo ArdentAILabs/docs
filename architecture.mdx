@@ -49,12 +49,12 @@ Where your data physically lives and where branches are served from. Runs on Ard
 
 - **Ardent Replicator**
   - Takes logical replication from production through a Kafka-backed pipeline into the read replica.
-  - Handles DDL in flight using **custom event triggers** that detect DDL on the primary and replay it **in order** on the replica, so schema changes keep streaming without stalls or silent drift.
-  - Applies changes in order across failures so retries do not leave gaps or duplicates.
-  - Manages WAL and slot pressure so replication does not destabilize the primary.
-  - Quarantines, resumes, and recovers broken streams without manual replay scripts.
+  - Tracks supported DDL with custom event triggers so schema changes can be replayed on the replica. Connector status and support workflows surface known fidelity gaps instead of treating them as ready.
+  - Applies changes in order across failures and records recovery state so retries are auditable.
+  - Monitors WAL and slot pressure so operators can intervene before replication destabilizes the primary.
+  - Quarantines broken events and preserves a paper trail for recovery when automatic replay is not safe.
 - **Read replica:** Stays in sync with production; branches are always created from the replica, never from production directly, so branch load never hits your primary.
-- **Branches (compute and storage):** Each branch is a full Postgres instance with **compute that auto-scales with load**. Branches share storage from the same replica through copy-on-write, so scaling to many branches is efficient for both compute and storage. Queries and connections run independently on autoscaling branch compute.
+- **Branches (compute and storage):** Each branch is a Postgres instance cloned from the replica with **compute that auto-scales with load**. Branches share storage from the same replica through copy-on-write, so scaling to many branches is efficient for both compute and storage. Queries and connections run independently on autoscaling branch compute.
 - **Isolation:** Your data stays inside this boundary. Only metadata crosses to the control plane. This means in a BYOC model you can maintain residency of all your data without losing Ardent's ability to manage the service
 
 You connect your database and open branches. The control plane orchestrates; the data plane runs replication, the replica, and branches.
