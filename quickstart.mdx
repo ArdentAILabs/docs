@@ -1,6 +1,6 @@
 ---
 title: "Quickstart"
-description: "Up and running in under a minute"
+description: "Preflight, connect, and branch your Postgres database"
 ---
 
 <Info>
@@ -24,19 +24,31 @@ npm install -g ardent-cli
 ardent login
 ```
 
-This opens your browser to authenticate with GitHub or email. If you only have one project and one connector, Ardent auto-selects them after login so you can go straight to `ardent branch create`.
+This opens your browser to authenticate with GitHub or email. If you only have one project and one connector, Ardent auto-selects them after login so you can go straight to branching.
+
+</Step>
+
+<Step title="Preflight your database">
+
+```bash
+ardent connector preflight postgresql 'postgresql://user:***@host:5432/mydb'
+```
+
+Preflight checks whether Ardent can reach and replicate from your source database. It does **not** create a connector, store credentials, or start replication. If grants are missing, Ardent prints the SQL to run.
+
+Wrap the URL in **single quotes** so special characters in the password or query string are not interpreted by your shell.
 
 </Step>
 
 <Step title="Connect your database">
 
+When preflight passes, create the connector:
+
 ```bash
-ardent connector create postgresql 'postgresql://user:password@host:5432/mydb'
+ardent connector create postgresql 'postgresql://user:***@host:5432/mydb'
 ```
 
-Wrap the URL in **single quotes** so special characters in the password or query string are not interpreted by the shell.
-
-Ardent replicates your database during initial setup. This may take some time depending on the size of your data — but you only do this once. After setup, every branch creates in under 6 seconds regardless of data size.
+Ardent stores encrypted credentials, discovers your schema, performs the initial snapshot, and starts continuous replication. Initial setup time depends on data size, write rate, and network throughput. Small sources may be ready in minutes; large production databases can take much longer.
 
 <Note>The new connector is automatically selected as your active connector.</Note>
 
@@ -44,27 +56,29 @@ Ardent replicates your database during initial setup. This may take some time de
 
 <Step title="Create your first branch">
 
+Once the connector is healthy:
+
 ```bash
 ardent branch create my-feature
 ```
 
-Done. You now have an isolated copy of your production database. The CLI returns a connection string you can use anywhere — psql, your app, an ORM, or hand it to an agent.
+Done. You now have an isolated copy of your production database. The CLI returns a connection string you can use anywhere — psql, your app, an ORM, or an agent.
 
 </Step>
 </Steps>
 
 ## What's next
 
-- Feed the connection URL to Claude Code — test if your migration breaks, try a new index to see if it speeds up your queries, or let it write and validate schema changes against real data
+- Feed the branch URL to Claude Code or Cursor — test if your migration breaks, try a new index, or validate schema changes against realistic data
 - Run `ardent branch info` to see the connection URL and status for your current branch
-- Create more branches for different tasks — they auto-suspend when idle, so don't worry about cleanup
+- Create more branches for different tasks — they auto-suspend when idle
 - Working across multiple databases or environments? Use `ardent project switch` and `ardent connector switch` to move between them
 
 <CardGroup cols={2}>
+  <Card title="Connector docs" icon="unplug" href="/connectors/supabase">
+    Provider-specific setup for Supabase, RDS, PlanetScale, and self-hosted Postgres.
+  </Card>
   <Card title="CLI Reference" icon="terminal" href="/cli/overview">
     Every command, flag, and option.
-  </Card>
-  <Card title="FAQ" icon="circle-question" href="/faq">
-    Common questions answered.
   </Card>
 </CardGroup>
