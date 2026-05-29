@@ -3,15 +3,7 @@ title: "Supabase"
 description: "Connect your Supabase Postgres database to Ardent"
 ---
 
-Supabase works well with Ardent when you use the direct Postgres connection to a writable project database.
-
-The recommended flow is:
-
-1. Copy the direct connection string from Supabase.
-2. Run Ardent preflight.
-3. Fix anything preflight reports.
-4. Create the connector.
-5. Create branches after the connector is healthy.
+Ardent is compatible with Supabase Postgres.
 
 **Want Claude or Cursor to help?** Paste this prompt into your agent:
 
@@ -62,7 +54,7 @@ If it shows a checkmark, you're good. If not, click **IPv4 settings** and enable
 Still in the Connect dialog, copy the URI. It looks like:
 
 ```text
-postgresql://postgres:***@db.[PROJECT-REF].supabase.co:5432/postgres
+postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
 ```
 
 Wrap the URI in single quotes when you use it in a shell.
@@ -72,7 +64,7 @@ Wrap the URI in single quotes when you use it in a shell.
 <Step title="Run preflight">
 
 ```bash
-ardent connector preflight postgresql 'postgresql://postgres:***@db.[PROJECT-REF].supabase.co:5432/postgres' --schemas public
+ardent connector preflight postgresql 'postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres' --schemas public
 ```
 
 Preflight checks reachability, credentials, source writability, logical replication, permissions, and duplicate-source status without creating a connector or storing credentials. It also prints a generated grant script.
@@ -92,7 +84,7 @@ Then re-run preflight. Do not create the connector until preflight passes.
 <Step title="Connect your database">
 
 ```bash
-ardent connector create postgresql 'postgresql://postgres:***@db.[PROJECT-REF].supabase.co:5432/postgres'
+ardent connector create postgresql 'postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres'
 ```
 
 Ardent stores encrypted credentials, discovers your schema, snapshots selected tables, and starts continuous replication. Initial setup time depends on data size, write rate, and network throughput.
@@ -101,13 +93,13 @@ Ardent stores encrypted credentials, discovers your schema, snapshots selected t
 
 <Step title="Create your first branch">
 
-When the connector is healthy:
+When the connector is ready:
 
 ```bash
 ardent branch create my-feature
 ```
 
-Done. You now have an isolated copy of your Supabase database — schema, data, and all. The CLI returns a connection URL you can use anywhere.
+Done. You now have an isolated copy of your Supabase database: schema, data, and all. The CLI returns a connection URL you can use anywhere.
 
 </Step>
 </Steps>

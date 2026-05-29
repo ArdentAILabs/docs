@@ -1,36 +1,35 @@
 ---
 title: "Connectors"
 sidebarTitle: "Connectors"
-description: "ardent connector preflight, create, list, switch, retry-setup, update, delete"
+description: "A connector links Ardent to one Postgres source server"
 ---
 
-A connector links Ardent to one Postgres source database. You need a healthy connector before creating branches.
-
-For production databases, start with preflight. It checks the source and prints the SQL to fix missing grants **without** creating a connector row or storing credentials.
+For production databases, start with preflight. It checks the source and prints the SQL to fix missing grants **without** creating a connector or storing credentials.
 
 ### ardent connector preflight
 
 Validate a Postgres source before creating a connector.
 
 ```bash
-ardent connector preflight postgresql 'postgresql://user:***@host:5432/mydb'
+ardent connector preflight postgresql 'postgresql://user:[YOUR-PASSWORD]@host:5432/mydb'
 ```
 
-Preflight runs the same source-readiness gate as connector creation, but it does not persist anything. It prints:
+Preflight runs a series of checks so you know whether Ardent can create a working connector for your database. If anything's missing, you'll see exactly what to fix. It does not store credentials or create anything. The checks cover:
 
-- connection and authentication checks
-- writer/read-replica check
+- connection and authentication
+- whether you're connected to a writer (not a read replica)
 - logical replication settings
 - replication slot and WAL sender capacity
-- `wal2json` availability
-- table-read and schema-write checks
-- duplicate-source detection
-- a generated grant script when Ardent can infer the provider and username
+- `wal2json` plugin availability
+- Ardent's permission to read your tables and create its metadata schema
+- whether this server is already connected to Ardent
 
-Use `--schemas` to generate schema-specific grant SQL:
+Preflight detects your Postgres provider and the permissions your user has. If any required permissions are missing, it generates a grant script you can paste back to fix them in one step.
+
+If your tables live in schemas other than `public`, pass `--schemas` so preflight checks permissions on those schemas too:
 
 ```bash
-ardent connector preflight postgresql 'postgresql://user:***@host:5432/mydb' \
+ardent connector preflight postgresql 'postgresql://user:[YOUR-PASSWORD]@host:5432/mydb' \
   --schemas public,billing
 ```
 
@@ -70,22 +69,22 @@ ardent connector preflight postgresql '<url>' \
   --private-link-id epl_123
 ```
 
-If an environment has an active private connection, Ardent requires `--private-link-id` so preflight and connector creation do not accidentally test through the public path.
+If an environment has an active private connection, Ardent requires `--private-link-id` so preflight uses the same private route the connector will.
 
 ### ardent connector create
 
 Create a connector after preflight passes.
 
 ```bash
-ardent connector create postgresql 'postgresql://user:***@host:5432/mydb'
+ardent connector create postgresql 'postgresql://user:[YOUR-PASSWORD]@host:5432/mydb'
 ```
 
 **Shell quoting:** Wrap the connection URL in **single quotes**. Otherwise the shell may treat characters in real strings (for example `?`, `&`, `#`, `!`, `$`, parentheses, or spaces inside passwords) as globs, history expansion, or variable substitution, and the command can fail or connect to the wrong place.
 
-Give the connector a name with `-n`:
+Give the connector a name with `--name`:
 
 ```bash
-ardent connector create postgresql 'postgresql://user:***@host:5432/mydb' -n prod-db
+ardent connector create postgresql 'postgresql://user:[YOUR-PASSWORD]@host:5432/mydb' --name prod-db
 ```
 
 <Accordion defaultOpen={false} title="Example output">
@@ -97,7 +96,7 @@ ardent connector create postgresql 'postgresql://user:***@host:5432/mydb' -n pro
 ```
 </Accordion>
 
-Initial setup can take minutes to hours depending on source size, write rate, and network throughput. Once the connector is healthy and caught up, branch creation is fast and independent of source database size.
+Initial setup can take minutes to hours depending on source size, write rate, and network throughput. After setup, branch creation is fast and independent of source database size.
 
 **BYOC / private-network connector:**
 
@@ -121,9 +120,9 @@ ardent connector create postgresql '<url>' \
 
 Decision values are:
 
-- `exclude` — do not replicate this table yet
-- `add_pk` — you will add a primary key or valid unique key on source before retrying
-- `replica_identity_full` — opt into `REPLICA IDENTITY FULL` for this table
+- `exclude`: do not replicate this table yet
+- `add_pk`: you will add a primary key or valid unique key on source before retrying
+- `replica_identity_full`: opt into `REPLICA IDENTITY FULL` for this table
 
 You can also accept safe defaults non-interactively. Undecided tables are excluded:
 
@@ -137,7 +136,7 @@ ardent connector create postgresql '<url>' --accept-replica-identity-defaults
 
 ### ardent connector list
 
-List all connectors in the current project. In the terminal, the **active** connector is **highlighted in green** and prefixed with `*`; other rows use default/dim text. `●` means healthy, `○` means not healthy. The service type prints on the line below each name. Warnings appear in yellow with a count on the name line and full text indented below.
+List all connectors in the current project. In the terminal, the **active** connector is **highlighted in green** and prefixed with `*`; other rows use default/dim text. `●` means the connector is ready to branch from; `○` means it is not. The service type prints on the line below each name. Warnings appear in yellow with a count on the name line and full text indented below.
 
 ```bash
 ardent connector list
@@ -174,13 +173,13 @@ Switched from 'prod-db' to 'staging-db'
 
 ### ardent connector retry-setup
 
-Retry branching-engine setup for a connector that validated but did not finish setup.
+Retry setup for a connector whose preflight passed but did not finish creating.
 
 ```bash
 ardent connector retry-setup prod-db
 ```
 
-If retry needs replica identity decisions, pass the same flags as `connector create`:
+If the original setup needed replica identity decisions, pass the same JSON file when retrying:
 
 ```bash
 ardent connector retry-setup prod-db \
@@ -211,7 +210,7 @@ Delete a connector.
 ardent connector delete staging-db
 ```
 
-By default, Ardent waits for in-flight WAL/Kafka work to drain so replicated changes are not abandoned. Use `--force` only when you intentionally want to skip that wait.
+By default, Ardent waits for in-progress replication work to finish so changes aren't abandoned. Use `--force` only when you intentionally want to skip that wait.
 
 ```bash
 ardent connector delete staging-db --force

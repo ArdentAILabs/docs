@@ -3,7 +3,7 @@ title: "Self-hosted Postgres"
 description: "Connect any Postgres database with logical replication"
 ---
 
-Ardent works with self-managed Postgres 13 or newer. The safest path is:
+Ardent is compatible with self-managed Postgres 13 or newer. The safest path is:
 
 1. Run preflight. Ardent checks your source without storing credentials or creating a connector.
 2. Apply the SQL Ardent generates for your database and schemas.
@@ -15,7 +15,7 @@ Ardent works with self-managed Postgres 13 or newer. The safest path is:
 </Info>
 
 ```bash
-ardent connector preflight postgresql 'postgresql://user:***@host:5432/mydb' --schemas public
+ardent connector preflight postgresql 'postgresql://user:[YOUR-PASSWORD]@host:5432/mydb' --schemas public
 ```
 
 Preflight prints a pass/fail checklist and a **Grant script** section with the exact SQL to run for your provider, replication user, database, and schemas.
@@ -60,7 +60,7 @@ hostssl all          ardent_replication  <egress_ip>/32  scram-sha-256
 hostssl replication  ardent_replication  <egress_ip>/32  scram-sha-256
 ```
 
-After editing `pg_hba.conf`, reload Postgres so the new rules take effect. A reload is enough — no restart is needed for `pg_hba.conf` changes:
+After editing `pg_hba.conf`, reload Postgres so the new rules take effect. A reload is enough. No restart is needed for `pg_hba.conf` changes:
 
 ```sql
 SELECT pg_reload_conf();
@@ -213,10 +213,10 @@ WHERE schemaname = '<schema>';
 <Step title="Run preflight until it passes">
 
 ```bash
-ardent connector preflight postgresql 'postgresql://ardent_replication:***@your-host:5432/mydb' --schemas public
+ardent connector preflight postgresql 'postgresql://ardent_replication:[YOUR-PASSWORD]@your-host:5432/mydb' --schemas public
 ```
 
-Preflight checks the source and prints what passed, what failed, and the SQL to fix missing grants. It does not create a connector row and does not store your credentials.
+Preflight checks the source and prints what passed, what failed, and the SQL to fix missing grants. It does not create a connector or store your credentials.
 
 Common failures:
 
@@ -233,7 +233,7 @@ Common failures:
 Once preflight passes, create the connector:
 
 ```bash
-ardent connector create postgresql 'postgresql://ardent_replication:***@your-host:5432/mydb'
+ardent connector create postgresql 'postgresql://ardent_replication:[YOUR-PASSWORD]@your-host:5432/mydb'
 ```
 
 Ardent stores the encrypted credentials, discovers the schema, performs the initial snapshot, and starts continuous replication. Initial sync time depends on data size, write rate, and network throughput; large databases can take much longer than a few minutes.
@@ -246,13 +246,13 @@ Ardent stores the encrypted credentials, discovers the schema, performs the init
 
 <Step title="Create your first branch">
 
-When the connector is healthy, create a branch:
+When the connector is ready, create a branch:
 
 ```bash
 ardent branch create my-feature
 ```
 
-Done. You now have an isolated copy of your database — schema, data, and all. The CLI returns a connection URL you can use anywhere.
+Done. You now have an isolated copy of your database: schema, data, and all. The CLI returns a connection URL you can use anywhere.
 
 </Step>
 

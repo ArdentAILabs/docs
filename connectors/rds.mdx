@@ -3,9 +3,9 @@ title: "AWS RDS"
 description: "Connect your RDS Postgres database to Ardent"
 ---
 
-Ardent connects to RDS for PostgreSQL through logical replication. RDS needs a parameter-group change, a replication grant, and network access before connector creation will pass.
+Ardent is compatible with AWS RDS for PostgreSQL.
 
-Start with preflight so Ardent can tell you exactly what's missing before it stores credentials or creates a connector.
+RDS needs a parameter-group change, a replication grant, and network access before Ardent can connect. Start with preflight so Ardent can tell you exactly what's missing before it stores credentials or creates a connector.
 
 **Want Claude or Cursor to help?** Paste this prompt into your agent:
 
@@ -78,13 +78,13 @@ Ardent may also need per-database and per-schema grants for the schemas you want
 Your RDS connection string looks like:
 
 ```text
-postgresql://user:***@your-instance.region.rds.amazonaws.com:5432/mydb
+postgresql://user:[YOUR-PASSWORD]@your-instance.region.rds.amazonaws.com:5432/mydb
 ```
 
 Run:
 
 ```bash
-ardent connector preflight postgresql 'postgresql://user:***@your-instance.region.rds.amazonaws.com:5432/mydb' --schemas public
+ardent connector preflight postgresql 'postgresql://user:[YOUR-PASSWORD]@your-instance.region.rds.amazonaws.com:5432/mydb' --schemas public
 ```
 
 Preflight checks reachability, credentials, source writability, logical replication, RDS replication permissions, table grants, and duplicate-source status without creating a connector or storing credentials.
@@ -104,7 +104,7 @@ Then re-run preflight until it passes.
 <Step title="Connect your database">
 
 ```bash
-ardent connector create postgresql 'postgresql://user:***@your-instance.region.rds.amazonaws.com:5432/mydb'
+ardent connector create postgresql 'postgresql://user:[YOUR-PASSWORD]@your-instance.region.rds.amazonaws.com:5432/mydb'
 ```
 
 Ardent stores encrypted credentials, discovers your schema, snapshots selected tables, and starts continuous replication. Initial setup time depends on data size, write rate, and network throughput.
@@ -117,13 +117,13 @@ Ardent stores encrypted credentials, discovers your schema, snapshots selected t
 
 <Step title="Create your first branch">
 
-When the connector is healthy:
+When the connector is ready:
 
 ```bash
 ardent branch create my-feature
 ```
 
-Done. You now have an isolated copy of your RDS database — schema, data, and all. The CLI returns a connection URL you can use anywhere.
+Done. You now have an isolated copy of your RDS database: schema, data, and all. The CLI returns a connection URL you can use anywhere.
 
 </Step>
 </Steps>

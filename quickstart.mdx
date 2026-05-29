@@ -1,6 +1,6 @@
 ---
 title: "Quickstart"
-description: "Preflight, connect, and branch your Postgres database"
+description: "Branch your Postgres database in a few minutes"
 ---
 
 <Info>
@@ -31,7 +31,7 @@ This opens your browser to authenticate with GitHub or email. If you only have o
 <Step title="Preflight your database">
 
 ```bash
-ardent connector preflight postgresql 'postgresql://user:***@host:5432/mydb'
+ardent connector preflight postgresql 'postgresql://user:[YOUR-PASSWORD]@host:5432/mydb'
 ```
 
 Preflight checks whether Ardent can reach and replicate from your source database. It does **not** create a connector, store credentials, or start replication. If grants are missing, Ardent prints the SQL to run.
@@ -45,10 +45,10 @@ Wrap the URL in **single quotes** so special characters in the password or query
 When preflight passes, create the connector:
 
 ```bash
-ardent connector create postgresql 'postgresql://user:***@host:5432/mydb'
+ardent connector create postgresql 'postgresql://user:[YOUR-PASSWORD]@host:5432/mydb'
 ```
 
-Ardent stores encrypted credentials, discovers your schema, performs the initial snapshot, and starts continuous replication. Initial setup time depends on data size, write rate, and network throughput. Small sources may be ready in minutes; large production databases can take much longer.
+Ardent replicates your database during initial setup. You only do this once. Setup time depends on data size, write rate, and network throughput. Small sources are ready in minutes; large production databases take longer. After setup, every branch creates in under 6 seconds, regardless of data size.
 
 <Note>The new connector is automatically selected as your active connector.</Note>
 
@@ -56,22 +56,22 @@ Ardent stores encrypted credentials, discovers your schema, performs the initial
 
 <Step title="Create your first branch">
 
-Once the connector is healthy:
+When the connector is ready:
 
 ```bash
 ardent branch create my-feature
 ```
 
-Done. You now have an isolated copy of your production database. The CLI returns a connection string you can use anywhere — psql, your app, an ORM, or an agent.
+Done. You now have an isolated copy of your production database. The CLI returns a connection string you can use anywhere: psql, your app, an ORM, or an agent.
 
 </Step>
 </Steps>
 
 ## What's next
 
-- Feed the branch URL to Claude Code or Cursor — test if your migration breaks, try a new index, or validate schema changes against realistic data
+- Feed the branch URL to Claude Code or Cursor. Test if your migration breaks, try a new index, or validate schema changes against realistic data
 - Run `ardent branch info` to see the connection URL and status for your current branch
-- Create more branches for different tasks — they auto-suspend when idle
+- Create more branches for different tasks. They auto-suspend when idle, so don't worry about cleanup
 - Working across multiple databases or environments? Use `ardent project switch` and `ardent connector switch` to move between them
 
 <CardGroup cols={2}>

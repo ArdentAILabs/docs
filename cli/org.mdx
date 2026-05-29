@@ -1,7 +1,7 @@
 ---
 title: "Team"
 sidebarTitle: "Team"
-description: "ardent invite and ardent org"
+description: "Invite teammates and manage your organization"
 ---
 
 ### ardent invite
@@ -21,7 +21,7 @@ ardent invite alice@company.com admin
 
 ### ardent invite list
 
-Output is **not** a table: one block per invite (email, then role and sent date on the next line). Dates use your **locale** (`toLocaleDateString`). No ANSI colors.
+Shows all pending invites for your organization.
 
 ```bash
 ardent invite list
@@ -51,7 +51,7 @@ ardent invite delete alice@company.com
 
 ### ardent org members
 
-Output is **not** a table. Each member is two lines: email, optional ` (display name)` on the same line, then `Role: …` indented. Blank line between members. No ANSI colors.
+Shows everyone in your organization.
 
 ```bash
 ardent org members

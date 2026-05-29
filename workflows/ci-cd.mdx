@@ -127,7 +127,7 @@ jobs:
 **What each step does:**
 
 - **`ardent login --token`** authenticates the CLI using your repo secret.
-- **`ardent project switch` / `ardent connector switch`** explicitly selects which project and connector to branch from. A connector represents one Postgres server. Replace `my-project` and `my-connector` with your names. Always set these in CI so the workflow is deterministic.
+- **`ardent project switch` / `ardent connector switch`** explicitly selects which project and connector to branch from. A connector represents one Postgres server. Replace `my-project` and `my-connector` with your names. Always set these in CI so the workflow uses the right database, even if your local CLI defaults change.
 - **`ardent branch create`** creates an isolated database branch. The name includes the PR number and run ID so concurrent runs and re-runs don't collide.
 - **`ardent branch info | awk '/URL:/{print $2}'`** extracts the branch connection URL and writes it to `DATABASE_URL` in `GITHUB_ENV`. Your test step reads `DATABASE_URL` like any other environment variable. If your app uses a different env var name, change it in the `echo` line.
 - **`npm test`** runs your test suite against the branch. Replace with `pytest`, `pnpm test`, `make test`, or whatever your project uses.
