@@ -3,17 +3,17 @@ title: "Security"
 description: "How Ardent keeps your data safe"
 ---
 
-Ardent is designed to never put your production data at risk. Here's how.
+Ardent does not put your production data at risk. Here's how.
 
 ## Minimal production footprint
 
-Ardent uses logical replication to sync your table data and does not write to your application tables. During connector setup, Ardent creates one dedicated schema for its own metadata and installs DDL event triggers there so schema changes can be detected and replayed in order on the replica.
+Ardent uses logical replication to sync your table data and does not write to your application tables. During connector setup, Ardent creates one dedicated schema for its own metadata and installs DDL event triggers there so schema changes replicate correctly.
 
-This has little to no performance impact on production. Normal application reads and writes continue against your database as usual.
+Replication has minimal performance impact on production. Normal application reads and writes continue against your database as usual.
 
 ## Encryption and secrets
 
-Ardent encrypts source database credentials, API keys, and connection secrets at rest. Replication components read credentials only at runtime when they need to connect.
+Ardent encrypts source database credentials, API keys, and connection secrets at rest. Credentials are read only at runtime, when Ardent needs to connect to your database.
 
 With **BYOC (bring your own cloud)**, secrets live in your own infrastructure (for example AWS SSM Parameter Store). Ardent reads them directly from your secret store at runtime, and your credentials never leave your network.
 
@@ -23,7 +23,7 @@ Branches are controlled through Ardent's control plane, so you can delete or de-
 
 ## Branch anonymization
 
-Branches default to a full copy of your production data. When you need realistic schema and relationships but not real PII, you can run connector-scoped SQL on **every new branch** after it is created.
+Branches default to a full copy of your production data. When you need realistic schema and relationships but not real PII, you can run SQL on **every new branch** from this connector after it is created.
 
 Set it with the CLI:
 
@@ -33,11 +33,11 @@ ardent settings set branch_sql @./scripts/anonymize-branch.sql
 
 Or paste SQL inline (large scripts are easier as a file with `@path`).
 
-Your script might `UPDATE` columns to hashed or synthetic values, redact free-text fields, or trim tables that should never leave production. Execution is **idempotent per branch**: if Ardent re-runs the hook for that branch, successful runs are not duplicated.
+Your script might `UPDATE` columns to hashed or synthetic values, redact free-text fields, or trim tables that should never leave production. The script runs once per branch. If Ardent re-runs it for the same branch, successful runs are not repeated.
 
 This is the same **`branch_sql`** setting documented in [CLI settings](/cli/settings). There is no separate anonymization toggle: you own the SQL, so you stay in control of exactly what changes.
 
-Each branch is a fully independent copy. Changes on one branch don't affect production or any other branch. When you're done, delete it or let it auto-suspend — nothing persists unless you want it to.
+Each branch is a fully independent copy. Changes on one branch don't affect production or any other branch. When you're done, delete it or let it auto-suspend. Nothing persists unless you want it to.
 
 ## Data residency
 

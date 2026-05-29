@@ -5,7 +5,7 @@ description: "Branch before you touch the database. Every time."
 
 The rule: branch before you touch the database. Every time.
 
-Takes 6 seconds. Means you can run any migration, drop any table, try any index — and if it breaks, delete the branch and start over. Your production data is never at risk.
+Takes 6 seconds. Means you can run any migration, drop any table, try any index. If it breaks, delete the branch and start over. Your production data is never at risk.
 
 ## The pattern
 
@@ -16,7 +16,7 @@ ardent branch create my-feature
 # Work, run migrations, break things freely
 psql postgresql://...my-feature...tryardent.com/db
 
-# Done — or it all went wrong — either way:
+# Done, or it all went wrong. Either way:
 ardent branch delete my-feature
 ```
 
@@ -31,4 +31,4 @@ ardent branch list
 ardent branch switch auth-refactor
 ```
 
-Branches auto-suspend after 5 minutes of inactivity — leave them running and they won't cost you anything while idle.
+Branches auto-suspend after 5 minutes of inactivity. Leave them running and they won't cost you anything while idle.

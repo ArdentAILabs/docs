@@ -6,7 +6,7 @@ description: "How Ardent's split-plane architecture keeps your data safe and you
 Ardent follows a split-plane architecture like databricks where the **control plane** and **data plane** are separated:
 
 - **Control plane:** Operated by Ardent. Handles branch orchestration, replication health monitoring, connection routing, auto-scaling, and policy enforcement. Spans across all deployments.
-- **Data plane:** Where your data lives. Includes the ardent replicator, kafka, your read replica, cloned databases and more. Can be deployed on your cloud or ours.
+- **Data plane:** Where your data lives. Includes Ardent's replication pipeline, your read replica, your branches, and more. Can be deployed on your cloud or ours.
 
 Only metadata (schema structure, replication status, branch state) flows from the data plane to the control plane. Your actual data never leaves the data plane.
 
@@ -38,10 +38,10 @@ flowchart TB
 
 Always operated by Ardent. Orchestration, policies, routing, and visibility across every branch and connection.
 
-- **Branch lifecycle:** Create, suspend, delete, and route traffic to the right branch. Connection URLs go through Ardent's proxy so every session is tied to an account and can enforce rules, hooks, and policies as well as prevent leakage of raw URLs for safety.
-- **Replication coordination:** Monitors health, lag, and pipeline status from metadata; scales and manages the Kafka layer that backs replication so you are not sizing or operating brokers yourself.
-- **Connector setup:** Discovery and validation when you connect a database, plus connector-scoped settings such as default database and branch SQL hooks.
-- **Auth, usage, and billing:** Org access, API keys, and metering. Per-user and per-branch visibility Postgres does not give you out of the box.
+- **Branch lifecycle:** Create, suspend, delete, and route traffic to the right branch. Connection URLs route through Ardent's proxy. Every session is tied to an account, policies apply per branch, and raw URLs never leak.
+- **Replication coordination:** Ardent watches replication health and scales the Kafka layer that backs it, so you never have to size or operate brokers yourself.
+- **Connector setup:** When you connect a database, Ardent inspects and validates it, and gives you connector-level settings: the default database name for new branches, and any SQL to run on each new branch.
+- **Auth, usage, and billing:** Org access, API keys, and usage tracking. Per-user and per-branch visibility Postgres does not give you out of the box.
 
 ### Data plane
 
@@ -54,8 +54,8 @@ Where your data physically lives and where branches are served from. Runs on Ard
   - Manages WAL and slot pressure so replication does not destabilize the primary.
   - Quarantines, resumes, and recovers broken streams without manual replay scripts.
 - **Read replica:** Stays in sync with production; branches are always created from the replica, never from production directly, so branch load never hits your primary.
-- **Branches (compute and storage):** Each branch is a full Postgres instance with **compute that auto-scales with load**. Branches share storage from the same replica through copy-on-write, so scaling to many branches is efficient for both compute and storage. Queries and connections run independently on autoscaling branch compute.
-- **Isolation:** Your data stays inside this boundary. Only metadata crosses to the control plane. This means in a BYOC model you can maintain residency of all your data without losing Ardent's ability to manage the service
+- **Branches (compute and storage):** Each branch is a full Postgres instance cloned from the replica with **compute that auto-scales with load**. Branches share storage from the same replica through copy-on-write, so scaling to many branches is efficient for both compute and storage.
+- **Isolation:** Your data stays inside this boundary. Only metadata crosses to the control plane. This means in **managed, your cloud** mode you can maintain residency of all your data without losing Ardent's ability to manage the service.
 
 You connect your database and open branches. The control plane orchestrates; the data plane runs replication, the replica, and branches.
 

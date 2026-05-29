@@ -3,82 +3,257 @@ title: "Self-hosted Postgres"
 description: "Connect any Postgres database with logical replication"
 ---
 
-Any Postgres instance with logical replication enabled works with Ardent.
+Ardent is compatible with self-managed Postgres 13 or newer. The safest path is:
 
-**Want Claude to handle this?** Paste this into Claude Code or Cursor:
+1. Run preflight. Ardent checks your source without storing credentials or creating a connector.
+2. Apply the SQL Ardent generates for your database and schemas.
+3. Re-run preflight until it passes.
+4. Create the connector and let Ardent perform the initial sync.
+
+<Info>
+  Preflight is fast and non-destructive. Connector creation is the step that stores encrypted credentials and starts replication.
+</Info>
+
+```bash
+ardent connector preflight postgresql 'postgresql://user:[YOUR-PASSWORD]@host:5432/mydb' --schemas public
+```
+
+Preflight prints a pass/fail checklist and a **Grant script** section with the exact SQL to run for your provider, replication user, database, and schemas.
+
+**Want Claude or Cursor to help?** Paste this prompt into your agent:
 
 ```
-Check if my Postgres database is ready to connect to Ardent.
+Check whether my self-hosted Postgres database is ready to connect to Ardent.
 My connection string: [paste here]
 
-Verify:
-1. The host is reachable and credentials work
-2. wal_level is set to logical (SELECT current_setting('wal_level'))
-3. The user has the REPLICATION privilege
-4. At least 1 replication slot is available (SELECT * FROM pg_replication_slots)
+Use Ardent preflight first:
+ardent connector preflight postgresql '<connection-string>' --schemas public
 
-Tell me exactly what to fix if anything fails, then run:
+Then verify these source requirements and tell me exactly what to fix:
+1. The host is reachable from Ardent over TLS on the Postgres port.
+2. pg_hba.conf allows both normal and replication connections from Ardent's egress IP.
+3. wal_level is logical, max_wal_senders >= 10, max_replication_slots >= 10 (or higher if already higher, since these are minimums Ardent expects), and at least one replication slot is free.
+4. wal2json is available. If you create a temporary slot to test it, immediately drop it; if the drop fails, stop and run SELECT pg_drop_replication_slot('ardent_probe'); before doing anything else.
+5. The connection is to a writable primary, not a read replica: SELECT pg_is_in_recovery(); must return false.
+6. The Ardent role has the grants from the preflight Grant script.
+7. Tables selected for replication have a primary key, valid unique NOT NULL index, or REPLICA IDENTITY FULL.
+
+After preflight passes, run:
 ardent connector create postgresql '<connection-string>'
 ```
 
 ---
 
 <Steps>
+
+<Step title="Allow inbound from Ardent">
+
+Ardent connects from a static egress IP for your environment. If your network restricts inbound traffic, allow that IP on the Postgres port, usually `5432`. Ask your Ardent contact for the current egress IP if you do not already have it.
+
+Make sure `ssl = on` and `pg_hba.conf` accepts **both** regular SQL sessions and logical replication sessions from Ardent. PostgreSQL treats them as different connection types, so both lines matter:
+
+```conf
+# regular connections: discovery, grants, and bookkeeping
+hostssl all          ardent_replication  <egress_ip>/32  scram-sha-256
+
+# replication connections: logical WAL streaming
+hostssl replication  ardent_replication  <egress_ip>/32  scram-sha-256
+```
+
+After editing `pg_hba.conf`, reload Postgres so the new rules take effect. A reload is enough. No restart is needed for `pg_hba.conf` changes:
+
+```sql
+SELECT pg_reload_conf();
+```
+
+Or from the shell: `pg_ctl reload -D <datadir>` (or `sudo systemctl reload postgresql` on systemd installs).
+
+Hostnames must resolve to an IPv4 address. IPv6-only hosts are not supported today.
+
+</Step>
+
 <Step title="Enable logical replication">
 
-Set `wal_level = logical` in your `postgresql.conf`:
+Check the current values first:
 
 ```sql
-ALTER SYSTEM SET wal_level = 'logical';
+SHOW wal_level;
+SHOW max_wal_senders;
+SHOW max_replication_slots;
 ```
 
-Then restart Postgres for the change to take effect.
+Ardent needs `wal_level = logical`, at least one free replication slot, and enough WAL sender capacity for Ardent plus anything else already replicating from your database. If your existing values are higher than Ardent's minimums, keep the higher values.
 
-</Step>
-
-<Step title="Check replication slots">
-
-Make sure you have at least 1 available replication slot:
+`ALTER SYSTEM SET` only accepts a literal value, not an expression, so running `ALTER SYSTEM SET max_wal_senders = 10` on a server that already has `max_wal_senders = 20` (for example, to support existing standbys) will lower it to 10 on the next restart and can start refusing connections from those standbys. The block below raises each parameter only when the current value is below Ardent's minimum:
 
 ```sql
-SELECT * FROM pg_replication_slots;
+DO $$
+DECLARE
+  v_wal_level  text := current_setting('wal_level');
+  v_senders    int  := current_setting('max_wal_senders')::int;
+  v_slots      int  := current_setting('max_replication_slots')::int;
+BEGIN
+  IF v_wal_level <> 'logical' THEN
+    EXECUTE 'ALTER SYSTEM SET wal_level = ''logical''';
+  END IF;
+  IF v_senders < 10 THEN
+    EXECUTE format('ALTER SYSTEM SET max_wal_senders = %s', 10);
+  END IF;
+  IF v_slots < 10 THEN
+    EXECUTE format('ALTER SYSTEM SET max_replication_slots = %s', 10);
+  END IF;
+END
+$$;
 ```
 
-</Step>
+If you prefer to manage these by hand, run the `SHOW` queries above first and only `ALTER SYSTEM SET` the parameters whose current values are below 10.
 
-<Step title="Grant replication permissions">
+<Warning>
+  These changes require a Postgres restart. Plan a maintenance window before continuing.
+</Warning>
 
-Ensure your user has the `REPLICATION` privilege:
-
-```sql
-ALTER USER your_user WITH REPLICATION;
-```
-
-</Step>
-
-<Step title="Connect your database">
-
-```bash
-ardent connector create postgresql 'postgresql://user:password@your-host:5432/mydb'
-```
-
-Use **single quotes** around the URL in the shell so passwords or query parameters are not mangled.
-
-Ardent will verify your setup and begin replicating your database. This may take a few minutes depending on data size.
+<Warning>
+  Be careful with `max_slot_wal_keep_size`. A finite value protects your disk, but if a logical slot falls behind past that limit, Postgres can invalidate the slot. That forces a connector rebuild / resnapshot; it is not a graceful catch-up path. For high-write databases, set the value with enough headroom and monitor retained WAL.
+</Warning>
 
 <Tip>
-  Not sure if your database is ready? Just run the command — Ardent checks all prerequisites during setup and tells you what's missing.
+  Long idle transactions can hold back WAL cleanup. Consider setting `idle_in_transaction_session_timeout` on human or application roles that might leave transactions open, for example `ALTER ROLE app_user SET idle_in_transaction_session_timeout = '5min';`.
 </Tip>
+
+</Step>
+
+<Step title="Install the wal2json output plugin">
+
+Ardent reads changes through the `wal2json` logical-decoding plugin. Install the package matched to your Postgres major version:
+
+- Debian and Ubuntu: `postgresql-<major>-wal2json`
+- RHEL family: `wal2json_<major>`
+
+Restart Postgres if the plugin was not already loaded.
+
+To test it manually, create and immediately drop a temporary slot:
+
+```sql
+SELECT pg_create_logical_replication_slot('ardent_probe', 'wal2json');
+SELECT pg_drop_replication_slot('ardent_probe');
+```
+
+If your session is interrupted after the create statement, run the drop statement manually before continuing. An unconsumed logical slot retains WAL indefinitely and can fill the disk.
+
+Verify cleanup:
+
+```sql
+SELECT slot_name
+FROM pg_replication_slots
+WHERE slot_name = 'ardent_probe';
+```
+
+No rows should be returned.
+
+</Step>
+
+<Step title="Create the Ardent role">
+
+<Warning>
+  Today, vanilla self-hosted Postgres requires the Ardent role to be able to create event triggers, which is restricted to `SUPERUSER`. That is a broad permission: a Postgres superuser can read and modify anything on the cluster. Use a dedicated role, restrict network access to Ardent's egress IP, rotate the password deliberately, and prefer a dedicated source cluster or database when your security model requires stricter isolation.
+</Warning>
+
+```sql
+CREATE ROLE ardent_replication WITH LOGIN PASSWORD '<strong-password>';
+ALTER ROLE ardent_replication WITH REPLICATION SUPERUSER;
+```
+
+The grants below are still worth running. While the role is a superuser, they do **not** limit what it can access. They document the intended read footprint and make the setup ready for the future narrower Ardent role.
+
+For each database you want to replicate:
+
+```sql
+GRANT CONNECT ON DATABASE "<db>" TO ardent_replication;
+GRANT CREATE  ON DATABASE "<db>" TO ardent_replication;
+```
+
+`GRANT CREATE ON DATABASE` lets Ardent create its own `pgstream` bookkeeping schema and publication. It does not grant write access to your application schemas.
+
+For each schema you want replicated, run inside the matching database:
+
+```sql
+GRANT USAGE ON SCHEMA "<schema>" TO ardent_replication;
+GRANT SELECT ON ALL TABLES    IN SCHEMA "<schema>" TO ardent_replication;
+GRANT SELECT ON ALL SEQUENCES IN SCHEMA "<schema>" TO ardent_replication;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA "<schema>"
+  GRANT SELECT ON TABLES TO ardent_replication;
+ALTER DEFAULT PRIVILEGES IN SCHEMA "<schema>"
+  GRANT SELECT ON SEQUENCES TO ardent_replication;
+```
+
+The `ALTER DEFAULT PRIVILEGES` lines are what keep future tables and sequences visible to replication. They only apply to objects created by the role that ran the `ALTER`. If your application creates tables as another role, repeat them with `FOR ROLE`:
+
+```sql
+ALTER DEFAULT PRIVILEGES FOR ROLE "app_writer" IN SCHEMA "<schema>"
+  GRANT SELECT ON TABLES TO ardent_replication;
+ALTER DEFAULT PRIVILEGES FOR ROLE "app_writer" IN SCHEMA "<schema>"
+  GRANT SELECT ON SEQUENCES TO ardent_replication;
+```
+
+Find table-owner roles in a schema with:
+
+```sql
+SELECT DISTINCT tableowner
+FROM pg_tables
+WHERE schemaname = '<schema>';
+```
+
+<Tip>
+  You usually do not need to assemble this by hand. `ardent connector preflight postgresql '<url>' --schemas public,billing` prints the generated grant script before a connector exists. After a connector exists, Ardent can also generate the exact selected-schema script for that connector.
+</Tip>
+
+</Step>
+
+<Step title="Run preflight until it passes">
+
+```bash
+ardent connector preflight postgresql 'postgresql://ardent_replication:[YOUR-PASSWORD]@your-host:5432/mydb' --schemas public
+```
+
+Preflight checks the source and prints what passed, what failed, and the SQL to fix missing grants. It does not create a connector or store your credentials.
+
+Common failures:
+
+- `is writer` fails: the URL points at a read replica. Use the writable primary.
+- `wal level` fails: enable logical replication and restart Postgres.
+- `wal2json` is unverified or failed: install the plugin or ask Ardent to confirm provider support.
+- `can read tables` fails: run the generated grant script.
+- `duplicate source` fails: this database is already connected to Ardent.
+
+</Step>
+
+<Step title="Create your connector">
+
+Once preflight passes, create the connector:
+
+```bash
+ardent connector create postgresql 'postgresql://ardent_replication:[YOUR-PASSWORD]@your-host:5432/mydb'
+```
+
+Ardent stores the encrypted credentials, discovers the schema, performs the initial snapshot, and starts continuous replication. Initial sync time depends on data size, write rate, and network throughput; large databases can take much longer than a few minutes.
+
+<Note>
+  Every replicated table needs a stable way to identify rows in WAL: a primary key, a valid unique NOT NULL index (single- or multi-column, non-partial, non-deferrable, no nullable columns), or `REPLICA IDENTITY FULL`. If a table has none of these, the CLI asks whether to exclude it, add a key yourself, or opt into `REPLICA IDENTITY FULL`. Ardent never runs DDL on your source automatically.
+</Note>
 
 </Step>
 
 <Step title="Create your first branch">
 
+When the connector is ready, create a branch:
+
 ```bash
 ardent branch create my-feature
 ```
 
-Done. You now have an isolated copy of your database — schema, data, and all. The CLI returns a connection URL you can use anywhere.
+Done. You now have an isolated copy of your database: schema, data, and all. The CLI returns a connection URL you can use anywhere.
 
 </Step>
+
 </Steps>

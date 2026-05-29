@@ -1,12 +1,12 @@
 ---
-title: "Ardent — Git for your data infrastructure"
+title: "Ardent: Git for your data infrastructure"
 sidebarTitle: "Introduction"
 description: ""
 ---
 
-Ardent lets you create instant, isolated copies of your production Postgres database in under 6 seconds right in your terminal. 
+Ardent lets you create instant, isolated copies of your production Postgres database in under 6 seconds, right in your terminal.
 
-Test migrations, run schema changes and let coding agents like Claude Code and Cursor actually test its database work — all against real data, without touching production so you know they work.
+Test migrations, run schema changes and let coding agents like Claude Code and Cursor actually test its database work, all against real data, without touching production so you know they work.
 
 No more shared staging databases. No more hand-maintained fixtures. No more one-off environments for agents. No more hoping your migration works. 
 
@@ -27,7 +27,7 @@ An instant database for every task.
 ## Get started
 
 <Card title="Quickstart" icon="rocket" href="/quickstart" horizontal>
-  Up and running in 4 commands. Takes about 2 minutes.
+  Branch your Postgres database in a few commands.
 </Card>
 
 **Or have Claude walk you through it.** Paste this into Claude Code or Cursor:
@@ -35,9 +35,9 @@ An instant database for every task.
 ```
 Set up Ardent for database branching. Act like a teammate at my keyboard:
 run the commands yourself, stop only when you need me to do something
-only I can do (browser sign-up, paste a credential). Before each step,
-give me one short line on what's happening and why — process guidance,
-not a recap afterward.
+only I can do (browser sign-up, paste a credential, run source-database SQL).
+Before each step, give me one short line on what's happening and why.
+Process guidance, not a recap afterward.
 
 Run these in order:
 
@@ -46,19 +46,24 @@ Run these in order:
 2. ardent login → opens a browser to authenticate. Tell me to finish
    sign-up or login and ping you when done.
 
-3. Tell me to export my Postgres connection string in this shell so
-   Ardent can connect to my database and start replicating it for
-   branching:
+3. Tell me to export my Postgres connection string in this shell:
    export ARDENT_DB_URL='postgres://...'
    Then run:
-   ardent connector create postgresql "$ARDENT_DB_URL"
-   (a project gets auto-created here)
+   ardent connector preflight postgresql "$ARDENT_DB_URL"
+   If preflight prints a Grant script, stop and ask me to run it on the
+   source database, then re-run preflight until it passes.
 
-4. ardent branch create my-feature → spins up an isolated copy of my
+4. After preflight passes, run:
+   ardent connector create postgresql "$ARDENT_DB_URL"
+   Initial setup may take minutes or longer depending on database size,
+   write rate, and network throughput. Wait until `ardent connector create`
+   finishes and prints that the connector is ready.
+
+5. ardent branch create my-feature → spins up an isolated copy of my
    database I can use however I want without touching prod.
 
-5. ardent branch info → give me the connection URL. That URL is my
-   isolated branch — I connect to it like any Postgres database.
+6. ardent branch info → give me the connection URL. That URL is my
+   isolated branch. I connect to it like any Postgres database.
 
 Skip the after-the-fact recap. Hand me the URL at the end. If a command
 errors, fix it.
@@ -78,10 +83,10 @@ Production DB → Replication → Read replica → Many branches (each in second
 
 The workflow mirrors what you already know from git:
 
-- **`ardent branch create`** — spin up an isolated database copy
-- **`ardent branch switch`** — switch between branches
-- **`ardent branch info`** — see the connection URL and status
-- **`ardent branch delete`** — clean up when you're done
+- **`ardent branch create`**: spin up an isolated database copy
+- **`ardent branch switch`**: switch between branches
+- **`ardent branch info`**: see the connection URL and status
+- **`ardent branch delete`**: clean up when you're done
 
 Branches auto-suspend after 5 minutes of inactivity and spin back up instantly on reconnect. Branches will not incur any storage cost either, only changes you make on the branches.
 
