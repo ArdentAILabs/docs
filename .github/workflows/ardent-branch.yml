@@ -21,7 +21,7 @@ jobs:
         run: npm ci
 
       - name: Install Ardent CLI
-        run: npm install -g ardent-cli
+        run: npm install -g ardent-cli@0.0.46
 
       - name: Log in to Ardent
         env:

@@ -48,7 +48,7 @@ jobs:
         run: npm ci
 
       - name: Install Ardent CLI
-        run: npm install -g ardent-cli
+        run: npm install -g ardent-cli@0.0.46
 
       - name: Log in to Ardent
         env:
@@ -101,7 +101,7 @@ jobs:
 The pattern is the same everywhere:
 
 ```bash
-npm install -g ardent-cli
+npm install -g ardent-cli@0.0.46
 ardent project switch my-project
 ardent connector switch my-connector
 export DATABASE_URL="$(ardent branch create "$CI_BRANCH_NAME" --print-url)"
