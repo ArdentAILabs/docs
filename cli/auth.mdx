@@ -1,25 +1,26 @@
 ---
 title: "Authentication"
 sidebarTitle: "Authentication"
-description: "Sign in to Ardent and manage your session"
+description: "Sign in to Ardent from your terminal or a headless environment"
 ---
 
-### ardent login
+Ardent supports two CLI authentication modes:
 
-Opens your browser to authenticate with GitHub or email. After login, Ardent automatically selects your project and connector if you only have one of each, so you can go straight to `ardent branch create`.
+- **Browser login** for local development.
+- **API tokens** for CI, scripts, and other headless environments.
+
+## ardent login
+
+Open your browser to authenticate with GitHub or email:
 
 ```bash
 ardent login
 ```
 
-If you're authenticating in CI or a script, use `--token`:
+After login, Ardent automatically selects your project and connector if you only have one of each, so you can go straight to `ardent branch create`.
 
-```bash
-ardent login --token <your-token>
-```
-
-<Accordion defaultOpen={false} title="Example output (single project + connector)">
-```
+<Accordion defaultOpen={false} title="Example output: one project and one connector">
+```text
 ✓ Logged in as vikram@tryardent.com
 
   Auto-selected project 'my-app'
@@ -29,8 +30,8 @@ ardent login --token <your-token>
 ```
 </Accordion>
 
-<Accordion defaultOpen={false} title="Example output (multiple projects)">
-```
+<Accordion defaultOpen={false} title="Example output: multiple projects">
+```text
 ✓ Logged in as vikram@tryardent.com
 
 3 projects found.
@@ -39,25 +40,61 @@ List your projects: ardent project list
 ```
 </Accordion>
 
-### ardent logout
+## Token login
 
-Clears all stored credentials and cached data.
+For one-off headless login, pass a token directly:
 
 ```bash
-ardent logout
+ardent login --token <your-token>
 ```
 
-### ardent status
+For repeat automation, prefer the `ARDENT_TOKEN` environment variable. It avoids writing a session to disk and makes the job's credential source obvious:
 
-Check your current authentication, project, and connector.
+```bash
+export ARDENT_TOKEN="ardent_..."
+ardent project list
+ardent branch create pr-123 --print-url
+```
+
+In GitHub Actions:
+
+```yaml
+env:
+  ARDENT_TOKEN: ${{ secrets.ARDENT_TOKEN }}
+
+steps:
+  - run: npm install -g ardent-cli
+  - run: ardent project switch my-project
+  - run: ardent connector switch prod-db
+  - run: echo "DATABASE_URL=$(ardent branch create pr-${{ github.run_id }} --print-url)" >> "$GITHUB_ENV"
+```
+
+Create and revoke API tokens from **Ardent dashboard > Settings > API keys**. Store tokens in your secret manager and rotate them if they are exposed.
+
+## ardent status
+
+Check your current authentication, project, connector, and branch:
 
 ```bash
 ardent status
 ```
 
 <Accordion defaultOpen={false} title="Example output">
-```
-✓ Logged in as vikram@tryardent.com
-  Organization: Ardent
+```text
+✓ Authenticated
+  Email:   vikram@tryardent.com
+  Org:     Ardent
 ```
 </Accordion>
+
+If the CLI is authenticated only through `ARDENT_TOKEN`, status may show token-based authentication and ask you to run `ardent login` to refresh profile details. That is fine for CI.
+
+## ardent logout
+
+Clear stored credentials and cached workspace data from this machine:
+
+```bash
+ardent logout
+```
+
+This does not revoke API tokens in the dashboard. Revoke tokens from **Settings > API keys** when you want to invalidate them.

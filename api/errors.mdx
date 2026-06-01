@@ -1,0 +1,50 @@
+---
+title: "Errors"
+sidebarTitle: "Errors"
+description: "Understand API error responses and safe retry behavior"
+---
+
+Ardent uses standard HTTP status codes. Error responses include a `detail` field with a human-readable message.
+
+```json
+{
+  "detail": "Project not found"
+}
+```
+
+Validation errors may include structured field details from the request validator.
+
+## Status codes
+
+| Status | Meaning | Retry? |
+| --- | --- | --- |
+| `400 Bad Request` | Required data is missing or invalid | No. Fix the request first |
+| `401 Unauthorized` | Missing or invalid token | No. Refresh or replace the token |
+| `403 Forbidden` | Token is valid but not allowed to perform the action | No. Update access or use a different token |
+| `404 Not Found` | Resource was not found in the accessible scope | No. Check the resource ID |
+| `409 Conflict` | The request conflicts with current resource state | Usually no. Fetch current state and decide |
+| `422 Unprocessable Entity` | Request body failed validation | No. Fix the request body |
+| `429 Too Many Requests` | Too many requests in a short period | Yes, with backoff |
+| `500`/`502`/`503` | Server or dependency error | Yes, with bounded retry and alerting |
+
+## Long-running operation failures
+
+For async work, the HTTP request may succeed while the operation later fails. Always poll the operation and inspect `status` and `error`:
+
+```json
+{
+  "id": "op_123",
+  "status": "failed",
+  "stage": "connector_discovery",
+  "error": "Preflight must pass before setup can continue"
+}
+```
+
+Treat `failed` as terminal. Fix the cause and start a new operation or retry the supported CLI/API action.
+
+## Automation guidance
+
+- Fail loudly when required IDs, operation IDs, or branch URLs are missing.
+- Do not substitute production database URLs as a fallback.
+- Retry only transient failures, and cap retries.
+- Log request IDs or timestamps in your own systems so support can help correlate issues.

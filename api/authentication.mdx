@@ -1,0 +1,52 @@
+---
+title: "Authentication"
+sidebarTitle: "Authentication"
+description: "Authenticate API requests with bearer tokens and manage access safely"
+---
+
+The API uses bearer tokens. Create tokens in **Ardent dashboard > Settings > API keys**, store them in a secret manager, and pass them with each request.
+
+```bash
+curl --oauth2-bearer "$ARDENT_TOKEN" https://api.tryardent.com/v1/projects
+```
+
+## Token handling
+
+- Store tokens in your CI secret manager or platform vault.
+- Do not commit tokens to source control.
+- Rotate tokens when someone leaves the team or a token is exposed.
+- Prefer the least-privileged role that can perform the job.
+
+## API key roles
+
+| Role ID | Intended use |
+| --- | --- |
+| `role_org_viewer` | Read-only automation and reporting |
+| `role_org_member` | Create and modify day-to-day resources such as branches and connectors |
+| `role_org_admin` | Administrative automation, including team and API-key management |
+| `role_org_owner` | Full organization control |
+
+## CLI and API tokens
+
+The CLI can also use API tokens through `ARDENT_TOKEN`:
+
+```bash
+export ARDENT_TOKEN="ardent_..."
+ardent branch create pr-123 --print-url
+```
+
+For local interactive work, `ardent login` is friendlier. For CI and scripts, `ARDENT_TOKEN` is more explicit.
+
+## Common auth errors
+
+| Status | Meaning | What to do |
+| --- | --- | --- |
+| `401 Unauthorized` | The token is missing, expired, revoked, or malformed | Check the token and create a new one if needed |
+| `403 Forbidden` | The token is valid but does not have access to that organization or action | Use a token with the right role, or ask an organization admin to update access |
+| `404 Not Found` | The resource does not exist or is outside the token's accessible scope | Check the ID and organization context |
+
+## Example: list projects
+
+```bash
+curl --oauth2-bearer "$ARDENT_TOKEN" https://api.tryardent.com/v1/projects
+```

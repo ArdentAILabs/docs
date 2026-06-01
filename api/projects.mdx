@@ -1,0 +1,47 @@
+---
+title: "Projects API"
+sidebarTitle: "Projects"
+description: "Create, list, update, and delete Ardent projects"
+---
+
+Projects organize related connectors and branches inside an organization. Most teams create one project per application or environment family.
+
+## Endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `POST` | `/v1/projects` | Create a project |
+| `GET` | `/v1/projects` | List projects visible to the token |
+| `GET` | `/v1/projects/{project_id}` | Get one project |
+| `PATCH` | `/v1/projects/{project_id}` | Rename a project |
+| `DELETE` | `/v1/projects/{project_id}` | Delete a project |
+
+## Create a project
+
+```bash
+curl --oauth2-bearer "$ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/projects   -H 'Content-Type: application/json'   -d '{"name":"my-app","org_id":"org_123"}'
+```
+
+`org_id` is optional when the token has exactly one clear organization. Pass it explicitly in automation.
+
+## List projects
+
+```bash
+curl --oauth2-bearer "$ARDENT_TOKEN"   'https://api.tryardent.com/v1/projects?org_id=org_123'
+```
+
+## Update a project
+
+```bash
+curl --oauth2-bearer "$ARDENT_TOKEN"   -X PATCH https://api.tryardent.com/v1/projects/project_123   -H 'Content-Type: application/json'   -d '{"name":"my-app-production"}'
+```
+
+## Delete a project
+
+```bash
+curl --oauth2-bearer "$ARDENT_TOKEN"   -X DELETE https://api.tryardent.com/v1/projects/project_123
+```
+
+<Warning>
+  Deleting a project is destructive for the resources under that project. For day-to-day cleanup, delete branches or unused connectors instead.
+</Warning>
