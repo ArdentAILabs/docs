@@ -52,12 +52,12 @@ describe("migration on Ardent branch", () => {
       ["ci-test@example.com"]
     );
 
-    const res = await client.query(
+    const selectRes = await client.query(
       `SELECT email FROM ${TABLE} WHERE email = $1`,
       ["ci-test@example.com"]
     );
-    expect(res.rows.length).toBe(1);
-    expect(res.rows[0].email).toBe("ci-test@example.com");
+    expect(selectRes.rows.length).toBe(1);
+    expect(selectRes.rows[0].email).toBe("ci-test@example.com");
 
     await client.query(`ALTER TABLE ${TABLE} ADD COLUMN name TEXT`);
 
