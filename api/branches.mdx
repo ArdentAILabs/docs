@@ -1,0 +1,60 @@
+---
+title: "Branches API"
+sidebarTitle: "Branches"
+description: "Create and list isolated database branches"
+---
+
+Branches are isolated Postgres databases created from a connector. Use them for CI runs, local development, migration testing, agent work, and short-lived review environments.
+
+## Endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `POST` | `/v1/branch/create` | Create a branch |
+| `GET` | `/v1/branches/{connector_id}` | List branches for a connector |
+
+For interactive deletion and switching, use the CLI: `ardent branch delete` and `ardent branch switch`.
+
+## Create a branch
+
+```bash
+curl --oauth2-bearer "$ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/branch/create   -H 'Content-Type: application/json'   -d '{"connector_id":"conn_123","service_type":"postgresql","name":"pr-123"}'
+```
+
+Representative response:
+
+```json
+{
+  "id": "br_123",
+  "name": "pr-123",
+  "service_type": "postgresql",
+  "status": "active",
+  "branch_url": "postgresql://user:***@pr-123-postgres.routing.tryardent.com:5432/db",
+  "created_at": "2026-06-01T12:00:00Z",
+  "warning": null
+}
+```
+
+Treat `branch_url` as sensitive. It is a credential-bearing database URL.
+
+## List branches
+
+```bash
+curl --oauth2-bearer "$ARDENT_TOKEN" https://api.tryardent.com/v1/branches/conn_123
+```
+
+Use this to populate internal dashboards or cleanup tools. For shell scripts that only need a URL, the CLI is simpler:
+
+```bash
+DATABASE_URL="$(ardent branch create pr-123 --print-url)"
+```
+
+## Naming guidance
+
+Use names that are unique, readable, and safe to clean up automatically:
+
+- `pr-123-456789`
+- `agent-fix-login-20260601`
+- `migration-add-index-smoke-test`
+
+Avoid embedding secrets, customer names, or production incident details in branch names.
