@@ -1,93 +1,151 @@
 ---
 title: "Branches"
 sidebarTitle: "Branches"
-description: "Branches are isolated copies of your database, cloned from production"
+description: "Create isolated database branches and use their connection URLs"
 ---
 
-### ardent branch create
+Branches are isolated Postgres databases created from a connected source. They are built for work that should feel production-like without touching the source database: migrations, test runs, data investigations, demos, and agent workflows.
 
-Create a new isolated database branch. Automatically checks it out and returns the connection URL.
+## ardent branch create
+
+Create a branch from the current connector. The new branch becomes your current branch.
 
 ```bash
 ardent branch create my-feature
 ```
 
 <Accordion defaultOpen={false} title="Example output">
-```
+```text
 ✓ Branch 'my-feature' created and checked out in 4.2s
 
-postgresql://user:pass@my-feature-postgres.routing.tryardent.com:5432/db
+postgresql://user:***@my-feature-postgres.routing.tryardent.com:5432/db
 ```
 </Accordion>
 
-### ardent branch list
+### Options
 
-In the terminal, the **current** branch is **green**: the `*`, status dot, name, and connection URL. Other branches use default color for the name and **dim** for the URL. The expandable example uses green for the current branch and dimmer text for the rest. `●` means **active**, `○` means not active. Each URL is indented on the line below the branch name (six spaces in the terminal). There is a **blank line** between each branch.
+| Option | Description |
+| --- | --- |
+| `-s, --service <type>` | Service type to branch. Today this is usually `postgresql` and can normally be omitted |
+| `--print-url` | Print only the branch connection URL. Best for scripts and CI |
+| `--format json` | Print a stable JSON object for automation |
 
-Offline cache shows `⚠ Offline - showing cached data from …` above the list when applicable.
+`--print-url` and `--format` are mutually exclusive.
+
+### Use in scripts
+
+```bash
+DATABASE_URL="$(ardent branch create pr-123 --print-url)"
+export DATABASE_URL
+```
+
+If `--print-url` prints nothing, stop the script. A missing database URL is a failed setup, not a value to fall back from.
+
+### JSON output
+
+```bash
+ardent branch create pr-123 --format json
+```
+
+```json
+{
+  "schema_version": 1,
+  "id": "br_123",
+  "name": "pr-123",
+  "connector_id": "conn_123",
+  "service_type": "postgresql",
+  "status": "active",
+  "branch_url": "postgresql://user:***@pr-123-postgres.routing.tryardent.com:5432/db",
+  "created_at": "2026-06-01T12:00:00Z",
+  "last_branch_activity": null,
+  "current": true,
+  "warning": null
+}
+```
+
+Clients should read the fields they need and ignore additional fields.
+
+## ardent branch list
+
+List branches for the current connector:
 
 ```bash
 ardent branch list
 ```
+
+In the terminal, the current branch is highlighted and prefixed with `*`. `●` means active; `○` means not active. Offline cache output is clearly labeled with `⚠ Offline - showing cached data from ...`.
 
 <Accordion defaultOpen={false} title="Example output">
   <div className="font-mono text-[13px] leading-normal rounded-md border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-950">
     <div className="text-zinc-800 dark:text-zinc-200">Branches:</div>
     <div className="text-green-600 dark:text-green-400">
       <div>* ● my-feature</div>
-      <div>{"      "}postgresql://user:pass@my-feature-postgres.routing.tryardent.com:5432/db</div>
+      <div>{"      "}postgresql://user:***@my-feature-postgres.routing.tryardent.com:5432/db</div>
     </div>
     <div className="h-3" aria-hidden />
     <div>
       <div className="text-zinc-800 dark:text-zinc-200">{"  "}○ staging</div>
       <div className="text-zinc-500 dark:text-zinc-500">
-        {"      "}postgresql://user:pass@staging-postgres.routing.tryardent.com:5432/db
+        {"      "}postgresql://user:***@staging-postgres.routing.tryardent.com:5432/db
       </div>
     </div>
   </div>
 </Accordion>
 
-### ardent branch info
+## ardent branch info
 
-Show details and connection URL for a branch. Defaults to the current branch if no name is given.
+Show details and the connection URL for a branch. If you omit the name, Ardent shows the current branch.
 
 ```bash
 ardent branch info my-feature
 ```
 
 <Accordion defaultOpen={false} title="Example output">
-```
-Name:    my-feature
-URL:     postgresql://user:pass@my-feature-postgres.routing.tryardent.com:5432/db
-Status:  active
+```text
+Branch: my-feature
+Type:   postgresql
+Status: active
 Created: 2 minutes ago
+URL:    postgresql://user:***@my-feature-postgres.routing.tryardent.com:5432/db
 ```
 </Accordion>
 
-### ardent branch switch
+Use the same automation flags as `branch create`:
 
-Switch to a different branch.
+```bash
+ardent branch info --print-url
+ardent branch info my-feature --format json
+```
+
+## ardent branch switch
+
+Switch the current branch for future CLI commands:
 
 ```bash
 ardent branch switch staging
 ```
 
 <Accordion defaultOpen={false} title="Example output">
-```
-✓ Switched to staging
+```text
+Switched from 'my-feature' to 'staging'
+postgresql://user:***@staging-postgres.routing.tryardent.com:5432/db
 ```
 </Accordion>
 
-### ardent branch delete
+Switching branches does not change your source database and does not modify application configuration by itself. Copy the new URL into your app or test environment when you want to use it.
 
-Delete a branch. Branches auto-suspend after 5 minutes of inactivity, so cleanup is optional.
+## ardent branch delete
+
+Delete a branch when you are done:
 
 ```bash
 ardent branch delete my-feature
 ```
 
 <Accordion defaultOpen={false} title="Example output">
-```
-✓ Branch deleted: my-feature
+```text
+✓ Branch deleted
 ```
 </Accordion>
+
+Branches auto-suspend after a short idle period, so cleanup is not urgent for local development. CI workflows should still delete branches with `if: always()` or your CI provider's equivalent so every run cleans up after itself.

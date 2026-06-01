@@ -88,34 +88,27 @@
               {
                 "group": "Workspace",
                 "icon": "folder-key",
-                "expanded": false,
+                "expanded": true,
                 "pages": [
                   "cli/auth",
                   "cli/projects"
                 ]
               },
               {
-                "group": "Connectors",
+                "group": "Database setup",
                 "icon": "unplug",
-                "expanded": false,
+                "expanded": true,
                 "pages": [
-                  "cli/connectors"
+                  "cli/connectors",
+                  "cli/settings"
                 ]
               },
               {
                 "group": "Branches",
                 "icon": "git-branch",
-                "expanded": false,
+                "expanded": true,
                 "pages": [
                   "cli/branches"
-                ]
-              },
-              {
-                "group": "Settings",
-                "icon": "sliders-horizontal",
-                "expanded": false,
-                "pages": [
-                  "cli/settings"
                 ]
               },
               {
@@ -126,6 +119,39 @@
                   "cli/org"
                 ]
               }
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API reference",
+        "icon": "braces",
+        "groups": [
+          {
+            "group": "Start here",
+            "icon": "sparkles",
+            "pages": [
+              "api/overview",
+              "api/authentication",
+              "api/errors"
+            ]
+          },
+          {
+            "group": "Core resources",
+            "icon": "box",
+            "pages": [
+              "api/projects",
+              "api/connectors",
+              "api/branches",
+              "api/operations"
+            ]
+          },
+          {
+            "group": "Administration",
+            "icon": "shield",
+            "pages": [
+              "api/api-keys",
+              "api/orgs"
             ]
           }
         ]

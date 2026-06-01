@@ -1,0 +1,48 @@
+---
+title: "Organizations API"
+sidebarTitle: "Organizations"
+description: "Manage organizations, members, invites, and roles"
+---
+
+Organization APIs are for team administration: listing members, sending invites, updating roles, and managing organization metadata.
+
+## Organization endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/v1/orgs` | List organizations visible to the token |
+| `POST` | `/v1/orgs` | Create an organization |
+| `GET` | `/v1/orgs/{org_id}` | Get organization details |
+| `PATCH` | `/v1/orgs/{org_id}` | Update organization metadata |
+| `DELETE` | `/v1/orgs/{org_id}` | Delete an organization |
+
+## Members and invites
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/v1/orgs/{org_id}/members` | List members |
+| `PATCH` | `/v1/orgs/{org_id}/members/{target_user_id}` | Update a member role |
+| `DELETE` | `/v1/orgs/{org_id}/members/{target_user_id}` | Remove a member |
+| `POST` | `/v1/orgs/{org_id}/invite` | Invite a user |
+| `GET` | `/v1/orgs/{org_id}/invites` | List pending invites |
+| `DELETE` | `/v1/orgs/{org_id}/invites/{invite_id}` | Revoke an invite |
+| `GET` | `/v1/orgs/{org_id}/roles` | List available roles |
+
+## Invite a teammate
+
+```bash
+curl --oauth2-bearer "$ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/orgs/org_123/invite   -H 'Content-Type: application/json'   -d '{"email":"teammate@example.com","role_key":"member"}'
+```
+
+## Update a role
+
+```bash
+curl --oauth2-bearer "$ARDENT_TOKEN"   -X PATCH https://api.tryardent.com/v1/orgs/org_123/members/user_123   -H 'Content-Type: application/json'   -d '{"role_key":"admin"}'
+```
+
+## Role guidance
+
+- Use `viewer` for read-only users and reporting automation.
+- Use `member` for developers who create branches and manage day-to-day resources.
+- Use `admin` for teammates who manage access and shared resources.
+- Reserve `owner` for organization-level control.

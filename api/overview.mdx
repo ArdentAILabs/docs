@@ -1,0 +1,67 @@
+---
+title: "API overview"
+sidebarTitle: "Overview"
+description: "Build on Ardent with the REST API"
+---
+
+The Ardent API lets you create projects, connect Postgres sources, create branches, poll long-running operations, and manage organization access from your own automation.
+
+Use the CLI for interactive setup and day-to-day terminal work. Use the API when you are building CI systems, internal developer platforms, custom dashboards, or agent workflows.
+
+## Base URL
+
+```text
+https://api.tryardent.com/v1
+```
+
+All examples use JSON over HTTPS and assume your token is stored in `ARDENT_TOKEN`.
+
+## Authentication
+
+Pass an API token with each request:
+
+```bash
+curl --oauth2-bearer "$ARDENT_TOKEN" https://api.tryardent.com/v1/projects
+```
+
+Create and revoke tokens in **Ardent dashboard > Settings > API keys**. See [Authentication](/api/authentication) for token handling, roles, and troubleshooting.
+
+## Resource model
+
+```text
+Organization
+  └─ Project
+       └─ Connector
+            └─ Branch
+```
+
+- **Organization**: your team and billing/security boundary.
+- **Project**: a workspace for related connectors and branches.
+- **Connector**: one Postgres source server that Ardent can replicate and branch.
+- **Branch**: an isolated database created from a connector.
+
+## A minimal API flow
+
+1. List or create a project.
+2. Preflight a Postgres source.
+3. Create a connector after preflight passes.
+4. Create a branch from the connector.
+5. Use the returned branch URL in your app, test runner, or agent.
+
+```bash
+curl --oauth2-bearer "$ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/branch/create   -H 'Content-Type: application/json'   -d '{"connector_id":"conn_123","service_type":"postgresql","name":"pr-123"}'
+```
+
+## Long-running work
+
+Some API calls return immediately with an operation ID while Ardent continues the work in the background. Connector discovery and setup are the most common examples.
+
+```bash
+curl --oauth2-bearer "$ARDENT_TOKEN" https://api.tryardent.com/v1/operations/op_123
+```
+
+See [Operations](/api/operations) for the full polling model.
+
+## Stability notes
+
+The public API may add fields over time. Clients should read the fields they need and ignore unknown fields. Treat missing required fields, failed operations, and empty branch URLs as hard failures in automation.

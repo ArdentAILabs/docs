@@ -1,23 +1,105 @@
 ---
 title: "CLI reference"
 sidebarTitle: "Overview"
-description: "Install the ardent CLI and browse command groups"
+description: "Install the Ardent CLI, understand command groups, and automate branch workflows"
 ---
+
+The Ardent CLI is the fastest way to connect a Postgres source, create isolated database branches, and hand safe branch URLs to apps, tests, and coding agents.
+
+Use the CLI when you are working at a terminal. Use the [API](/api/overview) when you are building your own automation or platform integration.
+
+## Install
 
 ```bash
 npm install -g ardent-cli
 ```
 
-Run `ardent` with no arguments for onboarding hints.
+The CLI runs on modern Node.js LTS releases. We recommend Node 18 or newer.
 
-To print the full command list in your terminal, run:
+Check your install:
 
 ```bash
+ardent --version
 ardent --help
 ```
 
-You can also use `--help` on any subcommand, for example `ardent branch --help`.
+You can also ask any command for help:
 
-Global options: `--help`, `--version`.
+```bash
+ardent connector --help
+ardent branch create --help
+```
 
-Use the sections in this sidebar for auth, projects, connectors, branches, connector settings, and team commands.
+## How the CLI is organized
+
+| Group | What it manages |
+| --- | --- |
+| `ardent login`, `ardent logout`, `ardent status` | Your local session and active workspace |
+| `ardent project ...` | Projects inside your organization |
+| `ardent connector ...` | Source databases Ardent can replicate and branch |
+| `ardent branch ...` | Isolated database branches and connection URLs |
+| `ardent settings ...` | Per-connector defaults for future branches |
+| `ardent invite ...`, `ardent org ...` | Team invites, members, and roles |
+
+## The selection model
+
+The CLI keeps track of the current project, connector, and branch for you:
+
+1. A **project** groups related connectors and branches.
+2. A **connector** points to one Postgres source server.
+3. A **branch** is an isolated database created from that connector.
+
+After login, Ardent auto-selects your project and connector if there is only one clear choice. If your organization has more than one, select explicitly:
+
+```bash
+ardent project switch my-project
+ardent connector switch prod-db
+ardent branch switch my-feature
+```
+
+In CI, always switch project and connector explicitly. That keeps automation stable even if your personal defaults change.
+
+## Human output and automation output
+
+Most commands print friendly terminal output by default. Branch commands also support automation-friendly output:
+
+```bash
+ardent branch create pr-123 --print-url
+ardent branch info my-feature --format json
+```
+
+Use `--print-url` when a script needs only the connection URL. Use `--format json` when you want a stable object with the branch name, status, service type, connector ID, and URL.
+
+## Environment variables
+
+| Variable | Use it for |
+| --- | --- |
+| `ARDENT_TOKEN` | Authenticate in CI or other headless environments without running `ardent login` |
+| `ARDENT_API_URL` | Override the API endpoint. Defaults to `https://api.tryardent.com` |
+
+For GitHub Actions, store your token as a repository secret named `ARDENT_TOKEN`, then run commands normally:
+
+```bash
+ARDENT_TOKEN="$ARDENT_TOKEN" ardent branch create pr-123 --print-url
+```
+
+## A complete first branch
+
+```bash
+ardent login
+ardent connector preflight postgresql 'postgresql://user:***@host:5432/mydb'
+ardent connector create postgresql 'postgresql://user:***@host:5432/mydb' --name prod-db
+ardent branch create my-feature --print-url
+```
+
+Preflight is intentionally first. It checks reachability, permissions, logical replication settings, and source readiness without creating a connector or storing credentials.
+
+## Troubleshooting
+
+| Symptom | What to try |
+| --- | --- |
+| `Not authenticated` | Run `ardent login`, or set `ARDENT_TOKEN` in the current shell |
+| The wrong project or connector is selected | Run `ardent project list`, `ardent project switch <name>`, then `ardent connector switch <name>` |
+| A script needs the database URL only | Use `ardent branch create <name> --print-url` |
+| Preflight fails | Fix the specific check that failed, then re-run preflight before creating the connector |
+| A branch URL is missing in CI | Treat it as a hard failure. Re-run `ardent branch info --print-url` and stop the job if it prints nothing |

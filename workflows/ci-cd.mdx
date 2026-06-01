@@ -3,80 +3,26 @@ title: "CI / CD"
 description: "A fresh database for every PR. Isolated, production-like, torn down after merge."
 ---
 
-Every PR gets its own fresh database cloned from production, torn down after merge. No shared staging that drifts out of sync. No test runs that corrupt each other.
-
-## Have Claude set this up
-
-Paste this into Claude Code or Cursor and it will walk you through the whole thing:
-
-```
-Set up Ardent branching in our GitHub Actions CI. Act like a teammate
-at my keyboard: write the workflow yourself, only stop when you need
-me to do browser-only steps.
-
-Steps:
-
-1. Tell me to create an API token at
-   https://app.tryardent.com/app/settings/api-keys and add it as a
-   repo secret called ARDENT_TOKEN (Settings > Secrets and variables >
-   Actions). Wait until I confirm both are done.
-
-2. Run `ardent project list` and `ardent connector list` to get my
-   project and connector names. If I have multiple, ask me which to use.
-
-3. Create .github/workflows/ardent-branch.yml using the template at
-   https://docs.tryardent.com/workflows/ci-cd, with my project and
-   connector substituted in. Use `npm test` unless this repo uses
-   something else (check package.json).
-
-4. Commit on a new branch and open a PR so the workflow runs.
-
-Don't narrate every step. Hand me a working PR at the end. If a step
-errors, fix it.
-```
-
-Or follow the manual walkthrough below.
+Every PR can run against its own fresh database branch cloned from your connected source. No shared staging database that drifts out of sync. No test runs that corrupt each other. No production credentials handed to CI.
 
 ## Prerequisites
 
-You need an Ardent account with at least one connector set up. If you haven't done that yet, follow the [Quickstart](/quickstart) first.
+You need:
 
-## Setup
+- An Ardent account with one ready connector. If you do not have one yet, follow the [Quickstart](/quickstart).
+- An API token stored as a CI secret named `ARDENT_TOKEN`.
+- The project and connector names you want CI to use.
 
-<Steps>
-<Step title="Get your project and connector names">
-
-Run these locally to find the values you'll need for the workflow:
+Find project and connector names locally:
 
 ```bash
 ardent project list
 ardent connector list
 ```
 
-Note the project name and connector name. You will use these in the workflow to explicitly select which database to branch from.
-
-</Step>
-
-<Step title="Create an API token">
-
-Go to [Ardent dashboard > API keys](https://app.tryardent.com/app/settings/api-keys) and create a token.
-
-</Step>
-
-<Step title="Add the token to GitHub">
-
-In your repo, go to **Settings > Secrets and variables > Actions** and click **New repository secret**. Name it **`ARDENT_TOKEN`** and paste your token.
-
-</Step>
-
-<Step title="Add the workflow file">
-
-Copy the YAML below to `.github/workflows/ardent-branch.yml` in your repo, replacing `my-project` and `my-connector` with your values from step 1.
-
-</Step>
-</Steps>
-
 ## GitHub Actions workflow
+
+Copy this to `.github/workflows/ardent-branch.yml`, replacing `my-project`, `my-connector`, and `npm test` for your repo.
 
 ```yaml
 name: Test with Ardent branch
@@ -88,6 +34,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      ARDENT_TOKEN: ${{ secrets.ARDENT_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
@@ -101,9 +49,6 @@ jobs:
       - name: Install Ardent CLI
         run: npm install -g ardent-cli
 
-      - name: Log in to Ardent
-        run: ardent login --token ${{ secrets.ARDENT_TOKEN }}
-
       - name: Select project and connector
         run: |
           ardent project switch my-project
@@ -112,31 +57,57 @@ jobs:
       - name: Create database branch
         run: |
           BRANCH_NAME="pr-${{ github.event.pull_request.number }}-${{ github.run_id }}"
-          ardent branch create "$BRANCH_NAME"
-          echo "DATABASE_URL=$(ardent branch info | awk '/URL:/{print $2}')" >> "$GITHUB_ENV"
+          DATABASE_URL="$(ardent branch create "$BRANCH_NAME" --print-url)"
+          if [ -z "$DATABASE_URL" ]; then
+            echo "Ardent did not return a database URL" >&2
+            exit 1
+          fi
+          echo "DATABASE_URL=$DATABASE_URL" >> "$GITHUB_ENV"
           echo "ARDENT_BRANCH=$BRANCH_NAME" >> "$GITHUB_ENV"
 
       - name: Run tests
         run: npm test
 
       - name: Delete database branch
-        if: always()
+        if: always() && env.ARDENT_BRANCH != ''
         run: ardent branch delete "$ARDENT_BRANCH"
 ```
 
-**What each step does:**
+## Why this shape works
 
-- **`ardent login --token`** authenticates the CLI using your repo secret.
-- **`ardent project switch` / `ardent connector switch`** explicitly selects which project and connector to branch from. A connector represents one Postgres server. Replace `my-project` and `my-connector` with your names. Always set these in CI so the workflow uses the right database, even if your local CLI defaults change.
-- **`ardent branch create`** creates an isolated database branch. The name includes the PR number and run ID so concurrent runs and re-runs don't collide.
-- **`ardent branch info | awk '/URL:/{print $2}'`** extracts the branch connection URL and writes it to `DATABASE_URL` in `GITHUB_ENV`. Your test step reads `DATABASE_URL` like any other environment variable. If your app uses a different env var name, change it in the `echo` line.
-- **`npm test`** runs your test suite against the branch. Replace with `pytest`, `pnpm test`, `make test`, or whatever your project uses.
-- **`ardent branch delete`** cleans up the branch. `if: always()` ensures this runs even when tests fail.
+- `ARDENT_TOKEN` authenticates the CLI without writing an interactive login session.
+- `ardent project switch` and `ardent connector switch` make the workflow deterministic.
+- `ardent branch create --print-url` returns only the connection URL, which is safer and cleaner than scraping human output.
+- The branch name includes both PR number and run ID so re-runs and concurrent jobs do not collide.
+- Cleanup runs with `if: always()` so failed tests still delete the branch.
 
-## Compared to a shared staging database
+## Other CI providers
 
-- **Full production data:** branches are not schema-only copies. You test against the same data at the same scale, so if something would blow up in production, it blows up here first.
-- **Isolation:** each PR gets its own branch. No test run can interfere with another.
-- **Efficient at scale:** compute auto-scales per branch and storage is shared across branches, so spinning up many ephemeral environments stays cheap.
-- **Always in sync:** branches are created from a continuously synced replica. No drift.
-- **Auto cleanup:** `if: always()` deletes the branch after the run. No orphaned environments.
+The pattern is the same everywhere:
+
+```bash
+npm install -g ardent-cli
+ardent project switch my-project
+ardent connector switch my-connector
+export DATABASE_URL="$(ardent branch create "$CI_BRANCH_NAME" --print-url)"
+# run tests
+ardent branch delete "$CI_BRANCH_NAME"
+```
+
+Store `ARDENT_TOKEN` in your CI provider's secret manager. Do not commit tokens to the repository.
+
+## JSON variant
+
+If your CI step wants more than the URL, use JSON output:
+
+```bash
+BRANCH_JSON="$(ardent branch create "$BRANCH_NAME" --format json)"
+DATABASE_URL="$(node -e 'console.log(JSON.parse(process.argv[1]).branch_url)' "$BRANCH_JSON")"
+```
+
+## Compared to shared staging
+
+- **Production-like data:** branches are not schema-only copies.
+- **Isolation:** each PR gets its own database.
+- **Fast branch creation:** once a connector is ready, branch creation is independent of source database size.
+- **Clean teardown:** branches can be deleted after each run and auto-suspend when idle.
