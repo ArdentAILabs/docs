@@ -49,18 +49,20 @@ jobs:
       - name: Install Ardent CLI
         run: npm install -g ardent-cli
 
-      - name: Select project and connector
+      - name: Log in to Ardent
         env:
           ARDENT_TOKEN: ${{ secrets.ARDENT_TOKEN }}
+        run: ardent login --token "$ARDENT_TOKEN"
+
+      - name: Select project and connector
         run: |
           ardent project switch my-project
           ardent connector switch my-connector
 
       - name: Create database branch
-        env:
-          ARDENT_TOKEN: ${{ secrets.ARDENT_TOKEN }}
         run: |
           DATABASE_URL="$(ardent branch create "$ARDENT_BRANCH" --print-url)"
+          echo "ARDENT_BRANCH_CREATED=true" >> "$GITHUB_ENV"
           if [ -z "$DATABASE_URL" ]; then
             echo "Ardent did not return a database URL" >&2
             exit 1
@@ -71,20 +73,19 @@ jobs:
         run: npm test
 
       - name: Delete database branch
-        if: always() && env.ARDENT_BRANCH != ''
-        env:
-          ARDENT_TOKEN: ${{ secrets.ARDENT_TOKEN }}
+        if: always() && env.ARDENT_BRANCH_CREATED == 'true'
         run: ardent branch delete "$ARDENT_BRANCH"
 ```
 
 ## Why this shape works
 
-- `ARDENT_TOKEN` authenticates the CLI without writing an interactive login session or interpolating the secret into a shell command. It is scoped only to the Ardent CLI steps, not the test step.
+- `ardent login --token "$ARDENT_TOKEN"` authenticates the CLI without interpolating the secret directly into the shell command.
 - `ardent project switch` and `ardent connector switch` make the workflow deterministic.
 - `ARDENT_BRANCH` defines the branch name before the branch is created, so cleanup does not depend on the create step writing that name to `GITHUB_ENV`.
 - `ardent branch create --print-url` returns only the connection URL, which is safer and cleaner than scraping human output.
 - The branch name includes both PR number and run ID so re-runs and concurrent jobs do not collide.
-- Cleanup runs with `if: always()` so failed tests still delete the branch.
+- `ARDENT_BRANCH_CREATED` makes cleanup run only after branch creation succeeds, so earlier setup failures do not try to delete a branch that never existed.
+- Cleanup runs with `if: always()` after branch creation so failed tests still delete the branch.
 
 ## Other CI providers
 

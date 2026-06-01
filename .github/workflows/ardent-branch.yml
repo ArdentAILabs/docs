@@ -22,18 +22,20 @@ jobs:
       - name: Install Ardent CLI
         run: npm install -g ardent-cli
 
-      - name: Select project and connector
+      - name: Log in to Ardent
         env:
           ARDENT_TOKEN: ${{ secrets.ARDENT_TOKEN }}
+        run: ardent login --token "$ARDENT_TOKEN"
+
+      - name: Select project and connector
         run: |
           ardent project switch newer-testing
           ardent connector switch new-connector
 
       - name: Create database branch
-        env:
-          ARDENT_TOKEN: ${{ secrets.ARDENT_TOKEN }}
         run: |
           DATABASE_URL="$(ardent branch create "$ARDENT_BRANCH" --print-url)"
+          echo "ARDENT_BRANCH_CREATED=true" >> "$GITHUB_ENV"
           if [ -z "$DATABASE_URL" ]; then
             echo "Ardent did not return a database URL" >&2
             exit 1
@@ -44,7 +46,5 @@ jobs:
         run: npm test
 
       - name: Delete database branch
-        if: always() && env.ARDENT_BRANCH != ''
-        env:
-          ARDENT_TOKEN: ${{ secrets.ARDENT_TOKEN }}
+        if: always() && env.ARDENT_BRANCH_CREATED == 'true'
         run: ardent branch delete "$ARDENT_BRANCH"
