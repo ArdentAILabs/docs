@@ -4,10 +4,10 @@ sidebarTitle: "Authentication"
 description: "Authenticate API requests with bearer tokens and manage access safely"
 ---
 
-The API uses bearer tokens. Create tokens in **Ardent dashboard > Settings > API keys**, store them in a secret manager, and pass them with each request.
+The API uses bearer tokens. Create tokens in **Ardent dashboard > Settings > API keys**, store them in a secret manager, and pass them with each request. API keys start with `sk-ard_` and are passed in an `Authorization: Bearer` header.
 
 ```bash
-curl --oauth2-bearer "$ARDENT_TOKEN" https://api.tryardent.com/v1/projects
+curl -H "Authorization: Bearer $ARDENT_TOKEN" https://api.tryardent.com/v1/projects
 ```
 
 ## Token handling
@@ -31,7 +31,7 @@ curl --oauth2-bearer "$ARDENT_TOKEN" https://api.tryardent.com/v1/projects
 The CLI can also use API tokens through `ARDENT_TOKEN`:
 
 ```bash
-export ARDENT_TOKEN="ardent_..."
+export ARDENT_TOKEN="sk-ard_..."
 ardent branch create pr-123 --print-url
 ```
 
@@ -48,5 +48,5 @@ For local interactive work, `ardent login` is friendlier. For CI and scripts, `A
 ## Example: list projects
 
 ```bash
-curl --oauth2-bearer "$ARDENT_TOKEN" https://api.tryardent.com/v1/projects
+curl -H "Authorization: Bearer $ARDENT_TOKEN" https://api.tryardent.com/v1/projects
 ```

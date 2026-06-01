@@ -17,7 +17,7 @@ API keys let automation call Ardent without a human browser login. Create the na
 ## Create an API key
 
 ```bash
-curl --oauth2-bearer "$ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/orgs/org_123/api-keys   -H 'Content-Type: application/json'   -d '{"name":"github-actions-main","role_id":"role_org_member","scopes":["branches:write","connectors:read"],"expires_days":90}'
+curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/orgs/org_123/api-keys   -H 'Content-Type: application/json'   -d '{"name":"github-actions-main","role_id":"role_org_member","scopes":["branches:write","connectors:read"],"expires_days":90}'
 ```
 
 <Warning>
@@ -27,7 +27,7 @@ curl --oauth2-bearer "$ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/orgs
 ## List API keys
 
 ```bash
-curl --oauth2-bearer "$ARDENT_TOKEN" https://api.tryardent.com/v1/orgs/org_123/api-keys
+curl -H "Authorization: Bearer $ARDENT_TOKEN" https://api.tryardent.com/v1/orgs/org_123/api-keys
 ```
 
 List responses include metadata such as name, role, creation time, and expiration, but never the secret token.
@@ -35,7 +35,7 @@ List responses include metadata such as name, role, creation time, and expiratio
 ## Revoke an API key
 
 ```bash
-curl --oauth2-bearer "$ARDENT_TOKEN"   -X DELETE https://api.tryardent.com/v1/orgs/org_123/api-keys/key_123
+curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X DELETE https://api.tryardent.com/v1/orgs/org_123/api-keys/key_123
 ```
 
 Revocation is immediate. Any CI job or integration using that token will fail authentication on its next request.

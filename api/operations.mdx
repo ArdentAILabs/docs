@@ -9,7 +9,7 @@ Some Ardent work takes longer than a single request: connector discovery, connec
 ## Get an operation
 
 ```bash
-curl --oauth2-bearer "$ARDENT_TOKEN" https://api.tryardent.com/v1/operations/op_123
+curl -H "Authorization: Bearer $ARDENT_TOKEN" https://api.tryardent.com/v1/operations/op_123
 ```
 
 Representative response:
@@ -43,7 +43,7 @@ Representative response:
 
 ```bash
 while true; do
-  json="$(curl -s --oauth2-bearer "$ARDENT_TOKEN"     "https://api.tryardent.com/v1/operations/$OPERATION_ID")"
+  json="$(curl -s -H "Authorization: Bearer $ARDENT_TOKEN"     "https://api.tryardent.com/v1/operations/$OPERATION_ID")"
   status="$(node -e 'console.log(JSON.parse(process.argv[1]).status)' "$json")"
 
   case "$status" in
