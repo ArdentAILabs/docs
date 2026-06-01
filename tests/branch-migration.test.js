@@ -7,6 +7,10 @@ const TABLE = "ardent_ci_test";
 let client;
 
 beforeAll(async () => {
+  if (!process.env.DATABASE_URL) {
+    throw new Error("DATABASE_URL is required");
+  }
+
   client = new Client({ connectionString: process.env.DATABASE_URL });
   await client.connect();
 }, 30000);
@@ -17,12 +21,10 @@ afterAll(async () => {
 }, 30000);
 
 describe("migration on Ardent branch", () => {
-  it("connects to the branch database", async () => {
+  it("runs a full migration lifecycle", async () => {
     const res = await client.query("SELECT 1 AS ok");
     expect(res.rows[0].ok).toBe(1);
-  }, 15000);
 
-  it("runs a CREATE TABLE migration", async () => {
     await client.query(`DROP TABLE IF EXISTS ${TABLE}`);
     await client.query(`
       CREATE TABLE ${TABLE} (
@@ -32,18 +34,19 @@ describe("migration on Ardent branch", () => {
       )
     `);
 
-    const res = await client.query(`
+    const createRes = await client.query(
+      `
       SELECT column_name
       FROM information_schema.columns
-      WHERE table_name = '${TABLE}'
+      WHERE table_name = $1
       ORDER BY ordinal_position
-    `);
+    `,
+      [TABLE]
+    );
 
-    const columns = res.rows.map((r) => r.column_name);
+    const columns = createRes.rows.map((r) => r.column_name);
     expect(columns).toEqual(["id", "email", "created_at"]);
-  }, 15000);
 
-  it("inserts and reads data", async () => {
     await client.query(
       `INSERT INTO ${TABLE} (email) VALUES ($1)`,
       ["ci-test@example.com"]
@@ -55,25 +58,27 @@ describe("migration on Ardent branch", () => {
     );
     expect(res.rows.length).toBe(1);
     expect(res.rows[0].email).toBe("ci-test@example.com");
-  }, 15000);
 
-  it("runs an ALTER TABLE migration", async () => {
     await client.query(`ALTER TABLE ${TABLE} ADD COLUMN name TEXT`);
 
-    const res = await client.query(`
+    const alterRes = await client.query(
+      `
       SELECT column_name FROM information_schema.columns
-      WHERE table_name = '${TABLE}' AND column_name = 'name'
-    `);
-    expect(res.rows.length).toBe(1);
-  }, 15000);
+      WHERE table_name = $1 AND column_name = $2
+    `,
+      [TABLE, "name"]
+    );
+    expect(alterRes.rows.length).toBe(1);
 
-  it("cleans up with DROP TABLE", async () => {
     await client.query(`DROP TABLE ${TABLE}`);
 
-    const res = await client.query(`
+    const dropRes = await client.query(
+      `
       SELECT table_name FROM information_schema.tables
-      WHERE table_name = '${TABLE}'
-    `);
-    expect(res.rows.length).toBe(0);
-  }, 15000);
+      WHERE table_name = $1
+    `,
+      [TABLE]
+    );
+    expect(dropRes.rows.length).toBe(0);
+  }, 60000);
 });

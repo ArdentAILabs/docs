@@ -34,6 +34,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     env:
       ARDENT_BRANCH: pr-${{ github.event.pull_request.number }}-${{ github.run_id }}
     steps:
@@ -55,18 +56,23 @@ jobs:
         run: ardent login --token "$ARDENT_TOKEN"
 
       - name: Select project and connector
+        env:
+          ARDENT_TOKEN: ${{ secrets.ARDENT_TOKEN }}
         run: |
           ardent project switch my-project
           ardent connector switch my-connector
 
       - name: Create database branch
+        env:
+          ARDENT_TOKEN: ${{ secrets.ARDENT_TOKEN }}
         run: |
           DATABASE_URL="$(ardent branch create "$ARDENT_BRANCH" --print-url)"
           echo "ARDENT_BRANCH_CREATED=true" >> "$GITHUB_ENV"
-          if [ -z "$DATABASE_URL" ]; then
-            echo "Ardent did not return a database URL" >&2
-            exit 1
-          fi
+          case "$DATABASE_URL" in
+            postgres://*|postgresql://*) ;;
+            *) echo "Ardent did not return a Postgres database URL" >&2; exit 1 ;;
+          esac
+          echo "::add-mask::$DATABASE_URL"
           echo "DATABASE_URL=$DATABASE_URL" >> "$GITHUB_ENV"
 
       - name: Run tests
@@ -74,18 +80,21 @@ jobs:
 
       - name: Delete database branch
         if: always() && env.ARDENT_BRANCH_CREATED == 'true'
+        env:
+          ARDENT_TOKEN: ${{ secrets.ARDENT_TOKEN }}
         run: ardent branch delete "$ARDENT_BRANCH"
 ```
 
 ## Why this shape works
 
-- `ardent login --token "$ARDENT_TOKEN"` authenticates the CLI without interpolating the secret directly into the shell command.
+- `ARDENT_TOKEN` is passed through `env` to Ardent CLI steps so it is not interpolated directly into shell commands or exposed to the test step.
 - `ardent project switch` and `ardent connector switch` make the workflow deterministic.
 - `ARDENT_BRANCH` defines the branch name before the branch is created, so cleanup does not depend on the create step writing that name to `GITHUB_ENV`.
 - `ardent branch create --print-url` returns only the connection URL, which is safer and cleaner than scraping human output.
+- The workflow validates the captured URL starts with `postgres://` or `postgresql://`, then masks it before writing it to `GITHUB_ENV`.
 - The branch name includes both PR number and run ID so re-runs and concurrent jobs do not collide.
 - `ARDENT_BRANCH_CREATED` makes cleanup run only after branch creation succeeds, so earlier setup failures do not try to delete a branch that never existed.
-- Cleanup runs with `if: always()` after branch creation so failed tests still delete the branch.
+- `timeout-minutes` bounds external-service hangs, and cleanup runs with `if: always()` after branch creation so failed tests still delete the branch.
 
 ## Other CI providers
 
