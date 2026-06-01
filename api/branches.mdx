@@ -1,0 +1,63 @@
+---
+title: "Branches API"
+sidebarTitle: "Branches"
+description: "Create and list isolated database branches"
+---
+
+Branches are isolated Postgres databases created from a connector. Use them for CI runs, local development, migration testing, agent work, and short-lived review environments.
+
+## Endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `POST` | `/v1/branch/create` | Create a branch |
+| `GET` | `/v1/branches/{connector_id}` | List branches for a connector |
+
+For interactive deletion and switching, use the CLI: `ardent branch delete` and `ardent branch switch`.
+
+## Create a branch
+
+```bash
+curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/branch/create   -H 'Content-Type: application/json'   -d '{"connector_id":"conn_123","service_type":"postgresql","name":"pr-123"}'
+```
+
+The response is the branch's connection details:
+
+```json
+{
+  "host": "pr-123-postgres.routing.tryardent.com",
+  "port": 5432,
+  "username": "user",
+  "password": "***",
+  "database": "db",
+  "connection_uri": "postgresql://user:***@pr-123-postgres.routing.tryardent.com:5432/db"
+}
+```
+
+Treat `connection_uri` and the discrete credential fields as sensitive.
+
+When the branch is cut from a source whose WAL advanced past the snapshot, the response also includes a `warning` string describing the staleness. It is absent otherwise.
+
+For branch metadata such as `id`, `status`, and `created_at`, list the connector's branches with `GET /v1/branches/{connector_id}`, or use the CLI's `ardent branch create --format json`.
+
+## List branches
+
+```bash
+curl -H "Authorization: Bearer $ARDENT_TOKEN" https://api.tryardent.com/v1/branches/conn_123
+```
+
+Use this to populate internal dashboards or cleanup tools. For shell scripts that only need a URL, the CLI is simpler:
+
+```bash
+DATABASE_URL="$(ardent branch create pr-123 --print-url)"
+```
+
+## Naming guidance
+
+Use names that are unique, readable, and safe to clean up automatically:
+
+- `pr-123-456789`
+- `agent-fix-login-20260601`
+- `migration-add-index-smoke-test`
+
+Avoid embedding secrets, customer names, or production incident details in branch names.

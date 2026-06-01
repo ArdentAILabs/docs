@@ -1,0 +1,58 @@
+---
+title: "Operations API"
+sidebarTitle: "Operations"
+description: "Poll long-running Ardent work to completion"
+---
+
+Some Ardent work takes longer than a single request: connector discovery, connector setup, resets, and environment operations. Those endpoints return an operation ID that you can poll.
+
+## Get an operation
+
+```bash
+curl -H "Authorization: Bearer $ARDENT_TOKEN" https://api.tryardent.com/v1/operations/op_123
+```
+
+Representative response:
+
+```json
+{
+  "id": "op_123",
+  "org_id": "org_123",
+  "type": "connector_engine_setup",
+  "resource_id": "conn_123",
+  "status": "running",
+  "stage": "initializing",
+  "progress": 35,
+  "result": null,
+  "error": null,
+  "created_at": "2026-06-01T12:00:00Z",
+  "updated_at": "2026-06-01T12:02:00Z"
+}
+```
+
+## Status values
+
+| Status | Meaning |
+| --- | --- |
+| `pending` | The operation is queued |
+| `running` | Work is in progress |
+| `completed` | Work finished successfully |
+| `failed` | Work reached a terminal failure |
+
+## Polling loop
+
+```bash
+while true; do
+  json="$(curl -s -H "Authorization: Bearer $ARDENT_TOKEN"     "https://api.tryardent.com/v1/operations/$OPERATION_ID")"
+  status="$(node -e 'console.log(JSON.parse(process.argv[1]).status)' "$json")"
+
+  case "$status" in
+    completed) echo "$json"; break ;;
+    failed) echo "$json" >&2; exit 1 ;;
+    pending|running) sleep 5 ;;
+    *) echo "Unknown operation status: $status" >&2; exit 1 ;;
+  esac
+done
+```
+
+Poll with a bounded timeout in production automation. If an operation fails, read `error`, fix the cause, and start a new supported action rather than assuming the old operation will recover.

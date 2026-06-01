@@ -1,0 +1,80 @@
+---
+title: "Connectors API"
+sidebarTitle: "Connectors"
+description: "Preflight, create, inspect, and update Postgres connectors"
+---
+
+A connector links Ardent to one Postgres source server. The safest API flow is the same as the CLI flow: preflight first, fix anything preflight reports, then create the connector.
+
+## Public lifecycle
+
+| Step | Endpoint | Notes |
+| --- | --- | --- |
+| Preflight source | `POST /v1/connectors/preflight` | Checks source readiness without creating a connector |
+| Create connector | `POST /v1/connectors` | Stores connector configuration and starts setup |
+| Discover schema | `POST /v1/connectors/{connector_id}/discover` | Starts async discovery when needed |
+| Select tables/schemas | `POST /v1/connectors/{connector_id}/selection` | Sets selected paths |
+| Submit replica decisions | `PUT /v1/connectors/{connector_id}/replica-identity-decisions` | Resolves table identity choices |
+| Start setup | `POST /v1/connectors/{connector_id}/engine-setup` | Starts async setup |
+| Inspect connector | `GET /v1/connectors/{connector_id}` | Returns status and readiness information |
+| List connectors | `GET /v1/connectors` | Lists connectors in scope |
+| Update connector | `PUT /v1/connectors/{connector_id}` | Updates supported settings |
+| Delete connector | `DELETE /v1/connectors/{connector_id}` | Deletes the connector |
+
+## Preflight a source
+
+```bash
+curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/connectors/preflight   -H 'Content-Type: application/json'   -d '{"org_id":"org_123","service_name":"postgresql","connection_details":{"url":"postgresql://user:***@host:5432/mydb"},"selected_schemas":["public","billing"]}'
+```
+
+Preflight does not create a connector. It checks reachability, writer status, logical replication settings, slot capacity, plugin availability, permissions, and whether the source is already connected.
+
+## Create a connector
+
+```bash
+curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/connectors   -H 'Content-Type: application/json'   -d '{"org_id":"org_123","project_id":"project_123","name":"prod-db","service_name":"postgresql","connection_details":{"url":"postgresql://user:***@host:5432/mydb"}}'
+```
+
+For private-network or customer-owned environments, include the environment and private connection IDs that your Ardent team has provisioned:
+
+```json
+{
+  "byoc": true,
+  "environment_id": "env_123",
+  "private_link_id": "epl_123"
+}
+```
+
+## Replica identity decisions
+
+If Ardent reports tables that need a decision, submit a table-to-decision map:
+
+```bash
+curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X PUT https://api.tryardent.com/v1/connectors/conn_123/replica-identity-decisions   -H 'Content-Type: application/json'   -d '{"decisions":{"public.audit_events":"exclude","public.invoice_line_items":"replica_identity_full"}}'
+```
+
+Decision values:
+
+| Value | Meaning |
+| --- | --- |
+| `exclude` | Do not replicate this table yet |
+| `add_pk` | You will add a primary key or valid unique key on source before retrying |
+| `replica_identity_full` | Opt into `REPLICA IDENTITY FULL` for this table |
+
+## Async setup and discovery
+
+Discovery and setup can return an operation ID. Poll it until terminal:
+
+```bash
+curl -H "Authorization: Bearer $ARDENT_TOKEN" https://api.tryardent.com/v1/operations/op_123
+```
+
+See [Operations](/api/operations).
+
+## Delete a connector
+
+```bash
+curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X DELETE https://api.tryardent.com/v1/connectors/conn_123
+```
+
+By default, Ardent waits for in-progress replication work to finish before deletion. Use force-delete behavior only when your Ardent workflow explicitly supports it and you understand the cleanup impact.

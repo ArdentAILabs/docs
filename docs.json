@@ -48,7 +48,7 @@
               {
                 "group": "PostgreSQL",
                 "icon": "database",
-                "collapsed": false,
+                "expanded": true,
                 "pages": [
                   "connectors/supabase",
                   "connectors/rds",
@@ -95,11 +95,12 @@
                 ]
               },
               {
-                "group": "Connectors",
+                "group": "Database setup",
                 "icon": "unplug",
                 "expanded": true,
                 "pages": [
-                  "cli/connectors"
+                  "cli/connectors",
+                  "cli/settings"
                 ]
               },
               {
@@ -111,21 +112,46 @@
                 ]
               },
               {
-                "group": "Settings",
-                "icon": "sliders-horizontal",
-                "expanded": true,
-                "pages": [
-                  "cli/settings"
-                ]
-              },
-              {
                 "group": "Team",
                 "icon": "users",
-                "expanded": true,
+                "expanded": false,
                 "pages": [
                   "cli/org"
                 ]
               }
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API reference",
+        "icon": "braces",
+        "groups": [
+          {
+            "group": "Start here",
+            "icon": "sparkles",
+            "pages": [
+              "api/overview",
+              "api/authentication",
+              "api/errors"
+            ]
+          },
+          {
+            "group": "Core resources",
+            "icon": "box",
+            "pages": [
+              "api/projects",
+              "api/connectors",
+              "api/branches",
+              "api/operations"
+            ]
+          },
+          {
+            "group": "Administration",
+            "icon": "shield",
+            "pages": [
+              "api/api-keys",
+              "api/orgs"
             ]
           }
         ]
