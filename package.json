@@ -1,0 +1,24 @@
+{
+  "name": "docs",
+  "version": "1.0.0",
+  "description": "Documentation for [Ardent](https://tryardent.com) — Git for your data infrastructure.",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ArdentAILabs/docs.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ArdentAILabs/docs/issues"
+  },
+  "homepage": "https://github.com/ArdentAILabs/docs#readme",
+  "devDependencies": {
+    "pg": "^8.20.0",
+    "vitest": "^4.1.5"
+  }
+}
