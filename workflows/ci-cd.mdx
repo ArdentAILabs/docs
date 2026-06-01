@@ -56,6 +56,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      ARDENT_BRANCH: pr-${{ github.event.pull_request.number }}-${{ github.run_id }}
     steps:
       - uses: actions/checkout@v4
 
@@ -70,7 +72,9 @@ jobs:
         run: npm install -g ardent-cli
 
       - name: Log in to Ardent
-        run: ardent login --token ${{ secrets.ARDENT_TOKEN }}
+        env:
+          ARDENT_TOKEN: ${{ secrets.ARDENT_TOKEN }}
+        run: ardent login --token "$ARDENT_TOKEN"
 
       - name: Select project and connector
         run: |
@@ -79,10 +83,8 @@ jobs:
 
       - name: Create database branch
         run: |
-          BRANCH_NAME="pr-${{ github.event.pull_request.number }}-${{ github.run_id }}"
-          ardent branch create "$BRANCH_NAME"
+          ardent branch create "$ARDENT_BRANCH"
           echo "DATABASE_URL=$(ardent branch info | awk '/URL:/{print $2}')" >> "$GITHUB_ENV"
-          echo "ARDENT_BRANCH=$BRANCH_NAME" >> "$GITHUB_ENV"
 
       - name: Run tests
         run: npm test
@@ -94,9 +96,10 @@ jobs:
 
 **What each step does:**
 
-- **`ardent login --token`** authenticates the CLI using your repo secret.
+- **`ardent login --token "$ARDENT_TOKEN"`** authenticates the CLI using your repo secret. Passing the secret through `env` keeps shell metacharacters in the token from being interpreted by the shell.
 - **`ardent project switch` / `ardent connector switch`** explicitly selects which project and connector to branch from. A connector represents one Postgres server. Replace `my-project` and `my-connector` with your names. Always set these in CI so the workflow is deterministic.
-- **`ardent branch create`** creates an isolated database branch. The name includes the PR number and run ID so concurrent runs and re-runs don't collide.
+- **`ARDENT_BRANCH`** defines the branch name for both create and delete steps. The name includes the PR number and run ID so concurrent runs and re-runs don't collide.
+- **`ardent branch create`** creates an isolated database branch.
 - **`ardent branch info | awk '/URL:/{print $2}'`** extracts the branch connection URL and writes it to `DATABASE_URL` in `GITHUB_ENV`. Your test step reads `DATABASE_URL` like any other environment variable. If your app uses a different env var name, change it in the `echo` line.
 - **`npm test`** runs your test suite against the branch. Replace with `pytest`, `pnpm test`, `make test`, or whatever your project uses.
 - **`ardent branch delete`** cleans up the branch. `if: always()` ensures this runs even when tests fail.
