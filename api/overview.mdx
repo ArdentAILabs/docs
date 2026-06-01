@@ -21,7 +21,7 @@ All examples use JSON over HTTPS and assume your token is stored in `ARDENT_TOKE
 Pass an API token with each request:
 
 ```bash
-curl --oauth2-bearer "$ARDENT_TOKEN" https://api.tryardent.com/v1/projects
+curl -H "Authorization: Bearer $ARDENT_TOKEN" https://api.tryardent.com/v1/projects
 ```
 
 Create and revoke tokens in **Ardent dashboard > Settings > API keys**. See [Authentication](/api/authentication) for token handling, roles, and troubleshooting.
@@ -46,10 +46,10 @@ Organization
 2. Preflight a Postgres source.
 3. Create a connector after preflight passes.
 4. Create a branch from the connector.
-5. Use the returned branch URL in your app, test runner, or agent.
+5. Use the returned `connection_uri` (or the discrete `host`/`port`/`username`/`password`/`database` fields) in your app, test runner, or agent.
 
 ```bash
-curl --oauth2-bearer "$ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/branch/create   -H 'Content-Type: application/json'   -d '{"connector_id":"conn_123","service_type":"postgresql","name":"pr-123"}'
+curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/branch/create   -H 'Content-Type: application/json'   -d '{"connector_id":"conn_123","service_type":"postgresql","name":"pr-123"}'
 ```
 
 ## Long-running work
@@ -57,7 +57,7 @@ curl --oauth2-bearer "$ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/bran
 Some API calls return immediately with an operation ID while Ardent continues the work in the background. Connector discovery and setup are the most common examples.
 
 ```bash
-curl --oauth2-bearer "$ARDENT_TOKEN" https://api.tryardent.com/v1/operations/op_123
+curl -H "Authorization: Bearer $ARDENT_TOKEN" https://api.tryardent.com/v1/operations/op_123
 ```
 
 See [Operations](/api/operations) for the full polling model.

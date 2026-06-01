@@ -18,29 +18,32 @@ For interactive deletion and switching, use the CLI: `ardent branch delete` and 
 ## Create a branch
 
 ```bash
-curl --oauth2-bearer "$ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/branch/create   -H 'Content-Type: application/json'   -d '{"connector_id":"conn_123","service_type":"postgresql","name":"pr-123"}'
+curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/branch/create   -H 'Content-Type: application/json'   -d '{"connector_id":"conn_123","service_type":"postgresql","name":"pr-123"}'
 ```
 
-Representative response:
+The response is the branch's connection details:
 
 ```json
 {
-  "id": "br_123",
-  "name": "pr-123",
-  "service_type": "postgresql",
-  "status": "active",
-  "branch_url": "postgresql://user:***@pr-123-postgres.routing.tryardent.com:5432/db",
-  "created_at": "2026-06-01T12:00:00Z",
-  "warning": null
+  "host": "pr-123-postgres.routing.tryardent.com",
+  "port": 5432,
+  "username": "user",
+  "password": "***",
+  "database": "db",
+  "connection_uri": "postgresql://user:***@pr-123-postgres.routing.tryardent.com:5432/db"
 }
 ```
 
-Treat `branch_url` as sensitive. It is a credential-bearing database URL.
+Treat `connection_uri` and the discrete credential fields as sensitive.
+
+When the branch is cut from a source whose WAL advanced past the snapshot, the response also includes a `warning` string describing the staleness. It is absent otherwise.
+
+For branch metadata such as `id`, `status`, and `created_at`, list the connector's branches with `GET /v1/branches/{connector_id}`, or use the CLI's `ardent branch create --format json`.
 
 ## List branches
 
 ```bash
-curl --oauth2-bearer "$ARDENT_TOKEN" https://api.tryardent.com/v1/branches/conn_123
+curl -H "Authorization: Bearer $ARDENT_TOKEN" https://api.tryardent.com/v1/branches/conn_123
 ```
 
 Use this to populate internal dashboards or cleanup tools. For shell scripts that only need a URL, the CLI is simpler:

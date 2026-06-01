@@ -31,13 +31,13 @@ Organization APIs are for team administration: listing members, sending invites,
 ## Invite a teammate
 
 ```bash
-curl --oauth2-bearer "$ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/orgs/org_123/invite   -H 'Content-Type: application/json'   -d '{"email":"teammate@example.com","role_key":"member"}'
+curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/orgs/org_123/invite   -H 'Content-Type: application/json'   -d '{"email":"teammate@example.com","role_key":"member"}'
 ```
 
 ## Update a role
 
 ```bash
-curl --oauth2-bearer "$ARDENT_TOKEN"   -X PATCH https://api.tryardent.com/v1/orgs/org_123/members/user_123   -H 'Content-Type: application/json'   -d '{"role_key":"admin"}'
+curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X PATCH https://api.tryardent.com/v1/orgs/org_123/members/user_123   -H 'Content-Type: application/json'   -d '{"role_key":"admin"}'
 ```
 
 ## Role guidance

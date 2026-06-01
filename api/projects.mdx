@@ -19,7 +19,7 @@ Projects organize related connectors and branches inside an organization. Most t
 ## Create a project
 
 ```bash
-curl --oauth2-bearer "$ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/projects   -H 'Content-Type: application/json'   -d '{"name":"my-app","org_id":"org_123"}'
+curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/projects   -H 'Content-Type: application/json'   -d '{"name":"my-app","org_id":"org_123"}'
 ```
 
 `org_id` is optional when the token has exactly one clear organization. Pass it explicitly in automation.
@@ -27,19 +27,19 @@ curl --oauth2-bearer "$ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/proj
 ## List projects
 
 ```bash
-curl --oauth2-bearer "$ARDENT_TOKEN"   'https://api.tryardent.com/v1/projects?org_id=org_123'
+curl -H "Authorization: Bearer $ARDENT_TOKEN"   'https://api.tryardent.com/v1/projects?org_id=org_123'
 ```
 
 ## Update a project
 
 ```bash
-curl --oauth2-bearer "$ARDENT_TOKEN"   -X PATCH https://api.tryardent.com/v1/projects/project_123   -H 'Content-Type: application/json'   -d '{"name":"my-app-production"}'
+curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X PATCH https://api.tryardent.com/v1/projects/project_123   -H 'Content-Type: application/json'   -d '{"name":"my-app-production"}'
 ```
 
 ## Delete a project
 
 ```bash
-curl --oauth2-bearer "$ARDENT_TOKEN"   -X DELETE https://api.tryardent.com/v1/projects/project_123
+curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X DELETE https://api.tryardent.com/v1/projects/project_123
 ```
 
 <Warning>
