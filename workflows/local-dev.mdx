@@ -14,7 +14,12 @@ Takes 6 seconds. Means you can run any migration, drop any table, try any index.
 ardent branch create my-feature
 
 # Work, run migrations, break things freely
-psql "$(ardent branch info --print-url)"
+BRANCH_DATABASE_URL="$(ardent branch info --print-url)"
+if [ -z "$BRANCH_DATABASE_URL" ]; then
+  echo "branch info did not return a database URL" >&2
+  exit 1
+fi
+psql "$BRANCH_DATABASE_URL"
 
 # Done, or it all went wrong. Either way:
 ardent branch delete my-feature
