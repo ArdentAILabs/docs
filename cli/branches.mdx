@@ -41,6 +41,14 @@ export DATABASE_URL
 
 If `--print-url` prints nothing, stop the script. A missing database URL is a failed setup, not a value to fall back from.
 
+If branch creation times out, it may still be running server-side. Re-run the same command to resume, or check `ardent branch list`. The timeout error includes an operation ID for support:
+
+<Accordion defaultOpen={false} title="Create timeout output">
+```text
+✗ Branch creation did not complete within 10 minutes. It may still be running server-side — do NOT assume it failed. Re-run the same command to resume, or check `ardent branch list`. If you contact Ardent support, reference operation id <operation-id>.
+```
+</Accordion>
+
 ### JSON output
 
 ```bash

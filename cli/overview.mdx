@@ -88,6 +88,8 @@ Most users should leave these unset. They exist for CI systems and operator-run 
 | `ARDENT_BRANCH_DELETE_MAX_WAIT_MS` | `600000` (10 minutes) | `ardent branch delete` | Maximum time the CLI waits for branch delete before exiting. The delete may still be running server-side. |
 | `ARDENT_BRANCH_DELETE_POLL_INTERVAL_MS` | `2000` (2 seconds) | `ardent branch delete` | Fixed poll interval while waiting for branch delete. Use a positive value; `0` and non-numeric values fall back to the default, while negative values can create a tight polling loop and should not be used. |
 
+Use positive poll intervals for both create and delete. The two commands do not validate invalid overrides the same way today; the table above documents the current behavior.
+
 For GitHub Actions, store your token as a repository secret named `ARDENT_TOKEN`, then run commands normally:
 
 ```bash
