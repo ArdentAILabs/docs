@@ -26,7 +26,7 @@ postgresql://user:***@my-feature-postgres.routing.tryardent.com:5432/db
 
 | Option | Description |
 | --- | --- |
-| `-s, --service <type>` | Service type to branch. Today this is usually `postgresql` and can normally be omitted |
+| `-s, --service <type>` | Service type to branch. The default is `postgres`; omit this unless Ardent support tells you to use another service type |
 | `--print-url` | Print only the branch connection URL. Best for scripts and CI |
 | `--format json` | Print a stable JSON object for automation |
 
@@ -136,7 +136,7 @@ Switching branches does not change your source database and does not modify appl
 
 ## ardent branch delete
 
-Delete a branch when you are done:
+Delete a branch when you are done. The CLI queues the delete, polls the operation until it completes, then removes the branch from the local cache:
 
 ```bash
 ardent branch delete my-feature
@@ -147,5 +147,7 @@ ardent branch delete my-feature
 ✓ Branch deleted
 ```
 </Accordion>
+
+If polling times out, the delete may still be running server-side. Do not recreate cleanup logic by scraping cache state; re-run `ardent branch list` or contact Ardent support with the operation ID printed by the CLI.
 
 Branches auto-suspend after a short idle period, so cleanup is not urgent for local development. CI workflows should still delete branches with `if: always()` or your CI provider's equivalent so every run cleans up after itself.
