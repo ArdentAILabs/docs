@@ -48,13 +48,15 @@ For one-off headless login, pass a token directly:
 ardent login --token <your-token>
 ```
 
-For repeat automation, prefer the `ARDENT_TOKEN` environment variable. It avoids writing a session to disk and makes the job's credential source obvious:
+For repeat automation, prefer the `ARDENT_TOKEN` environment variable in a clean CI environment. It avoids writing a session to disk and makes the job's credential source obvious:
 
 ```bash
 export ARDENT_TOKEN="sk-ard_..."
 ardent project list
 ardent branch create pr-123 --print-url
 ```
+
+If a machine already has a stored browser or token login, the stored token is used before `ARDENT_TOKEN`. In CI, run on a clean runner or run `ardent logout` before setting `ARDENT_TOKEN` if you need to guarantee the environment variable is the only credential source.
 
 In GitHub Actions:
 
@@ -64,6 +66,7 @@ env:
 
 steps:
   - run: npm install -g ardent-cli
+  - run: ardent logout  # important on self-hosted runners; harmless on clean runners
   - run: ardent project switch my-project
   - run: ardent connector switch prod-db
   - run: echo "DATABASE_URL=$(ardent branch create pr-${{ github.run_id }} --print-url)" >> "$GITHUB_ENV"
@@ -91,7 +94,7 @@ If the CLI is authenticated only through `ARDENT_TOKEN`, status may show token-b
 
 ## ardent logout
 
-Clear stored credentials and cached workspace data from this machine:
+Clear stored credentials, stored API URL, current selections, and cached workspace data from this machine:
 
 ```bash
 ardent logout

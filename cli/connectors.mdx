@@ -177,11 +177,15 @@ Switched from 'prod-db' to 'staging-db'
 
 ## ardent connector retry-setup
 
-Retry setup for a connector whose preflight passed but did not finish creating:
+Recover setup for a connector that is still pending, failed source checks, or became unhealthy. The command preserves the existing connector row, credentials, and recovery handles; do not delete and recreate a connector just to retry setup.
 
 ```bash
 ardent connector retry-setup prod-db
 ```
+
+When source checks are stale, failed, or unhealthy, the CLI first re-checks the source database, then starts engine setup. When setup is already healthy, the backend can short-circuit and the CLI prints that no work was needed.
+
+If setup is already in progress, `retry-setup` is still safe to run. Ardent reuses the active server-side setup operation instead of starting a duplicate. In connector status output, `validating` means source validation or setup is already in progress. If the connector is already `validating` and a replica-identity decision is still required, the CLI exits with code `1` and prints that decisions cannot be changed while setup is already in progress; wait for the current setup attempt to finish, then retry if the connector still shows setup pending.
 
 If the original setup needed replica identity decisions, pass the same JSON file when retrying:
 

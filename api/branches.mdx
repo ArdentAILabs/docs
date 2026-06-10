@@ -18,8 +18,10 @@ For interactive deletion and switching, use the CLI: `ardent branch delete` and 
 ## Create a branch
 
 ```bash
-curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/branch/create   -H 'Content-Type: application/json'   -d '{"connector_id":"conn_123","service_type":"postgresql","name":"pr-123"}'
+curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/branch/create   -H 'Content-Type: application/json'   -d '{"connector_id":"conn_123","service_type":"postgres","name":"pr-123"}'
 ```
+
+For Postgres branches, `service_type` is `postgres`. Connector creation uses the connector type `postgresql`; branch creation uses the shorter branch service type.
 
 The response is the branch's connection details:
 

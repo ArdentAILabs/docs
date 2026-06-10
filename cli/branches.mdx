@@ -26,7 +26,7 @@ postgresql://user:***@my-feature-postgres.routing.tryardent.com:5432/db
 
 | Option | Description |
 | --- | --- |
-| `-s, --service <type>` | Service type to branch. Today this is usually `postgresql` and can normally be omitted |
+| `-s, --service <type>` | Branch service type. The CLI default is `postgres`; this is separate from the connector type `postgresql`. Omit it unless Ardent support tells you to use another service type |
 | `--print-url` | Print only the branch connection URL. Best for scripts and CI |
 | `--format json` | Print a stable JSON object for automation |
 
@@ -41,6 +41,14 @@ export DATABASE_URL
 
 If `--print-url` prints nothing, stop the script. A missing database URL is a failed setup, not a value to fall back from.
 
+If branch creation times out, it may still be running server-side. For the same connector, service type, and branch name, re-running the same command continues checking the original request or returns its completed result; it does not start a second branch create. Changing the branch name or service type starts a different create request. You can also run `ardent branch list`; if the branch already appears there, use that branch instead of creating another name. The timeout error includes an operation ID for support:
+
+<Accordion defaultOpen={false} title="Create timeout output">
+```text
+✗ Branch creation did not complete within 10 minutes. It may still be running server-side — do NOT assume it failed. Re-run the same command to resume, or check `ardent branch list`. If you contact Ardent support, reference operation id <operation-id>.
+```
+</Accordion>
+
 ### JSON output
 
 ```bash
@@ -53,7 +61,7 @@ ardent branch create pr-123 --format json
   "id": "br_123",
   "name": "pr-123",
   "connector_id": "conn_123",
-  "service_type": "postgresql",
+  "service_type": "postgres",
   "status": "active",
   "branch_url": "postgresql://user:***@pr-123-postgres.routing.tryardent.com:5432/db",
   "created_at": "2026-06-01T12:00:00Z",
@@ -64,6 +72,8 @@ ardent branch create pr-123 --format json
 ```
 
 Clients should read the fields they need and ignore additional fields.
+
+`service_type` is the Ardent branch service value (`postgres`). The connection URL still uses the standard PostgreSQL URI scheme, `postgresql://`.
 
 ## ardent branch list
 
@@ -103,7 +113,7 @@ ardent branch info my-feature
 <Accordion defaultOpen={false} title="Example output">
 ```text
 Branch: my-feature
-Type:   postgresql
+Type:   postgres
 Status: active
 Created: 2 minutes ago
 URL:    postgresql://user:***@my-feature-postgres.routing.tryardent.com:5432/db
@@ -136,7 +146,7 @@ Switching branches does not change your source database and does not modify appl
 
 ## ardent branch delete
 
-Delete a branch when you are done:
+Delete a branch when you are done. The CLI queues the delete, polls the operation until it completes, then removes the branch from the local cache:
 
 ```bash
 ardent branch delete my-feature
@@ -147,5 +157,15 @@ ardent branch delete my-feature
 ✓ Branch deleted
 ```
 </Accordion>
+
+If polling times out, the delete may still be running server-side. Do not recreate cleanup logic by scraping cache state. The timeout error includes the operation ID to give Ardent support:
+
+<Accordion defaultOpen={false} title="Timeout output">
+```text
+✗ Branch delete did not complete within 10 minutes. It may still be running server-side. If you contact Ardent support, reference operation id <operation-id>.
+```
+</Accordion>
+
+The CLI removes the branch from the local cache only after the server confirms deletion. After a timeout, cached output may still show the branch even if the server-side delete later completes. Re-running `ardent branch delete <name>` for the same branch is safe: Ardent reuses the active delete operation, and a re-delete after the branch row is already gone polls the prior delete operation instead of starting a second teardown. You can also re-run `ardent branch list` online to refresh and check the final state.
 
 Branches auto-suspend after a short idle period, so cleanup is not urgent for local development. CI workflows should still delete branches with `if: always()` or your CI provider's equivalent so every run cleans up after itself.
