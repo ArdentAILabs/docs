@@ -18,7 +18,7 @@ ardent branch create my-feature
 ```text
 ✓ Branch 'my-feature' created and checked out in 4.2s
 
-postgresql://user:***@my-feature-postgres.routing.tryardent.com:5432/db
+postgresql://user:***@my-feature-postgres.routing.tryardent.com:5432/db?sslmode=require&channel_binding=disable
 ```
 </Accordion>
 
@@ -63,7 +63,7 @@ ardent branch create pr-123 --format json
   "connector_id": "conn_123",
   "service_type": "postgres",
   "status": "active",
-  "branch_url": "postgresql://user:***@pr-123-postgres.routing.tryardent.com:5432/db",
+  "branch_url": "postgresql://user:***@pr-123-postgres.routing.tryardent.com:5432/db?sslmode=require&channel_binding=disable",
   "created_at": "2026-06-01T12:00:00Z",
   "last_branch_activity": null,
   "current": true,
@@ -74,6 +74,20 @@ ardent branch create pr-123 --format json
 Clients should read the fields they need and ignore additional fields.
 
 `service_type` is the Ardent branch service value (`postgres`). The connection URL still uses the standard PostgreSQL URI scheme, `postgresql://`.
+
+## Connecting to a branch
+
+Use the branch connection URL exactly as Ardent returns it, including `?sslmode=require&channel_binding=disable`.
+
+```bash
+psql "$(ardent branch info --print-url)"
+```
+
+Branch connections go through Ardent's connection routing layer. Set your SQL client or IDE to SSL mode `require`, and do not load a custom root certificate or CA bundle. With no custom root certificate configured, `sslmode=require` encrypts the connection but does not validate a CA chain. If your client has fields named root certificate, CA bundle, SSL certificate authority, or `sslrootcert`, leave them blank and clear any source database certificate you previously configured.
+
+Some PostgreSQL clients treat `sslmode=require` plus a configured root certificate as certificate verification. A source database CA bundle cannot verify an Ardent branch URL and can cause TLS errors such as a secure channel mismatch. Clearing the custom certificate keeps the connection in TLS-required mode.
+
+Keep `channel_binding=disable` in the URL. Ardent terminates TLS at the routing layer, so clients that force channel binding can reject an otherwise valid branch connection. If your IDE has a channel binding setting, set it to `disable` or `off`.
 
 ## ardent branch list
 
@@ -90,13 +104,15 @@ In the terminal, the current branch is highlighted and prefixed with `*`. `●` 
     <div className="text-zinc-800 dark:text-zinc-200">Branches:</div>
     <div className="text-green-600 dark:text-green-400">
       <div>* ● my-feature</div>
-      <div>{"      "}postgresql://user:***@my-feature-postgres.routing.tryardent.com:5432/db</div>
+      <div>
+        {"      "}postgresql://user:***@my-feature-postgres.routing.tryardent.com:5432/db?sslmode=require&amp;channel_binding=disable
+      </div>
     </div>
     <div className="h-3" aria-hidden />
     <div>
       <div className="text-zinc-800 dark:text-zinc-200">{"  "}○ staging</div>
       <div className="text-zinc-500 dark:text-zinc-500">
-        {"      "}postgresql://user:***@staging-postgres.routing.tryardent.com:5432/db
+        {"      "}postgresql://user:***@staging-postgres.routing.tryardent.com:5432/db?sslmode=require&amp;channel_binding=disable
       </div>
     </div>
   </div>
@@ -116,7 +132,7 @@ Branch: my-feature
 Type:   postgres
 Status: active
 Created: 2 minutes ago
-URL:    postgresql://user:***@my-feature-postgres.routing.tryardent.com:5432/db
+URL:    postgresql://user:***@my-feature-postgres.routing.tryardent.com:5432/db?sslmode=require&channel_binding=disable
 ```
 </Accordion>
 
@@ -138,7 +154,7 @@ ardent branch switch staging
 <Accordion defaultOpen={false} title="Example output">
 ```text
 Switched from 'my-feature' to 'staging'
-postgresql://user:***@staging-postgres.routing.tryardent.com:5432/db
+postgresql://user:***@staging-postgres.routing.tryardent.com:5432/db?sslmode=require&channel_binding=disable
 ```
 </Accordion>
 

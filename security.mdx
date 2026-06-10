@@ -21,6 +21,16 @@ Every branch gets its own generated connection string. If a branch URL is ever c
 
 Branches are controlled through Ardent's control plane, so you can delete or de-provision them at any time.
 
+## Branch connection TLS
+
+Branch connection URLs include `?sslmode=require&channel_binding=disable`. Use the URL exactly as Ardent returns it.
+
+Set SQL clients and IDEs to SSL mode `require`. With no custom root certificate configured, `sslmode=require` encrypts the connection but does not validate a CA chain. Do not load a custom root certificate or CA bundle for branch connections, including the certificate bundle from your source database. If your client has a root certificate, CA bundle, SSL certificate authority, or `sslrootcert` field, leave it blank.
+
+Some PostgreSQL clients treat `sslmode=require` plus a configured root certificate as certificate verification. A source database CA bundle cannot verify an Ardent branch URL and can cause TLS errors such as a secure channel mismatch. Clearing the custom certificate keeps the connection in TLS-required mode.
+
+Keep `channel_binding=disable` in the URL. Ardent terminates TLS at the routing layer, so clients that force channel binding can reject an otherwise valid branch connection. If your client exposes channel binding, set it to `disable` or `off`.
+
 ## Branch anonymization
 
 Branches default to a full copy of your production data. When you need realistic schema and relationships but not real PII, you can run SQL on **every new branch** from this connector after it is created.
