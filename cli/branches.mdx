@@ -166,6 +166,6 @@ If polling times out, the delete may still be running server-side. Do not recrea
 ```
 </Accordion>
 
-The CLI removes the branch from the local cache only after the server confirms deletion. After a timeout, cached output may still show the branch even if the server-side delete later completes; re-run `ardent branch list` online to refresh and check the final state.
+The CLI removes the branch from the local cache only after the server confirms deletion. After a timeout, cached output may still show the branch even if the server-side delete later completes. Re-running `ardent branch delete <name>` for the same branch is safe: Ardent reuses the active delete operation, and a re-delete after the branch row is already gone polls the prior delete operation instead of starting a second teardown. You can also re-run `ardent branch list` online to refresh and check the final state.
 
 Branches auto-suspend after a short idle period, so cleanup is not urgent for local development. CI workflows should still delete branches with `if: always()` or your CI provider's equivalent so every run cleans up after itself.
