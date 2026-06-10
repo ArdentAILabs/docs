@@ -66,6 +66,7 @@ env:
 
 steps:
   - run: npm install -g ardent-cli
+  - run: ardent logout  # important on self-hosted runners; harmless on clean runners
   - run: ardent project switch my-project
   - run: ardent connector switch prod-db
   - run: echo "DATABASE_URL=$(ardent branch create pr-${{ github.run_id }} --print-url)" >> "$GITHUB_ENV"
