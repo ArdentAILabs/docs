@@ -16,7 +16,10 @@ Most apps and test runners read the DB from an environment variable. The usual n
 DATABASE_URL="$(ardent branch create regression-run --print-url)"
 export DATABASE_URL
 
-test -n "$DATABASE_URL"
+if [ -z "$DATABASE_URL" ]; then
+  echo "branch creation did not return a database URL" >&2
+  exit 1
+fi
 
 npm test
 # or: pytest   (if your tests read DATABASE_URL; some stacks use a different env var)

@@ -10,11 +10,15 @@ Ardent gives every agent run its own isolated copy of your real database: spun u
 ## The pattern
 
 ```bash
-# Create a branch for the agent task
-ardent branch create agent-task
+# Create a branch for the agent task and capture its URL
+AGENT_DATABASE_URL="$(ardent branch create agent-task --print-url)"
+if [ -z "$AGENT_DATABASE_URL" ]; then
+  echo "branch creation did not return a database URL" >&2
+  exit 1
+fi
 
 # Hand the returned URL to your agent
-# → postgresql://...agent-task...tryardent.com/db?sslmode=require&channel_binding=disable
+# → $AGENT_DATABASE_URL
 
 # Agent writes migrations, runs queries, tests against real data
 # When it's done, clean up
@@ -25,7 +29,7 @@ ardent branch delete agent-task
 
 ```
 I'm working on [describe task]. Before making any database changes,
-create an Ardent branch with `ardent branch create <branch-name>`,
+create an Ardent branch with `ardent branch create <branch-name> --print-url`,
 use the returned connection URL for all database work, and delete
 the branch when we're done. Never touch the main connection string.
 ```
