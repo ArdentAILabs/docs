@@ -32,11 +32,13 @@ The response is the branch's connection details:
   "username": "user",
   "password": "***",
   "database": "db",
-  "connection_uri": "postgresql://user:***@pr-123-postgres.routing.tryardent.com:5432/db"
+  "connection_uri": "postgresql://user:***@pr-123-postgres.routing.tryardent.com:5432/db?sslmode=require&channel_binding=disable"
 }
 ```
 
-Treat `connection_uri` and the discrete credential fields as sensitive.
+Treat `connection_uri` and the discrete credential fields as sensitive. Use `connection_uri` exactly as returned, including `sslmode=require` and `channel_binding=disable`. If you assemble a connection string from the discrete fields, add those same query parameters.
+
+For branch connections, set SQL clients and IDEs to SSL mode `require` and leave custom root certificate, CA bundle, SSL certificate authority, or `sslrootcert` fields blank. Do not reuse a source database CA bundle; it cannot verify the branch routing host and can cause TLS errors.
 
 When the branch is cut from a source whose WAL advanced past the snapshot, the response also includes a `warning` string describing the staleness. It is absent otherwise.
 
