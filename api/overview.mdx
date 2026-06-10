@@ -49,7 +49,7 @@ Organization
 5. Use the returned `connection_uri` (or the discrete `host`/`port`/`username`/`password`/`database` fields) in your app, test runner, or agent.
 
 ```bash
-curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/branch/create   -H 'Content-Type: application/json'   -d '{"connector_id":"conn_123","service_type":"postgresql","name":"pr-123"}'
+curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/branch/create   -H 'Content-Type: application/json'   -d '{"connector_id":"conn_123","service_type":"postgres","name":"pr-123"}'
 ```
 
 ## Long-running work

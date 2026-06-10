@@ -75,7 +75,7 @@ Use `--print-url` when a script needs only the connection URL. Use `--format jso
 | Variable | Use it for |
 | --- | --- |
 | `ARDENT_TOKEN` | Authenticate in CI or other headless environments without running `ardent login`. If this machine already has a stored login token, the stored token is used first; run `ardent logout` in that environment if you want `ARDENT_TOKEN` to be the only credential source. |
-| `ARDENT_API_URL` | Override the API endpoint. Defaults to `https://api.tryardent.com`. If a stored API URL exists from prior CLI configuration, the stored value is used first. |
+| `ARDENT_API_URL` | Override the API endpoint. Defaults to `https://api.tryardent.com`. If a stored API URL exists from prior CLI configuration, the stored value is used first. To force `ARDENT_API_URL`, run `ardent logout` in that environment first; this clears the stored API URL, token, selections, and cache. |
 
 ### Advanced polling controls
 
@@ -84,7 +84,7 @@ Most users should leave these unset. They exist for CI systems and operator-run 
 | Variable | Default | Applies to | Notes |
 | --- | --- | --- | --- |
 | `ARDENT_BRANCH_CREATE_MAX_WAIT_MS` | `600000` (10 minutes) | `ardent branch create` | Maximum time the CLI waits for the branch-create operation before exiting with an operation handle in the error message. |
-| `ARDENT_BRANCH_CREATE_POLL_INTERVAL_MS` | adaptive polling | `ardent branch create` | Forces a fixed poll interval. Must be a non-negative number; invalid values fail before any API request. |
+| `ARDENT_BRANCH_CREATE_POLL_INTERVAL_MS` | adaptive polling | `ardent branch create` | Forces a fixed poll interval in milliseconds. Use a positive value; negative and non-numeric values fail before any API request, while `0` creates a tight polling loop and should not be used. |
 | `ARDENT_BRANCH_DELETE_MAX_WAIT_MS` | `600000` (10 minutes) | `ardent branch delete` | Maximum time the CLI waits for branch delete before exiting. The delete may still be running server-side. |
 | `ARDENT_BRANCH_DELETE_POLL_INTERVAL_MS` | `2000` (2 seconds) | `ardent branch delete` | Fixed poll interval while waiting for branch delete. |
 

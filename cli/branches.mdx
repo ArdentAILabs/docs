@@ -26,7 +26,7 @@ postgresql://user:***@my-feature-postgres.routing.tryardent.com:5432/db
 
 | Option | Description |
 | --- | --- |
-| `-s, --service <type>` | Service type to branch. The default is `postgres`; omit this unless Ardent support tells you to use another service type |
+| `-s, --service <type>` | Branch service type. The CLI default is `postgres`; this is separate from the connector type `postgresql`. Omit it unless Ardent support tells you to use another service type |
 | `--print-url` | Print only the branch connection URL. Best for scripts and CI |
 | `--format json` | Print a stable JSON object for automation |
 
@@ -53,7 +53,7 @@ ardent branch create pr-123 --format json
   "id": "br_123",
   "name": "pr-123",
   "connector_id": "conn_123",
-  "service_type": "postgresql",
+  "service_type": "postgres",
   "status": "active",
   "branch_url": "postgresql://user:***@pr-123-postgres.routing.tryardent.com:5432/db",
   "created_at": "2026-06-01T12:00:00Z",
@@ -103,7 +103,7 @@ ardent branch info my-feature
 <Accordion defaultOpen={false} title="Example output">
 ```text
 Branch: my-feature
-Type:   postgresql
+Type:   postgres
 Status: active
 Created: 2 minutes ago
 URL:    postgresql://user:***@my-feature-postgres.routing.tryardent.com:5432/db
@@ -149,5 +149,11 @@ ardent branch delete my-feature
 </Accordion>
 
 If polling times out, the delete may still be running server-side. Do not recreate cleanup logic by scraping cache state; re-run `ardent branch list` or contact Ardent support with the operation ID printed by the CLI.
+
+<Accordion defaultOpen={false} title="Timeout output">
+```text
+✗ Branch delete did not complete within 10 minutes. It may still be running server-side. If you contact Ardent support, reference operation id <operation-id>.
+```
+</Accordion>
 
 Branches auto-suspend after a short idle period, so cleanup is not urgent for local development. CI workflows should still delete branches with `if: always()` or your CI provider's equivalent so every run cleans up after itself.
