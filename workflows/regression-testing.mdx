@@ -16,7 +16,7 @@ Most apps and test runners read the DB from an environment variable. The usual n
 ardent branch create regression-run
 
 # Use the URL from the CLI output (quoted so the shell does not mangle it)
-export DATABASE_URL='postgresql://user:pass@regression-run-postgres.routing.tryardent.com:5432/db'
+export DATABASE_URL='postgresql://user:pass@regression-run-postgres.routing.tryardent.com:5432/db?sslmode=require&channel_binding=disable'
 
 npm test
 # or: pytest   (if your tests read DATABASE_URL; some stacks use a different env var)

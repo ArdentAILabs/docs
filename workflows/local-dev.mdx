@@ -14,7 +14,7 @@ Takes 6 seconds. Means you can run any migration, drop any table, try any index.
 ardent branch create my-feature
 
 # Work, run migrations, break things freely
-psql postgresql://...my-feature...tryardent.com/db
+psql "$(ardent branch info --print-url)"
 
 # Done, or it all went wrong. Either way:
 ardent branch delete my-feature

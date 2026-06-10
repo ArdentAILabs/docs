@@ -14,7 +14,7 @@ Ardent gives every agent run its own isolated copy of your real database: spun u
 ardent branch create agent-task
 
 # Hand the returned URL to your agent
-# → postgresql://...agent-task...tryardent.com/db
+# → postgresql://...agent-task...tryardent.com/db?sslmode=require&channel_binding=disable
 
 # Agent writes migrations, runs queries, tests against real data
 # When it's done, clean up
