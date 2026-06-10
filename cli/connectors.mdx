@@ -185,6 +185,8 @@ ardent connector retry-setup prod-db
 
 When source checks are stale, failed, or unhealthy, the CLI first re-checks the source database, then starts engine setup. When setup is already healthy, the backend can short-circuit and the CLI prints that no work was needed.
 
+If setup is already in progress, `retry-setup` is still safe to run. Ardent reuses the active server-side setup operation instead of starting a duplicate; if the connector is already in the `validating` state, the CLI will not change replica-identity decisions for that in-flight attempt.
+
 If the original setup needed replica identity decisions, pass the same JSON file when retrying:
 
 ```bash

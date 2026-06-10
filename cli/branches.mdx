@@ -73,6 +73,8 @@ ardent branch create pr-123 --format json
 
 Clients should read the fields they need and ignore additional fields.
 
+`service_type` is the Ardent branch service value (`postgres`). The connection URL still uses the standard PostgreSQL URI scheme, `postgresql://`.
+
 ## ardent branch list
 
 List branches for the current connector:
