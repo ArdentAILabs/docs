@@ -148,12 +148,14 @@ ardent branch delete my-feature
 ```
 </Accordion>
 
-If polling times out, the delete may still be running server-side. Do not recreate cleanup logic by scraping cache state; re-run `ardent branch list` or contact Ardent support with the operation ID printed by the CLI.
+If polling times out, the delete may still be running server-side. Do not recreate cleanup logic by scraping cache state. The timeout error includes the operation ID to give Ardent support:
 
 <Accordion defaultOpen={false} title="Timeout output">
 ```text
 ✗ Branch delete did not complete within 10 minutes. It may still be running server-side. If you contact Ardent support, reference operation id <operation-id>.
 ```
 </Accordion>
+
+After a timeout, re-run `ardent branch list` to check whether the server-side delete finished.
 
 Branches auto-suspend after a short idle period, so cleanup is not urgent for local development. CI workflows should still delete branches with `if: always()` or your CI provider's equivalent so every run cleans up after itself.
