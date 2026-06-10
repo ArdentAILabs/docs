@@ -83,7 +83,7 @@ Use the branch connection URL exactly as Ardent returns it, including `?sslmode=
 psql "$(ardent branch info --print-url)"
 ```
 
-Branch connections go through Ardent's connection routing layer. Set your SQL client or IDE to SSL mode `require`, and do not load a custom root certificate or CA bundle. If your client has fields named root certificate, CA bundle, SSL certificate authority, or `sslrootcert`, leave them blank and clear any source database certificate you previously configured.
+Branch connections go through Ardent's connection routing layer. Set your SQL client or IDE to SSL mode `require`, and do not load a custom root certificate or CA bundle. With no custom root certificate configured, `sslmode=require` encrypts the connection but does not validate a CA chain. If your client has fields named root certificate, CA bundle, SSL certificate authority, or `sslrootcert`, leave them blank and clear any source database certificate you previously configured.
 
 Some PostgreSQL clients treat `sslmode=require` plus a configured root certificate as certificate verification. A source database CA bundle cannot verify an Ardent branch URL and can cause TLS errors such as a secure channel mismatch. Clearing the custom certificate keeps the connection in TLS-required mode.
 

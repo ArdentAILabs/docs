@@ -16,6 +16,8 @@ Most apps and test runners read the DB from an environment variable. The usual n
 DATABASE_URL="$(ardent branch create regression-run --print-url)"
 export DATABASE_URL
 
+test -n "$DATABASE_URL"
+
 npm test
 # or: pytest   (if your tests read DATABASE_URL; some stacks use a different env var)
 
@@ -38,6 +40,6 @@ ardent branch delete regression-run
 
 ```
 Run a regression test on [describe change] against a real copy of our database.
-Create an Ardent branch with `ardent branch create regression-run`, run the
+Create an Ardent branch with `ardent branch create regression-run --print-url`, run the
 tests using the returned connection URL, report what broke, then delete the branch.
 ```
