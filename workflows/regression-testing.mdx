@@ -12,11 +12,9 @@ Unit tests with mocked data miss the bugs that only appear with real data at rea
 Most apps and test runners read the DB from an environment variable. The usual name is `DATABASE_URL`; Django, SQLAlchemy, Prisma, and many pytest setups are already wired for that in dev, but yours might use something else (for example `PGURL` or a `.env` file you load before running tests).
 
 ```bash
-# Branch from production
-ardent branch create regression-run
-
-# Use the URL from the CLI output (quoted so the shell does not mangle it)
-export DATABASE_URL='postgresql://user:pass@regression-run-postgres.routing.tryardent.com:5432/db?sslmode=require&channel_binding=disable'
+# Branch from production and export the returned URL
+DATABASE_URL="$(ardent branch create regression-run --print-url)"
+export DATABASE_URL
 
 npm test
 # or: pytest   (if your tests read DATABASE_URL; some stacks use a different env var)
@@ -40,6 +38,6 @@ ardent branch delete regression-run
 
 ```
 Run a regression test on [describe change] against a real copy of our database.
-Create an Ardent branch with `ardent branch create regression-test`, run the
+Create an Ardent branch with `ardent branch create regression-run`, run the
 tests using the returned connection URL, report what broke, then delete the branch.
 ```
