@@ -1,14 +1,14 @@
 ---
 title: "Branches"
 sidebarTitle: "Branches"
-description: "Create isolated database branches and use their connection URLs"
+description: "Create isolated database branches and connect to them"
 ---
 
-Branches are isolated Postgres databases created from a connected source. They are built for work that should feel production-like without touching the source database: migrations, test runs, data investigations, demos, and agent workflows.
+A branch is an isolated Postgres database created from your connected source. Run migrations, tests, data investigations, and agents against it — your source database is never touched.
 
 ## ardent branch create
 
-Create a branch from the current connector. The new branch becomes your current branch.
+Create a branch from the current connector. It becomes your current branch.
 
 ```bash
 ardent branch create my-feature
@@ -26,11 +26,12 @@ postgresql://user:***@my-feature-postgres.routing.tryardent.com:5432/db?sslmode=
 
 | Option | Description |
 | --- | --- |
-| `-s, --service <type>` | Branch service type. The CLI default is `postgres`; this is separate from the connector type `postgresql`. Omit it unless Ardent support tells you to use another service type |
-| `--print-url` | Print only the branch connection URL. Best for scripts and CI |
-| `--format json` | Print a stable JSON object for automation |
+| `--print-url` | Print only the connection URL. Best for scripts |
+| `--format json` | Print a stable JSON object. See [Configuration & automation](/cli/configuration) |
+| `--url-type <type>` | Which URL to print: `direct` (default), `pooled`, or `prisma` |
+| `-s, --service <type>` | Branch service type. Default `postgres`. Leave it alone unless Ardent support says otherwise |
 
-`--print-url` and `--format` are mutually exclusive.
+`--print-url` and `--format` can't be combined. `--url-type` can't be combined with `--format json` — the JSON already includes every URL.
 
 ### Use in scripts
 
@@ -39,55 +40,40 @@ DATABASE_URL="$(ardent branch create pr-123 --print-url)"
 export DATABASE_URL
 ```
 
-If `--print-url` prints nothing, stop the script. A missing database URL is a failed setup, not a value to fall back from.
+If `--print-url` prints nothing, stop the script. A missing URL means setup failed — don't fall back to another database.
 
-If branch creation times out, it may still be running server-side. For the same connector, service type, and branch name, re-running the same command continues checking the original request or returns its completed result; it does not start a second branch create. Changing the branch name or service type starts a different create request. You can also run `ardent branch list`; if the branch already appears there, use that branch instead of creating another name. The timeout error includes an operation ID for support:
+If creation takes too long, the CLI stops waiting after 65 minutes — but the work usually finishes server-side.
 
-<Accordion defaultOpen={false} title="Create timeout output">
+<Accordion defaultOpen={false} title="If creation times out">
+Re-run the exact same command. For the same connector, branch name, and service type, a re-run picks up the original request instead of starting a second one. Changing the name starts a new branch.
+
+You can also run `ardent branch list` — if the branch appears there, it finished. Use it.
+
+The error includes an operation ID you can give Ardent support:
+
 ```text
-✗ Branch creation did not complete within 10 minutes. It may still be running server-side — do NOT assume it failed. Re-run the same command to resume, or check `ardent branch list`. If you contact Ardent support, reference operation id <operation-id>.
+✗ Branch creation did not complete within 65 minutes. It may still be running server-side — do NOT assume it failed. Re-run the same command to resume, or check `ardent branch list`. If you contact Ardent support, reference operation id <operation-id>.
 ```
 </Accordion>
 
-### JSON output
-
-```bash
-ardent branch create pr-123 --format json
-```
-
-```json
-{
-  "schema_version": 1,
-  "id": "br_123",
-  "name": "pr-123",
-  "connector_id": "conn_123",
-  "service_type": "postgres",
-  "status": "active",
-  "branch_url": "postgresql://user:***@pr-123-postgres.routing.tryardent.com:5432/db?sslmode=require&channel_binding=disable",
-  "created_at": "2026-06-01T12:00:00Z",
-  "last_branch_activity": null,
-  "current": true,
-  "warning": null
-}
-```
-
-Clients should read the fields they need and ignore additional fields.
-
-`service_type` is the Ardent branch service value (`postgres`). The connection URL still uses the standard PostgreSQL URI scheme, `postgresql://`.
-
 ## Connecting to a branch
 
-Use the branch connection URL exactly as Ardent returns it, including `?sslmode=require&channel_binding=disable`.
+Use the URL exactly as Ardent returns it, including everything after the `?`:
 
 ```bash
 psql "$(ardent branch info --print-url)"
 ```
 
-Branch connections go through Ardent's connection routing layer. Set your SQL client or IDE to SSL mode `require`, and do not load a custom root certificate or CA bundle. With no custom root certificate configured, `sslmode=require` encrypts the connection but does not validate a CA chain. If your client has fields named root certificate, CA bundle, SSL certificate authority, or `sslrootcert`, leave them blank and clear any source database certificate you previously configured.
+Two settings matter in database GUIs and IDEs:
 
-Some PostgreSQL clients treat `sslmode=require` plus a configured root certificate as certificate verification. A source database CA bundle cannot verify an Ardent branch URL and can cause TLS errors such as a secure channel mismatch. Clearing the custom certificate keeps the connection in TLS-required mode.
+- **SSL mode:** `require`. Leave root certificate / CA fields **blank** — your source database's certificate won't work here and causes TLS errors.
+- **Channel binding:** `disable`, if your client has the setting.
 
-Keep `channel_binding=disable` in the URL. Ardent terminates TLS at the routing layer, so clients that force channel binding can reject an otherwise valid branch connection. If your IDE has a channel binding setting, set it to `disable` or `off`.
+<Accordion defaultOpen={false} title="Why branch connections need these settings">
+Branch connections go through Ardent's routing layer, which terminates TLS. Your connection is encrypted, but it isn't signed by your source database's certificate authority — so a client configured to verify against your source's CA bundle will reject it. Clearing the certificate fields keeps the connection encrypted without that check.
+
+The same routing layer is why clients that force channel binding can reject an otherwise valid connection. `channel_binding=disable` in the URL handles it; set the IDE option too if there is one.
+</Accordion>
 
 ## ardent branch list
 
@@ -97,7 +83,7 @@ List branches for the current connector:
 ardent branch list
 ```
 
-In the terminal, the current branch is highlighted and prefixed with `*`. `●` means active; `○` means not active. Offline cache output is clearly labeled with `⚠ Offline - showing cached data from ...`.
+Your current branch is green and marked `*`. `●` means active; `○` means not. Each branch shows its type, readiness, age, and idle time.
 
 <Accordion defaultOpen={false} title="Example output">
   <div className="font-mono text-[13px] leading-normal rounded-md border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-950">
@@ -105,22 +91,24 @@ In the terminal, the current branch is highlighted and prefixed with `*`. `●` 
     <div className="text-green-600 dark:text-green-400">
       <div>* ● my-feature</div>
       <div>
-        {"      "}postgresql://user:***@my-feature-postgres.routing.tryardent.com:5432/db?sslmode=require&amp;channel_binding=disable
+        {"      "}postgres · ready · created 2026-06-01 · idle 2m (active)
       </div>
     </div>
     <div className="h-3" aria-hidden />
     <div>
       <div className="text-zinc-800 dark:text-zinc-200">{"  "}○ staging</div>
       <div className="text-zinc-500 dark:text-zinc-500">
-        {"      "}postgresql://user:***@staging-postgres.routing.tryardent.com:5432/db?sslmode=require&amp;channel_binding=disable
+        {"      "}postgres · ready · created 2026-05-20 · idle 3d (suspended)
       </div>
     </div>
   </div>
 </Accordion>
 
+If you're offline, the CLI shows cached data and labels it: `⚠ Offline - showing cached data from ...`.
+
 ## ardent branch info
 
-Show details and the connection URL for a branch. If you omit the name, Ardent shows the current branch.
+Show details and connection URLs for a branch. With no name, it shows the current branch.
 
 ```bash
 ardent branch info my-feature
@@ -128,15 +116,17 @@ ardent branch info my-feature
 
 <Accordion defaultOpen={false} title="Example output">
 ```text
-Branch: my-feature
-Type:   postgres
-Status: active
-Created: 2 minutes ago
-URL:    postgresql://user:***@my-feature-postgres.routing.tryardent.com:5432/db?sslmode=require&channel_binding=disable
+Branch: my-feature (current)
+  Type:    postgres
+  Status:  active
+  Ready:   read + write
+  Created: 6/1/2026, 12:00:00 PM
+
+Direct URL: postgresql://user:***@my-feature-postgres.routing.tryardent.com:5432/db?sslmode=require&channel_binding=disable
 ```
 </Accordion>
 
-Use the same automation flags as `branch create`:
+The same script flags work here:
 
 ```bash
 ardent branch info --print-url
@@ -145,43 +135,32 @@ ardent branch info my-feature --format json
 
 ## ardent branch switch
 
-Switch the current branch for future CLI commands:
+Change which branch is current for future CLI commands:
 
 ```bash
 ardent branch switch staging
 ```
 
-<Accordion defaultOpen={false} title="Example output">
-```text
-Switched from 'my-feature' to 'staging'
-postgresql://user:***@staging-postgres.routing.tryardent.com:5432/db?sslmode=require&channel_binding=disable
-```
-</Accordion>
-
-Switching branches does not change your source database and does not modify application configuration by itself. Copy the new URL into your app or test environment when you want to use it.
+Switching doesn't touch your source database or your app's config. Copy the printed URL into your app when you want to use the branch.
 
 ## ardent branch delete
-
-Delete a branch when you are done. The CLI queues the delete, polls the operation until it completes, then removes the branch from the local cache:
 
 ```bash
 ardent branch delete my-feature
 ```
 
-<Accordion defaultOpen={false} title="Example output">
-```text
-✓ Branch deleted
-```
-</Accordion>
+The CLI queues the delete, waits for it to finish, then prints `✓ Branch deleted`.
 
-If polling times out, the delete may still be running server-side. Do not recreate cleanup logic by scraping cache state. The timeout error includes the operation ID to give Ardent support:
+If the CLI stops waiting (after 10 minutes), the delete usually still finishes server-side.
 
-<Accordion defaultOpen={false} title="Timeout output">
+<Accordion defaultOpen={false} title="If the delete times out">
+Re-running `ardent branch delete <name>` is safe — it checks on the existing delete instead of starting a second one. Run `ardent branch list` online to see the final state; the local cache only drops the branch once the server confirms it's gone.
+
+The error includes an operation ID you can give Ardent support:
+
 ```text
 ✗ Branch delete did not complete within 10 minutes. It may still be running server-side. If you contact Ardent support, reference operation id <operation-id>.
 ```
 </Accordion>
 
-The CLI removes the branch from the local cache only after the server confirms deletion. After a timeout, cached output may still show the branch even if the server-side delete later completes. Re-running `ardent branch delete <name>` for the same branch is safe: Ardent reuses the active delete operation, and a re-delete after the branch row is already gone polls the prior delete operation instead of starting a second teardown. You can also re-run `ardent branch list` online to refresh and check the final state.
-
-Branches auto-suspend after a short idle period, so cleanup is not urgent for local development. CI workflows should still delete branches with `if: always()` or your CI provider's equivalent so every run cleans up after itself.
+Branches suspend on their own when idle, so cleanup isn't urgent on your laptop. CI should still delete its branches — use `if: always()` (or your CI's equivalent) so every run cleans up.

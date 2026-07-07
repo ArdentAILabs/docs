@@ -4,9 +4,11 @@ sidebarTitle: "Team"
 description: "Invite teammates and manage your organization"
 ---
 
+Roles, from most to least access: `owner`, `admin`, `member`, `viewer`.
+
 ### ardent invite
 
-Invite a user to your organization. Default role is `member`.
+Invite someone to your organization. The role is optional — it defaults to `member`:
 
 ```bash
 ardent invite alice@company.com
@@ -21,7 +23,7 @@ ardent invite alice@company.com admin
 
 ### ardent invite list
 
-Shows all pending invites for your organization.
+Pending invites:
 
 ```bash
 ardent invite list
@@ -39,19 +41,15 @@ Pending invites:
 
 ### ardent invite delete
 
+Revoke a pending invite:
+
 ```bash
 ardent invite delete alice@company.com
 ```
 
-<Accordion defaultOpen={false} title="Example output">
-```
-✓ Invite for alice@company.com deleted
-```
-</Accordion>
-
 ### ardent org members
 
-Shows everyone in your organization.
+Everyone in your organization:
 
 ```bash
 ardent org members
@@ -72,17 +70,11 @@ Organization members:
 
 ### ardent org set-role
 
-Available roles: `owner`, `admin`, `member`, `viewer`.
-
 ```bash
 ardent org set-role alice@company.com admin
 ```
 
-<Accordion defaultOpen={false} title="Example output">
-```
-✓ Updated alice@company.com to admin
-```
-</Accordion>
+Only admins and owners can change roles.
 
 ### ardent org remove
 
@@ -90,8 +82,4 @@ ardent org set-role alice@company.com admin
 ardent org remove alice@company.com
 ```
 
-<Accordion defaultOpen={false} title="Example output">
-```
-✓ Removed alice@company.com from organization
-```
-</Accordion>
+Only admins and owners can remove members.

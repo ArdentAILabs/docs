@@ -85,6 +85,7 @@
             "icon": "terminal",
             "pages": [
               "cli/overview",
+              "cli/configuration",
               {
                 "group": "Workspace",
                 "icon": "folder-key",
