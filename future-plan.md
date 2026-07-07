@@ -194,6 +194,54 @@ fact twice.
 different from the plan, and record any product answers you get to the open
 questions below. The next agent starts where you stopped.
 
+### How to migrate a page to the hybrid without losing the commentary
+
+Do this one endpoint page at a time, and only after Phase 1's spec exists.
+
+1. **Inventory the existing page first.** Go through it block by block and sort
+   each block into three buckets:
+   - *Facts the spec will now render* — endpoint tables, request/response field
+     lists, status-code lists. These get deleted, but only after step 4.
+   - *Commentary to keep* — warnings, accordions, narratives, retry advice,
+     anything that says "here's the gotcha" rather than "here's the field."
+   - *One-line facts that belong in the spec* — short field notes like "omitted
+     tables revert to `exclude`." Move these into the Pydantic model docstrings
+     in mono so they render inside the generated tables.
+2. **Convert the page, don't replace it.** Add the `openapi:` frontmatter line to
+   the existing MDX file (for example `openapi: "POST /v1/branch/create"`). Keep
+   every keep-bucket block in the body — Mintlify renders body content alongside
+   the generated reference. Put the narrative above the generated section,
+   accordions and edge cases below.
+3. **Check the rendered result side by side with the old page** (`mint dev`,
+   plus the git history for the old version). The generated tables must cover
+   every fact you're about to delete.
+4. **Run a removed-information audit before deleting anything** — the same
+   exercise as the 2026-07 overhaul: list every deleted claim and name where it
+   now lives (generated table, model docstring, or kept commentary). A fact with
+   no new home doesn't get deleted.
+5. **Redirects** in `docs.json` if the page URL changes. Prefer keeping URLs.
+
+Commentary that exists today and must survive the migration — treat this as a
+checklist, not a suggestion:
+
+- `api/branches.mdx`: the async create-then-poll narrative; the
+  `X-Idempotency-Key` retry note; the create error-code line; the "Client TLS
+  settings" accordion; the branch-deletion-is-CLI-only note; naming guidance.
+- `api/connectors.mdx`: the preflight-gate note (422 returns the full preflight
+  report); the "Private-network and customer-cloud connectors" accordion; the
+  replica-identity full-replace line; the delete blockers (lock, unfinished
+  replication); the single-quotes shell warning.
+- `api/operations.mdx`: the `?wait=` explanation; `stage` vs `stage_label`; the
+  "Results" section saying branch details land in `result`; the polling loop.
+- `api/orgs.mdx`: the dashboard-session-only note on org list/create; the
+  last-owner rule; the role guidance list.
+- `api/api-keys.mdx`: the secret-shown-once warning.
+- `api/projects.mdx`: the delete-cascades warning.
+- `api/errors.mdx` and `api/overview.mdx`: stay hand-written guides entirely.
+
+If a future page edit makes one of these redundant, update this list in the same
+PR — don't let the checklist and the pages disagree.
+
 ## Sequencing
 
 Phase 1 is a day or two of mostly mechanical work and immediately gives us the
