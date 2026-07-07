@@ -303,6 +303,87 @@ bullet list + generic cards with three intent cards.
 - Whether interrupting `connector create` client-side is always safe to resume with
   `retry-setup` (UX item 4).
 
+## API docs audit (client-visible API reference vs mono backend)
+
+Method: all nine `api/*.mdx` pages read in full; actual surface extracted from
+`mono/app/routes/v1/{branching,operations,connectors,projects,orgs,api_keys,auth}.py`
+plus the auth middleware. Line references are into `mono/app/`.
+
+### P0 — the docs describe an API that doesn't exist
+
+**1. Branch create is async; the documented response is fiction. (worst finding)**
+- Docs (`api/branches.mdx`, and the overview's "minimal flow"): `POST /v1/branch/create`
+  returns `{host, port, username, password, database, connection_uri}` and sometimes
+  a `warning` string.
+- Code: it returns **202 Accepted** with `{operation_id, status, type, resource_id}`
+  (`routes/v1/branching.py:1396-1401`). No credentials, no URI, no warning in the body.
+  The client polls `GET /v1/operations/{id}`; when a `branch_create` operation completes,
+  its `result` is enriched with the branch details — `branch_url`, `pooled_branch_url`,
+  `pooled_branch_prisma_url`, readiness timestamps (`operations.py:257-275`).
+- Anyone coding against the documented response gets a shape mismatch on their first
+  call. Rewrite the create section around 202 → poll → read `result`; fix overview
+  step 5 the same way. Document the useful extras while there: the idempotency header
+  (same connector+service+name resumes instead of duplicating) and the real error
+  codes (400 missing fields, 409 create-in-flight, 422 engine not ready).
+
+**2. The BYOC connector example sends the wrong field.**
+- Docs (`api/connectors.mdx`): `{"byoc": true, "environment_id": ..., "private_link_id": ...}`.
+- Code: `byoc` is a legacy *string* field (`"neon"` only). The real flag is
+  `use_environment: true`, and `environment_id`/`private_link_id` are only valid with
+  it (`connectors.py:426-464`). As documented, the call fails validation.
+
+**3. Two documented org endpoints reject API tokens.**
+- `GET /v1/orgs` and `POST /v1/orgs` use JWT-only auth (`verify_user_auth`,
+  `orgs.py:91,136`) — an `sk-ard_` bearer token gets 401. The docs list them alongside
+  token-authenticated endpoints with no warning. Either drop them from the client docs
+  or mark them dashboard-session-only. (Member/invite/role endpoints accept API keys.)
+
+### P1 — missing or incomplete, would bite automation
+
+- **Connector delete is async too**: returns 202 + operation handle
+  (`connectors.py:1678-1686`), 409 when deletion-locked, and `?force=true` is a query
+  param. Docs describe it as if synchronous and never name the param.
+- **Connector create enforces preflight**: a failing preflight returns **422 with the
+  full preflight report as the body** (`connectors.py:884-935`). Great behavior,
+  undocumented.
+- **`GET /v1/operations/{id}` supports `?wait=` long-polling** (0–10 seconds,
+  `operations.py:318-328`). Would simplify every polling loop in the docs; not mentioned.
+- **No documented way to delete a branch via the API.** The docs say "use the CLI."
+  The endpoint the CLI uses is `DELETE /v1/cli/branches/{branch_id}` — decide whether
+  to document it or state explicitly that branch deletion is CLI-only today.
+- **List branches** (`GET /v1/branches/{connector_id}`) returns a raw JSON array (not a
+  wrapped object) including `branch_url`/pooled URLs. Docs show no response at all.
+- **List connectors requires `org_id`** as a query param (`connectors.py:1034`); docs
+  table doesn't say so.
+- **Undocumented endpoints that are user-relevant** (already in the CLI docs): deletion
+  lock (`POST/DELETE /v1/connectors/{id}/deletion-lock`), quarantine list/release.
+  Also replica-identity decisions are full-replace with omitted tables defaulting to
+  `exclude` (`connectors.py:3057-3140`) — CLI docs say this, API docs don't.
+- **API-key list response**: docs say it includes "role"; actual fields are
+  `api_key_id, name, key_prefix, scopes, expires_at, revoked_at, created_at,
+  last_used_at, created_by, is_active` (`api_key_helpers.py:225-247`) — no role. Also
+  keys are env-scoped: `sk-ard_live_…` / `sk-ard_test_…` (`api_key_helpers.py:20-21`);
+  the auth page's `sk-ard_` claim is true but incomplete.
+- **Error semantics worth one line each**: revoke is a soft delete returning 204;
+  project create returns 409 on duplicate names; last-owner demote/remove is blocked.
+
+### Verified correct (no action)
+- Error envelope `{"detail": ...}` and the 422 structured-validation note — exact match
+  (FastAPI defaults, no custom handler).
+- Operation status values `pending/running/running/completed/failed` — match `models.py:33-40`.
+- Paths for preflight, discover, selection, replica-identity, engine-setup, projects
+  CRUD (incl. PATCH rename and DELETE), members/invites/roles, api-keys — all correct.
+- Project delete cascade warning — matches the code's documented cascade.
+- API key secret shown only once on create — confirmed, including the stored-hash design.
+
+### Verify with product owners (not provable from route code)
+- The `429 Too Many Requests` row in `api/errors.mdx` — no rate limiting in the app
+  code; if it exists it's at the edge. Confirm or soften.
+- The role-ID table in `api/authentication.mdx` (`role_org_viewer` etc.) and the
+  `scopes` example values (`branches:write`) — plausible but not confirmed in the
+  files read; `GET /v1/orgs/{org_id}/roles` is the source of truth.
+- Whether to expose `/v1/cli/*` endpoints (branch delete) as public API.
+
 ## Suggested execution order
 1. **PR 1 (correctness):** P0 items 1–3 — precedence rewrite, timeout default, JSON
    schema. These are actively misleading CI users today.
