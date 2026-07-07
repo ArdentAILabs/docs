@@ -36,7 +36,7 @@ The response is `202 Accepted` with an operation handle:
 }
 ```
 
-Poll the operation until it reaches a terminal status. On `completed`, its `result` holds the branch details:
+Poll the operation until it finishes. On `completed`, its `result` holds the branch details:
 
 ```bash
 curl -H "Authorization: Bearer $ARDENT_TOKEN"   "https://api.tryardent.com/v1/operations/op_123?wait=10"

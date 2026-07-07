@@ -93,4 +93,4 @@ Deletion is asynchronous: the call returns `202 Accepted` with an operation hand
 
 By default, Ardent waits for in-progress replication to finish before deleting. Add `?force=true` to skip that wait and abandon un-replicated changes.
 
-Two things block a delete: a deletion lock (`409` — remove it with the unlock endpoint) and, without `force`, un-replicated changes still draining.
+Two things block a delete: a deletion lock (`409` — unlock it first) and, without `force`, replication that hasn't finished yet.
