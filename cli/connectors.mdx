@@ -93,9 +93,12 @@ First-time setup copies your data, so it can take minutes to hours depending on 
 
 ### Replica identity decisions
 
-Some tables have no primary key or valid unique index, so Postgres can't tell which row an UPDATE or DELETE touched. (A valid unique index means unique, NOT NULL on every column, non-partial, and non-deferrable.) When Ardent finds tables like this, the CLI asks what to do with each one. In scripts (no terminal), it exits with code `1` instead of guessing — pass one of the three flags above.
+Some tables have no primary key or valid unique index, so Postgres can't tell which row an UPDATE or DELETE touched. When Ardent finds tables like this, the CLI asks what to do with each one. In scripts (no terminal), it exits with code `1` instead of guessing — pass one of the three flags above.
 
-A decisions file looks like:
+Most databases have keys on every table and never hit this.
+
+<Accordion defaultOpen={false} title="The decisions file, and what each choice means">
+A valid unique index means unique, NOT NULL on every column, non-partial, and non-deferrable. Tables without a primary key or an index like that need a decision:
 
 ```json
 {
@@ -116,6 +119,7 @@ The file must cover every listed table. With `--accept-replica-identity-defaults
 <Warning>
   `REPLICA IDENTITY FULL` makes UPDATE and DELETE write more to your database's WAL. Choose it deliberately. Ardent never changes replica identity on your source — when a change is needed, it prints the SQL for you to run.
 </Warning>
+</Accordion>
 
 ## ardent connector list
 
