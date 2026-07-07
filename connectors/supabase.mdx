@@ -1,12 +1,47 @@
 ---
 title: "Supabase"
-description: "Connect your Supabase Postgres database to Ardent"
+description: "The Supabase-specific parts of connecting to Ardent"
 ---
 
-Ardent is compatible with Supabase Postgres.
+Ardent works with Supabase Postgres. This page covers only what's specific to Supabase — the full walkthrough is the [Quickstart](/quickstart).
 
-**Want Claude or Cursor to help?** Paste this prompt into your agent:
+Three things matter here:
 
+<Steps>
+<Step title="Use the direct connection, not the pooler">
+
+In your Supabase dashboard, click **Connect** in the top right. Select the **Direct** tab, choose **Direct connection**, and set Type to **URI**.
+
+<Warning>
+  The pooler connection string will not work. Replication needs a direct Postgres connection.
+</Warning>
+
+</Step>
+
+<Step title="Check IPv4">
+
+Scroll down in the Connect dialog to the **IPv4 compatible** indicator. If it shows a checkmark, you're good. If not, click **IPv4 settings** and enable the dedicated IPv4 add-on — Ardent needs a direct IPv4 route to your database.
+
+</Step>
+
+<Step title="Copy the connection string">
+
+It looks like:
+
+```text
+postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
+```
+
+Wrap it in single quotes when you use it in a shell.
+
+</Step>
+</Steps>
+
+From here, continue with the [Quickstart](/quickstart): run preflight, run the grant script if preflight prints one, then create the connector.
+
+One Supabase-specific preflight failure to know: if preflight says the source is a **read replica**, you've copied a replica URL. Use the writable primary instead — branching needs a source that supports logical replication.
+
+<Accordion defaultOpen={false} title="Have Claude or Cursor check your setup — copy this prompt">
 ```
 Check if my Supabase database is ready to connect to Ardent.
 My connection string: [paste here]
@@ -25,81 +60,8 @@ Verify:
 After preflight passes, run:
 ardent connector create postgresql '<connection-string>'
 ```
+</Accordion>
 
----
-
-<Steps>
-<Step title="Open the Connect dialog">
-
-In your Supabase project dashboard, click **Connect** in the top right corner.
-
-Select the **Direct** tab, choose **Direct connection** as the connection method, and set Type to **URI**.
-
-<Warning>
-  Do not use the pooler connection string for Ardent. Logical replication needs a direct Postgres connection.
-</Warning>
-
-</Step>
-
-<Step title="Check IPv4">
-
-Scroll down in the Connect dialog. You'll see an **IPv4 compatible** indicator.
-
-If it shows a checkmark, you're good. If not, click **IPv4 settings** and enable the dedicated IPv4 add-on. Ardent needs a direct IPv4 route to your database.
-
-</Step>
-
-<Step title="Copy your connection string">
-
-Still in the Connect dialog, copy the URI. It looks like:
-
-```text
-postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
-```
-
-Wrap the URI in single quotes when you use it in a shell.
-
-</Step>
-
-<Step title="Run preflight">
-
-```bash
-ardent connector preflight postgresql 'postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres' --schemas public
-```
-
-Preflight checks reachability, credentials, source writability, logical replication, permissions, and duplicate-source status without creating a connector or storing credentials. It also prints a generated grant script.
-
-If preflight says the source is a read replica, use the writable primary database URL instead. Ardent refuses read replicas because full-fidelity branching needs a source that can support logical replication and schema tracking.
-
-</Step>
-
-<Step title="Run the generated grant script if needed">
-
-If preflight reports missing grants, copy the **Grant script** section and run it in `psql` as a Supabase role allowed to grant those privileges.
-
-Then re-run preflight. Do not create the connector until preflight passes.
-
-</Step>
-
-<Step title="Connect your database">
-
-```bash
-ardent connector create postgresql 'postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres'
-```
-
-Ardent stores encrypted credentials, discovers your schema, snapshots selected tables, and starts continuous replication. Initial setup time depends on data size, write rate, and network throughput.
-
-</Step>
-
-<Step title="Create your first branch">
-
-When the connector is ready:
-
-```bash
-ardent branch create my-feature
-```
-
-Done. You now have an isolated copy of your Supabase database: schema, data, and all. The CLI returns a connection URL you can use anywhere.
-
-</Step>
-</Steps>
+<Tip>
+  Running Supabase locally too? Ardent can point your local Supabase services at a branch — see [Local Supabase linking](/cli/settings#local-supabase-linking).
+</Tip>
