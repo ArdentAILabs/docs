@@ -30,7 +30,7 @@ curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X POST https://api.tryardent.co
 curl -H "Authorization: Bearer $ARDENT_TOKEN" https://api.tryardent.com/v1/orgs/org_123/api-keys
 ```
 
-List responses include metadata such as name, role, creation time, and expiration, but never the secret token.
+List responses include each key's name, key prefix, scopes, creation time, expiration, and last-used time — never the secret token.
 
 ## Revoke an API key
 
