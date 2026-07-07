@@ -21,7 +21,7 @@ For interactive deletion and switching, use the CLI: `ardent branch delete` and 
 curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/branch/create   -H 'Content-Type: application/json'   -d '{"connector_id":"conn_123","service_type":"postgres","name":"pr-123"}'
 ```
 
-For Postgres branches, `service_type` is `postgres`. Connector creation uses the connector type `postgresql`; branch creation uses the shorter branch service type.
+For Postgres branches, `service_type` is `postgres` — not the connector type `postgresql`.
 
 The response is the branch's connection details:
 
@@ -38,9 +38,13 @@ The response is the branch's connection details:
 
 Treat `connection_uri` and the discrete credential fields as sensitive. Use `connection_uri` exactly as returned, including `sslmode=require` and `channel_binding=disable`. If you assemble a connection string from the discrete fields, add those same query parameters.
 
-Branch connections go through Ardent's connection routing layer. For branch connections, set SQL clients and IDEs to SSL mode `require`. With no custom root certificate configured, `sslmode=require` encrypts the connection but does not validate a CA chain. Leave custom root certificate, CA bundle, SSL certificate authority, or `sslrootcert` fields blank. Do not reuse a source database CA bundle; it cannot verify the branch routing host and can cause TLS errors. Keep `channel_binding=disable`; clients that force channel binding can reject a valid branch connection because TLS terminates at the routing layer.
+Branch connections go through Ardent's routing layer, where TLS terminates. Configure SQL clients and IDEs accordingly:
 
-When the branch is cut from a source whose WAL advanced past the snapshot, the response also includes a `warning` string describing the staleness. It is absent otherwise.
+- Set SSL mode to `require`. This encrypts the connection; without a custom root certificate it does not validate a CA chain.
+- Leave root certificate, CA bundle, and `sslrootcert` fields blank. A source database CA bundle can't verify the routing host and causes TLS errors.
+- Keep `channel_binding=disable`. Clients that force channel binding reject valid branch connections.
+
+When the branch is cut from a source whose WAL advanced past the snapshot, the response also includes a `warning` string describing the staleness.
 
 For branch metadata such as `id`, `status`, and `created_at`, list the connector's branches with `GET /v1/branches/{connector_id}`, or use the CLI's `ardent branch create --format json`.
 

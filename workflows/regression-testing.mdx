@@ -9,7 +9,7 @@ Unit tests with mocked data miss the bugs that only appear with real data at rea
 
 `ardent branch create` prints a Postgres URL for the new branch. If you need it again, run `ardent branch info regression-run` (or `ardent branch info` when that branch is already checked out).
 
-Most apps and test runners read the DB from an environment variable. The usual name is `DATABASE_URL`; Django, SQLAlchemy, Prisma, and many pytest setups are already wired for that in dev, but yours might use something else (for example `PGURL` or a `.env` file you load before running tests).
+Most test runners read the database from `DATABASE_URL` — Django, SQLAlchemy, Prisma, and most pytest setups already do. If yours uses a different variable or a `.env` file, substitute that below.
 
 ```bash
 # Branch from production and export the returned URL
@@ -27,7 +27,7 @@ npm test
 ardent branch delete regression-run
 ```
 
-**One-line alternative:** `DATABASE_URL='…' npm test` sets the variable only for that one process, which is why it looked as if the URL and `npm test` had to share a line. That is valid shell, but `export` and a separate test command are easier to read and match how most people run pytest or rerun commands.
+**One-liner:** `DATABASE_URL='…' npm test` sets the variable for just that command. `export` is easier when you'll run more than one.
 
 **In CI:** create the branch in the job, assign the URL to `DATABASE_URL` (or wire it into your framework), run your test command, then delete the branch. See [CI / CD](/workflows/ci-cd) for a GitHub Actions–shaped example.
 

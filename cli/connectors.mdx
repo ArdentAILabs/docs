@@ -203,7 +203,7 @@ ardent connector update prod-db --drop-extensions ''
 ardent connector delete staging-db
 ```
 
-By default, Ardent first waits for in-progress replication to finish so no changes are abandoned. `--force` skips that wait and abandons them — use it only on purpose.
+By default, Ardent waits for in-progress replication to finish so no changes are lost. `--force` skips the wait and abandons those changes.
 
 Two things can stop a delete:
 
@@ -212,7 +212,7 @@ Two things can stop a delete:
 
 ## Locks and quarantines
 
-Two safety features you'll meet rarely but should recognize.
+You'll rarely need these two, but you should know they exist.
 
 <Accordion defaultOpen={false} title="ardent connector lock / unlock — protect a connector from deletion">
 ```bash

@@ -38,4 +38,4 @@ List responses include metadata such as name, role, creation time, and expiratio
 curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X DELETE https://api.tryardent.com/v1/orgs/org_123/api-keys/key_123
 ```
 
-Revocation is immediate. Any CI job or integration using that token will fail authentication on its next request.
+Revocation is immediate — the next request with that token fails authentication.

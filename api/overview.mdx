@@ -52,7 +52,7 @@ Organization
 curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/branch/create   -H 'Content-Type: application/json'   -d '{"connector_id":"conn_123","service_type":"postgres","name":"pr-123"}'
 ```
 
-For Postgres branches, `service_type` is `postgres`. Connector creation uses the connector type `postgresql`; branch creation uses the shorter branch service type.
+For Postgres branches, `service_type` is `postgres` — not the connector type `postgresql`.
 
 ## Long-running work
 
@@ -66,4 +66,4 @@ See [Operations](/api/operations) for the full polling model.
 
 ## Stability notes
 
-The public API may add fields over time. Clients should read the fields they need and ignore unknown fields. Treat missing required fields, failed operations, and empty branch URLs as hard failures in automation.
+Read the fields you need and ignore unknown ones — the API may add fields over time. Treat missing required fields, failed operations, and empty branch URLs as hard failures in automation.

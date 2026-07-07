@@ -4,7 +4,7 @@ sidebarTitle: "Authentication"
 description: "Authenticate API requests with bearer tokens and manage access safely"
 ---
 
-The API uses bearer tokens. Create tokens in **Ardent dashboard > Settings > API keys**, store them in a secret manager, and pass them with each request. API keys start with `sk-ard_` and are passed in an `Authorization: Bearer` header.
+The API uses bearer tokens. Create them in **Ardent dashboard > Settings > API keys** and store them in a secret manager. Keys start with `sk-ard_` and go in an `Authorization: Bearer` header on every request.
 
 ```bash
 curl -H "Authorization: Bearer $ARDENT_TOKEN" https://api.tryardent.com/v1/projects

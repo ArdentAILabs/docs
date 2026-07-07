@@ -5,7 +5,7 @@ description: "Prepare any self-managed Postgres 13+ for Ardent"
 
 Ardent works with self-managed Postgres 13 or newer. This page prepares your server; the connect-and-branch walkthrough is the [Quickstart](/quickstart).
 
-The loop is simple: run preflight, apply the SQL it generates, run preflight again until it passes.
+Setup is a loop: run preflight, apply the SQL it prints, run preflight again until it passes.
 
 ```bash
 ardent connector preflight postgresql 'postgresql://user:[YOUR-PASSWORD]@host:5432/mydb' --schemas public
@@ -219,4 +219,4 @@ Common failures:
 
 </Steps>
 
-When preflight passes, continue with the [Quickstart](/quickstart): create the connector and your first branch. One heads-up for that step: tables without a primary key or valid unique index need a [replica identity decision](/cli/connectors#replica-identity-decisions) — the CLI walks you through it, and Ardent never runs DDL on your source automatically.
+When preflight passes, continue with the [Quickstart](/quickstart): create the connector and your first branch. One heads-up for that step: tables without a primary key or valid unique index need a [replica identity decision](/cli/connectors#replica-identity-decisions). The CLI walks you through it, and Ardent never runs DDL on your source.
