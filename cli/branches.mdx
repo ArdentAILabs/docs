@@ -29,7 +29,7 @@ postgresql://user:***@my-feature-postgres.routing.tryardent.com:5432/db?sslmode=
 | `--print-url` | Print only the connection URL. Best for scripts |
 | `--format json` | Print a stable JSON object. See [Configuration & automation](/cli/configuration) |
 | `--url-type <type>` | Which URL to print: `direct` (default), `pooled`, or `prisma` |
-| `-s, --service <type>` | Branch service type. Default `postgres`. Leave it alone unless Ardent support says otherwise |
+| `-s, --service <type>` | Branch service type. Default `postgres` — not the same as the connector type `postgresql`. Leave it alone unless Ardent support says otherwise |
 
 `--print-url` and `--format` can't be combined. `--url-type` can't be combined with `--format json` — the JSON already includes every URL.
 
@@ -45,7 +45,7 @@ If `--print-url` prints nothing, stop the script. A missing URL means setup fail
 If creation takes too long, the CLI stops waiting after 65 minutes — but the work usually finishes server-side.
 
 <Accordion defaultOpen={false} title="If creation times out">
-Re-run the exact same command. For the same connector, branch name, and service type, a re-run picks up the original request instead of starting a second one. Changing the name starts a new branch.
+Re-run the exact same command. For the same connector, branch name, and service type, a re-run picks up the original request instead of starting a second one. Changing the name or service type starts a new request.
 
 You can also run `ardent branch list` — if the branch appears there, it finished. Use it.
 

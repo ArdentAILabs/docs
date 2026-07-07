@@ -89,11 +89,11 @@ The last three can't be combined — pass one.
 ```
 </Accordion>
 
-First-time setup copies your data, so it can take minutes to hours depending on database size. After that, branches are created in seconds regardless of size.
+First-time setup copies your data, so it can take minutes to hours depending on database size, write rate, and network speed. After that, branches are created in seconds regardless of size.
 
 ### Replica identity decisions
 
-Some tables have no primary key or unique index, so Postgres can't tell which row an UPDATE or DELETE touched. When Ardent finds tables like this, the CLI asks what to do with each one. In scripts (no terminal), it exits with code `1` instead of guessing — pass one of the three flags above.
+Some tables have no primary key or valid unique index, so Postgres can't tell which row an UPDATE or DELETE touched. (A valid unique index means unique, NOT NULL on every column, non-partial, and non-deferrable.) When Ardent finds tables like this, the CLI asks what to do with each one. In scripts (no terminal), it exits with code `1` instead of guessing — pass one of the three flags above.
 
 A decisions file looks like:
 
