@@ -5,6 +5,26 @@ description: "The PlanetScale-specific parts of connecting to Ardent"
 
 Ardent works with PlanetScale Postgres. This page covers only what's specific to PlanetScale — the full walkthrough is the [Quickstart](/quickstart).
 
+<Accordion defaultOpen={false} title="Using Claude Code or Cursor? Paste this prompt and it does the checks for you">
+```
+Check if my PlanetScale Postgres database is ready to connect to Ardent.
+My connection string: [paste here]
+
+Use Ardent preflight first:
+ardent connector preflight postgresql '<connection-string>'
+
+Verify:
+1. The host is reachable and credentials work.
+2. Logical replication is enabled in the PlanetScale dashboard.
+3. The URL points to the writable primary: SELECT pg_is_in_recovery(); must return false.
+4. The user has replication privileges.
+5. Tables selected for replication have a primary key, valid unique NOT NULL index, or REPLICA IDENTITY FULL.
+
+After preflight passes, run:
+ardent connector create postgresql '<connection-string>'
+```
+</Accordion>
+
 Two things matter here:
 
 <Steps>
@@ -28,23 +48,3 @@ Wrap it in single quotes in your shell — the `?sslmode=…` part must not be i
 </Steps>
 
 From here, continue with the [Quickstart](/quickstart): run preflight, fix anything it reports, then create the connector.
-
-<Accordion defaultOpen={false} title="Have Claude or Cursor check your setup — copy this prompt">
-```
-Check if my PlanetScale Postgres database is ready to connect to Ardent.
-My connection string: [paste here]
-
-Use Ardent preflight first:
-ardent connector preflight postgresql '<connection-string>'
-
-Verify:
-1. The host is reachable and credentials work.
-2. Logical replication is enabled in the PlanetScale dashboard.
-3. The URL points to the writable primary: SELECT pg_is_in_recovery(); must return false.
-4. The user has replication privileges.
-5. Tables selected for replication have a primary key, valid unique NOT NULL index, or REPLICA IDENTITY FULL.
-
-After preflight passes, run:
-ardent connector create postgresql '<connection-string>'
-```
-</Accordion>

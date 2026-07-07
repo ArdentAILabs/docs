@@ -5,6 +5,27 @@ description: "The RDS-specific parts of connecting to Ardent"
 
 Ardent works with AWS RDS for PostgreSQL. This page covers only what's specific to RDS — the full walkthrough is the [Quickstart](/quickstart).
 
+<Accordion defaultOpen={false} title="Using Claude Code or Cursor? Paste this prompt and it does the checks for you">
+```
+Check if my AWS RDS Postgres database is ready to connect to Ardent.
+My connection string: [paste here]
+
+Use Ardent preflight first:
+ardent connector preflight postgresql '<connection-string>' --schemas public
+
+Verify:
+1. The endpoint is reachable from Ardent and the security group allows inbound Postgres traffic.
+2. The URL points to the writable primary: SELECT pg_is_in_recovery(); must return false.
+3. The DB parameter group has rds.logical_replication = 1 and the instance has been rebooted after the change.
+4. The connecting role has GRANT rds_replication.
+5. The Ardent preflight Grant script has been run for the schemas I want to replicate.
+6. Tables selected for replication have a primary key, valid unique NOT NULL index, or REPLICA IDENTITY FULL.
+
+After preflight passes, run:
+ardent connector create postgresql '<connection-string>'
+```
+</Accordion>
+
 RDS needs three things before preflight can pass:
 
 <Steps>
@@ -61,24 +82,3 @@ Two RDS-specific notes:
 
 - If preflight says the source is a **read replica**, use the writer endpoint instead.
 - **WAL retention:** replication slots retain WAL while a consumer is behind. A very low retention limit can invalidate the slot under heavy writes or long transactions, forcing a connector rebuild. Leave enough headroom and watch long-running transactions.
-
-<Accordion defaultOpen={false} title="Have Claude or Cursor check your setup — copy this prompt">
-```
-Check if my AWS RDS Postgres database is ready to connect to Ardent.
-My connection string: [paste here]
-
-Use Ardent preflight first:
-ardent connector preflight postgresql '<connection-string>' --schemas public
-
-Verify:
-1. The endpoint is reachable from Ardent and the security group allows inbound Postgres traffic.
-2. The URL points to the writable primary: SELECT pg_is_in_recovery(); must return false.
-3. The DB parameter group has rds.logical_replication = 1 and the instance has been rebooted after the change.
-4. The connecting role has GRANT rds_replication.
-5. The Ardent preflight Grant script has been run for the schemas I want to replicate.
-6. Tables selected for replication have a primary key, valid unique NOT NULL index, or REPLICA IDENTITY FULL.
-
-After preflight passes, run:
-ardent connector create postgresql '<connection-string>'
-```
-</Accordion>

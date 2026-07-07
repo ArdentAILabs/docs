@@ -5,6 +5,27 @@ description: "The Supabase-specific parts of connecting to Ardent"
 
 Ardent works with Supabase Postgres. This page covers only what's specific to Supabase — the full walkthrough is the [Quickstart](/quickstart).
 
+<Accordion defaultOpen={false} title="Using Claude Code or Cursor? Paste this prompt and it does the checks for you">
+```
+Check if my Supabase database is ready to connect to Ardent.
+My connection string: [paste here]
+
+Use Ardent preflight first:
+ardent connector preflight postgresql '<connection-string>' --schemas public
+
+Verify:
+1. This is the Direct connection string, not the pooler string.
+2. IPv4 is enabled for the Supabase project.
+3. The URL points to the writable primary: SELECT pg_is_in_recovery(); must return false.
+4. Logical replication and wal2json are available.
+5. The Ardent preflight Grant script has been run for the schemas I want to replicate.
+6. Tables selected for replication have a primary key, valid unique NOT NULL index, or REPLICA IDENTITY FULL.
+
+After preflight passes, run:
+ardent connector create postgresql '<connection-string>'
+```
+</Accordion>
+
 Three things matter here:
 
 <Steps>
@@ -40,27 +61,6 @@ Wrap it in single quotes when you use it in a shell.
 From here, continue with the [Quickstart](/quickstart): run preflight, run the grant script if preflight prints one, then create the connector.
 
 One Supabase-specific preflight failure to know: if preflight says the source is a **read replica**, you've copied a replica URL. Use the writable primary instead — branching needs a source that supports logical replication.
-
-<Accordion defaultOpen={false} title="Have Claude or Cursor check your setup — copy this prompt">
-```
-Check if my Supabase database is ready to connect to Ardent.
-My connection string: [paste here]
-
-Use Ardent preflight first:
-ardent connector preflight postgresql '<connection-string>' --schemas public
-
-Verify:
-1. This is the Direct connection string, not the pooler string.
-2. IPv4 is enabled for the Supabase project.
-3. The URL points to the writable primary: SELECT pg_is_in_recovery(); must return false.
-4. Logical replication and wal2json are available.
-5. The Ardent preflight Grant script has been run for the schemas I want to replicate.
-6. Tables selected for replication have a primary key, valid unique NOT NULL index, or REPLICA IDENTITY FULL.
-
-After preflight passes, run:
-ardent connector create postgresql '<connection-string>'
-```
-</Accordion>
 
 <Tip>
   Running Supabase locally too? Ardent can point your local Supabase services at a branch — see [Local Supabase linking](/cli/settings#local-supabase-linking).
