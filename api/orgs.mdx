@@ -10,11 +10,15 @@ Organization APIs are for team administration: listing members, sending invites,
 
 | Method | Path | Description |
 | --- | --- | --- |
-| `GET` | `/v1/orgs` | List organizations visible to the token |
-| `POST` | `/v1/orgs` | Create an organization |
+| `GET` | `/v1/orgs` | List organizations — dashboard session only |
+| `POST` | `/v1/orgs` | Create an organization — dashboard session only |
 | `GET` | `/v1/orgs/{org_id}` | Get organization details |
 | `PATCH` | `/v1/orgs/{org_id}` | Update organization metadata |
 | `DELETE` | `/v1/orgs/{org_id}` | Delete an organization |
+
+<Note>
+  `GET /v1/orgs` and `POST /v1/orgs` accept only a logged-in dashboard session, not API tokens — an `sk-ard_` token gets `401`. API tokens belong to one organization, so they don't need to list or create orgs. Every other endpoint on this page accepts API tokens.
+</Note>
 
 ## Members and invites
 
@@ -46,3 +50,5 @@ curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X PATCH https://api.tryardent.c
 - Use `member` for developers who create branches and manage day-to-day resources.
 - Use `admin` for teammates who manage access and shared resources.
 - Reserve `owner` for organization-level control.
+
+An organization's last owner can't be demoted or removed — promote someone else first.
