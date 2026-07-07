@@ -44,11 +44,11 @@ spec snapshot we can diff in CI: a drift alarm.
     system-info, `/v1/bootstrap`, `/v1/me`, `/v1/my-orgs` (dashboard session
     surface), `GET /v1/connectors/{id}/connection-details` (returns credentials),
     readiness-checks/attempts (debug), `validate-github-*`.
-- Mechanism: tag every public route with `tags=["public"]` (most already carry a
-  group tag from `include_router`; add the marker tag at the route level), then
-  generate the spec and post-process it to keep only `public`-tagged paths.
-  Alternative: `include_in_schema=False` on everything internal. The tag filter is
-  less invasive — internal FastAPI docs at `/docs` keep working for the team.
+- Mechanism: add a `public` tag to each public route, then filter the generated
+  spec down to `public`-tagged paths. (Routes already carry group tags from
+  `include_router`; this is one more tag at the route level.) The alternative —
+  `include_in_schema=False` on everything internal — also works, but the tag
+  filter keeps the team's internal `/docs` page intact.
 - Declare the auth scheme once (`HTTPBearer`) and attach it to public routes.
   `verify_auth` runs inside handlers, so the scheme is declaration-only — that's
   fine; the spec just needs to say "bearer token" so the playground sends one.
@@ -93,15 +93,26 @@ common error responses (401/403/404/409/422) to public routes via a shared
 
 - Commit the filtered `openapi.json` into this docs repo (or fetch it at build
   time from a mono release artifact — committed copy is simpler to start).
-- Point Mintlify at it in `docs.json` and let it generate the endpoint pages with
-  the playground. Mintlify supports per-endpoint MDX stubs with an `openapi:`
-  frontmatter key when we want curated ordering and prose around the generated
-  reference.
-- The current hand-written API pages split into two kinds:
-  - **Guides stay hand-written:** the overview, the create-then-poll branch flow,
-    error/retry guidance. Prose about *how to use* the API doesn't autogenerate.
-  - **Reference becomes generated:** endpoint lists, request/response field
-    tables. Delete our hand-maintained copies and add redirects.
+- Point Mintlify at it in `docs.json`. The plan is a hybrid, not a replacement:
+  each endpoint page stays a normal MDX file with an `openapi:` frontmatter line
+  (for example `openapi: "POST /v1/branch/create"`). Mintlify generates the
+  parameter tables, response schemas, and the try-it playground from the spec;
+  everything else in the file is ours — warnings, examples, accordions, the
+  "here's the gotcha" notes.
+- Division of labor in the hybrid:
+  - **The spec owns the facts:** paths, fields, types, status codes. Generated,
+    so they can't drift.
+  - **We own the judgment:** the create-then-poll narrative, idempotency advice,
+    the TLS accordion, retry guidance. Hand-written MDX on the same pages, plus
+    the standalone guide pages (overview, errors).
+  - **One-line field notes live in the backend:** OpenAPI descriptions take
+    markdown, so short notes ("omitted tables revert to exclude") go in the
+    Pydantic model docstrings and flow into the spec. Anything longer stays in
+    MDX, where editing it doesn't need a backend PR.
+- The hand-written commentary can still drift — autogen only protects the
+  generated parts. The CI spec-diff covers this: when the spec changes, the diff
+  says which endpoint pages to reread. Delete only the hand-maintained field
+  tables the spec replaces, and add redirects where page URLs change.
 
 ## Phase 4 — Contract tests (keeps the spec honest)
 
@@ -129,6 +140,59 @@ don't want to promise.
   `role_org_*` IDs and `branches:write`-style scopes that nobody has verified.
 - Are the environments endpoints meant to be public? The CLI uses
   `GET /v1/environments/{id}` for BYOC allowlists.
+
+## Directions for the agent doing this work
+
+Read this before touching anything. These are the ways this project goes to shit,
+learned the hard way during the 2026-07 docs overhaul.
+
+**Verify against code, never against docs.** The docs are what drifted; the routes
+are the truth. Before documenting or modeling any behavior, read the handler and
+cite the file and line in your commit message. If you can't point at the line,
+don't write the claim. Don't invent example outputs — mark anything unverified as
+illustrative or leave it out.
+
+**`response_model` strips fields — this is the big landmine.** FastAPI's
+`response_model` drops any field the model doesn't declare. The CLI and dashboard
+read fields from these responses today. If you attach a strict model to an
+existing endpoint, you will silently break real clients. For existing endpoints,
+either use `extra="allow"` models, or document responses without enforcing them
+(`responses={...}` instead of `response_model=`). Diff the actual JSON an endpoint
+returns before and after your change — byte-for-byte on the fields.
+
+**Request models change validation.** Hand-parsed bodies today accept things
+Pydantic may reject (extra keys, loose types). When you add a request model to an
+endpoint like branch create, confirm the CLI's actual request payloads still pass.
+Grep `packages/ardent-cli` for every call site of the endpoint you're touching.
+
+**When in doubt, an endpoint is internal.** Never tag something public because it
+looks useful. The blocked-by-default list: anything under `/v1/cli/`,
+`/v1/internal*`, `/v1/branch/route`, webhooks, staff routes, and
+`connection-details` (it returns credentials). Making something public is a
+product decision — ask, don't infer.
+
+**Ship one endpoint per PR.** Each phase-2 item is independently shippable. A
+big-bang "add all the models" PR is unreviewable and will regress something. The
+order in Phase 2 is deliberate: branch create first, because it's the endpoint
+customers hit first.
+
+**Don't skip Phase 1.** The spec snapshot and CI diff come before any modeling.
+Without the diff alarm, the models you add will drift exactly like the
+hand-written docs did.
+
+**Don't delete hand-written docs until the generated page is live and checked.**
+Swap page by page: generate, compare against the hand-written version, keep the
+commentary, then remove the duplicated field tables. Add a redirect if the URL
+changes.
+
+**Writing style for any docs text you touch:** short sentences, plain words, the
+common case first, edge cases behind accordions. If a sentence needs re-reading,
+rewrite it. No filler ("simply", "note that", "robust"), no restating the same
+fact twice.
+
+**Update this file as you go.** Check off what's done, note what turned out
+different from the plan, and record any product answers you get to the open
+questions below. The next agent starts where you stopped.
 
 ## Sequencing
 
