@@ -33,6 +33,19 @@ better. This plan closes that gap.
 This phase pays for itself even before any models exist, because it produces a
 spec snapshot we can diff in CI: a drift alarm.
 
+**Status (July 2026): done**, on branches `openapi-public-spec` (mono) and
+`docs/openapi-hybrid` (docs). What shipped differs from the mechanism below in
+one way: instead of tagging each route, `scripts/export_public_openapi.py` in
+mono holds an explicit method-and-path allowlist and filters the generated spec
+against it. Same result, zero touched routes, and the allowlist file is the
+reviewable definition of the public surface. Boundary decisions made while
+building it: `GET /v1/orgs`, `POST /v1/orgs`, `grant-script`, and
+`validate-github-*` all stay hidden. The snapshot lives in mono as
+`openapi.public.json`, CI fails on drift (`--check` step in `test-pr.yml`), and
+`scripts/sync-openapi.sh` in the docs repo copies it over. One proof page
+(`api/operations-generated.mdx`) renders the hybrid: generated parameters and
+playground from the spec, our commentary on the same page.
+
 - Decide the public surface. Proposed:
   - **Public:** projects CRUD; orgs member/invite/role endpoints; api-keys;
     connectors (preflight, create, get, list, update, delete, discover, selection,
