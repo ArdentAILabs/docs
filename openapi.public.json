@@ -1,6 +1,158 @@
 {
   "components": {
     "schemas": {
+      "APIKeyCreateResponse": {
+        "additionalProperties": true,
+        "description": "Response of POST /v1/orgs/{org_id}/api-keys.\n\n`api_key` is the full secret (sk-ard_live_\u2026 / sk-ard_test_\u2026) and is\nreturned only here, once. Spec-only; see APIKeyListItem.",
+        "properties": {
+          "api_key": {
+            "title": "Api Key",
+            "type": "string"
+          },
+          "api_key_id": {
+            "title": "Api Key Id",
+            "type": "string"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "key_prefix": {
+            "title": "Key Prefix",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "role_id": {
+            "title": "Role Id",
+            "type": "string"
+          },
+          "role_key": {
+            "title": "Role Key",
+            "type": "string"
+          },
+          "scopes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Scopes",
+            "type": "array"
+          },
+          "warning": {
+            "title": "Warning",
+            "type": "string"
+          }
+        },
+        "required": [
+          "api_key_id",
+          "api_key",
+          "name",
+          "key_prefix",
+          "scopes",
+          "created_at",
+          "warning",
+          "role_id",
+          "role_key"
+        ],
+        "title": "APIKeyCreateResponse",
+        "type": "object"
+      },
+      "APIKeyListItem": {
+        "additionalProperties": true,
+        "description": "One row of GET /v1/orgs/{org_id}/api-keys. Never includes the secret.\n\nSpec-only: the handler returns plain dicts, so this model documents the\nshape without filtering (do not attach it as response_model).",
+        "properties": {
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "key_prefix": {
+            "title": "Key Prefix",
+            "type": "string"
+          },
+          "last_used_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Used At"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "revoked_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revoked At"
+          },
+          "scopes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Scopes",
+            "type": "array"
+          },
+          "users": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Users"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "key_prefix",
+          "scopes",
+          "created_at"
+        ],
+        "title": "APIKeyListItem",
+        "type": "object"
+      },
       "AsyncOperationResponse": {
         "description": "Response shape for GET /v1/operations/{id}.\n\nField set is intentionally narrow: the CLI polls this endpoint and\nwe only expose what the CLI / future UI needs. Audit fields stay\nout of the response.",
         "properties": {
@@ -179,6 +331,123 @@
         "title": "BYOCAccessCredentialsInput",
         "type": "object"
       },
+      "BranchRow": {
+        "additionalProperties": true,
+        "description": "One row of GET /v1/branches/{connector_id}.\n\nSpec-only: the handler returns raw table rows (select *) enriched with\nURL fields, so this model documents the stable core without filtering.\nextra=\"allow\" is the contract \u2014 rows carry additional columns, and\nclients must tolerate fields not listed here.",
+        "properties": {
+          "branch_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Branch Url"
+          },
+          "connector_id": {
+            "title": "Connector Id",
+            "type": "string"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "last_branch_activity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Branch Activity"
+          },
+          "masked_ready_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Masked Ready At"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "pooled_branch_prisma_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pooled Branch Prisma Url"
+          },
+          "pooled_branch_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pooled Branch Url"
+          },
+          "read_ready_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Read Ready At"
+          },
+          "service_type": {
+            "title": "Service Type",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "write_ready_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Write Ready At"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "connector_id",
+          "service_type",
+          "status",
+          "created_at"
+        ],
+        "title": "BranchRow",
+        "type": "object"
+      },
       "ConnectorDeletionLockRequest": {
         "properties": {
           "reason": {
@@ -195,6 +464,121 @@
           }
         },
         "title": "ConnectorDeletionLockRequest",
+        "type": "object"
+      },
+      "ConnectorEnvelope": {
+        "description": "Spec-only wrapper used by the deletion-lock endpoints.",
+        "properties": {
+          "connector": {
+            "$ref": "#/components/schemas/ConnectorRow"
+          }
+        },
+        "required": [
+          "connector"
+        ],
+        "title": "ConnectorEnvelope",
+        "type": "object"
+      },
+      "ConnectorListResponse": {
+        "description": "Spec-only wrapper for GET /v1/connectors.",
+        "properties": {
+          "connectors": {
+            "items": {
+              "$ref": "#/components/schemas/ConnectorRow"
+            },
+            "title": "Connectors",
+            "type": "array"
+          }
+        },
+        "required": [
+          "connectors"
+        ],
+        "title": "ConnectorListResponse",
+        "type": "object"
+      },
+      "ConnectorRow": {
+        "additionalProperties": true,
+        "description": "Loose core of a connector response.\n\nThe connector row is the most dynamic shape in the system; extra=\"allow\"\nis the contract \u2014 responses carry many more columns and clients must\ntolerate fields not listed here. can_update/can_delete are added by the\npermission projection on create/get/update/list responses.",
+        "properties": {
+          "can_delete": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Can Delete"
+          },
+          "can_update": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Can Update"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "org_id": {
+            "title": "Org Id",
+            "type": "string"
+          },
+          "project_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Id"
+          },
+          "service_name": {
+            "title": "Service Name",
+            "type": "string"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          }
+        },
+        "required": [
+          "id",
+          "org_id",
+          "name",
+          "service_name"
+        ],
+        "title": "ConnectorRow",
         "type": "object"
       },
       "CreateAPIKeyRequest": {
@@ -405,6 +789,64 @@
         "title": "CreateProjectRequest",
         "type": "object"
       },
+      "DiscoverAccepted": {
+        "description": "202 body of POST /{connector_id}/discover: an operation handle plus\ndiscovery context.",
+        "properties": {
+          "operation_id": {
+            "title": "Operation Id",
+            "type": "string"
+          },
+          "prerequisites": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prerequisites"
+          },
+          "resource_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resource Id"
+          },
+          "source_metadata": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Metadata"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OperationStatus"
+          },
+          "type": {
+            "$ref": "#/components/schemas/OperationType"
+          }
+        },
+        "required": [
+          "operation_id",
+          "status",
+          "type",
+          "resource_id"
+        ],
+        "title": "DiscoverAccepted",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -603,6 +1045,239 @@
           "connection_details"
         ],
         "title": "PreflightConnectorRequest",
+        "type": "object"
+      },
+      "PreflightReport": {
+        "additionalProperties": true,
+        "description": "Preflight result: POST /preflight's 200 body, and the 422 body when\nconnector create is gated on failed preflight.",
+        "properties": {
+          "branching_prerequisites_pass": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Branching Prerequisites Pass"
+          },
+          "checks": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checks"
+          },
+          "grant_script": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grant Script"
+          },
+          "preflight_pass": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preflight Pass"
+          },
+          "source_metadata": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Metadata"
+          },
+          "source_placement": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Placement"
+          },
+          "source_preflight": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Preflight"
+          },
+          "source_provider": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Provider"
+          }
+        },
+        "title": "PreflightReport",
+        "type": "object"
+      },
+      "ProjectListResponse": {
+        "description": "Spec-only wrapper for GET /v1/projects.",
+        "properties": {
+          "projects": {
+            "items": {
+              "$ref": "#/components/schemas/ProjectRow"
+            },
+            "title": "Projects",
+            "type": "array"
+          }
+        },
+        "required": [
+          "projects"
+        ],
+        "title": "ProjectListResponse",
+        "type": "object"
+      },
+      "ProjectRow": {
+        "additionalProperties": true,
+        "description": "One projects-table row, as returned by these endpoints.\n\nSpec-only: handlers return raw rows (select *) via JSONResponse, so\nthis documents the stable core without filtering. extra=\"allow\" \u2014\nrows may carry additional audit columns.",
+        "properties": {
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "org_id": {
+            "title": "Org Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "org_id",
+          "name",
+          "created_at"
+        ],
+        "title": "ProjectRow",
+        "type": "object"
+      },
+      "QuarantineListResponse": {
+        "description": "Spec-only wrapper for GET /{connector_id}/quarantine.",
+        "properties": {
+          "quarantines": {
+            "items": {
+              "$ref": "#/components/schemas/QuarantineRow"
+            },
+            "title": "Quarantines",
+            "type": "array"
+          }
+        },
+        "required": [
+          "quarantines"
+        ],
+        "title": "QuarantineListResponse",
+        "type": "object"
+      },
+      "QuarantineRow": {
+        "additionalProperties": true,
+        "description": "One paused replication deployment.",
+        "properties": {
+          "connector_id": {
+            "title": "Connector Id",
+            "type": "string"
+          },
+          "deployment_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deployment Name"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "released_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Released At"
+          },
+          "released_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Released By"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "connector_id",
+          "status"
+        ],
+        "title": "QuarantineRow",
         "type": "object"
       },
       "ReplicaIdentityDecisionsRequest": {
@@ -902,10 +1577,19 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/BranchRow"
+                  },
+                  "title": "Response 200 Get Branches V1 Branches  Connector Id  Get",
+                  "type": "array"
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "Up to 100 branch rows for the connector. Rows may carry additional columns beyond the documented core."
+          },
+          "404": {
+            "description": "Connector not found (or not visible to the caller)."
           },
           "422": {
             "content": {
@@ -980,7 +1664,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorListResponse"
+                }
               }
             },
             "description": "Successful Response"
@@ -1023,20 +1709,25 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorRow"
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "The created connector row plus `can_update`/`can_delete`."
+          },
+          "400": {
+            "description": "Validation, placement, or private-network configuration error."
           },
           "422": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/PreflightReport"
                 }
               }
             },
-            "description": "Validation Error"
+            "description": "Preflight hasn't passed for this source; the body is the full preflight report. (A malformed request body also returns 422.)"
           }
         },
         "security": [
@@ -1068,10 +1759,15 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/PreflightReport"
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "The full preflight report. A failed gate is still a 200 \u2014 read `preflight_pass`."
+          },
+          "400": {
+            "description": "Unsupported service, or the connection details failed validation."
           },
           "422": {
             "content": {
@@ -1121,13 +1817,24 @@
           }
         ],
         "responses": {
-          "200": {
+          "202": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/OperationHandle"
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "Delete accepted (or already in progress). Poll `GET /v1/operations/{operation_id}`."
+          },
+          "403": {
+            "description": "No delete permission on this connector."
+          },
+          "404": {
+            "description": "Connector not found (or not visible to the caller)."
+          },
+          "409": {
+            "description": "Deletion is locked, or a conflicting delete is active."
           },
           "422": {
             "content": {
@@ -1138,6 +1845,9 @@
               }
             },
             "description": "Validation Error"
+          },
+          "503": {
+            "description": "Dispatch failed \u2014 safe to retry."
           }
         },
         "security": [
@@ -1168,10 +1878,15 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorRow"
+                }
               }
             },
             "description": "Successful Response"
+          },
+          "404": {
+            "description": "Connector not found (or not visible to the caller)."
           },
           "422": {
             "content": {
@@ -1222,10 +1937,18 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorRow"
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "The updated connector row."
+          },
+          "400": {
+            "description": "Validation error."
+          },
+          "404": {
+            "description": "Connector not found (or not visible to the caller)."
           },
           "422": {
             "content": {
@@ -1268,10 +1991,21 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorEnvelope"
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "The unlocked connector."
+          },
+          "403": {
+            "description": "No update permission on this connector."
+          },
+          "404": {
+            "description": "Connector not found (or not visible to the caller)."
+          },
+          "409": {
+            "description": "A delete is already in progress."
           },
           "422": {
             "content": {
@@ -1322,10 +2056,21 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorEnvelope"
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "The locked connector."
+          },
+          "403": {
+            "description": "No update permission on this connector."
+          },
+          "404": {
+            "description": "Connector not found (or not visible to the caller)."
+          },
+          "409": {
+            "description": "A delete is already in progress."
           },
           "422": {
             "content": {
@@ -1365,23 +2110,27 @@
           }
         ],
         "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
+          "202": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/DiscoverAccepted"
                 }
               }
             },
-            "description": "Validation Error"
+            "description": "Discovery started (or joined, if one is already running). Poll the operation."
+          },
+          "400": {
+            "description": "The connector isn't in a state that can be discovered."
+          },
+          "404": {
+            "description": "Connector not found (or not visible to the caller)."
+          },
+          "422": {
+            "description": "Discovery prerequisites failed."
+          },
+          "503": {
+            "description": "Dispatch failed \u2014 safe to retry."
           }
         },
         "security": [
@@ -1414,20 +2163,40 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
-              }
-            },
-            "description": "Successful Response"
-          },
-          "422": {
-            "content": {
-              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ConnectorRow"
                 }
               }
             },
-            "description": "Validation Error"
+            "description": "Nothing to do: the engine is already set up. Returns the connector row with a `message`."
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationHandle"
+                }
+              }
+            },
+            "description": "Setup started (or joined). Poll `GET /v1/operations/{operation_id}`."
+          },
+          "400": {
+            "description": "The connector isn't in a state that can run setup."
+          },
+          "403": {
+            "description": "No update permission on this connector."
+          },
+          "404": {
+            "description": "Connector not found (or not visible to the caller)."
+          },
+          "409": {
+            "description": "A conflicting setup operation exists."
+          },
+          "422": {
+            "description": "Setup prerequisites failed (for example, unresolved replica identity decisions)."
+          },
+          "503": {
+            "description": "Dispatch failed \u2014 safe to retry."
           }
         },
         "security": [
@@ -1460,10 +2229,15 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/QuarantineListResponse"
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "Active (paused) replication deployments."
+          },
+          "404": {
+            "description": "Connector not found (or not visible to the caller)."
           },
           "422": {
             "content": {
@@ -1515,10 +2289,18 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/QuarantineRow"
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "The released quarantine entry."
+          },
+          "403": {
+            "description": "No update permission on this connector."
+          },
+          "404": {
+            "description": "Connector or quarantine entry not found."
           },
           "422": {
             "content": {
@@ -1571,10 +2353,24 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorRow"
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "The refreshed connector row, including `replica_identity_preflight`."
+          },
+          "400": {
+            "description": "A decision is invalid, covers an unknown table, or the map is incomplete."
+          },
+          "403": {
+            "description": "No update permission on this connector."
+          },
+          "404": {
+            "description": "Connector not found (or not visible to the caller)."
+          },
+          "409": {
+            "description": "The decisions could not be applied \u2014 state changed underneath; retry."
           },
           "422": {
             "content": {
@@ -1627,10 +2423,18 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorRow"
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "The connector row with the applied selection fields."
+          },
+          "400": {
+            "description": "No discovered schema to select from, or an invalid selection."
+          },
+          "404": {
+            "description": "Connector not found (or not visible to the caller)."
           },
           "422": {
             "content": {
@@ -1889,15 +2693,16 @@
               "application/json": {
                 "schema": {
                   "items": {
+                    "$ref": "#/components/schemas/APIKeyListItem",
                     "additionalProperties": true,
                     "type": "object"
                   },
-                  "title": "Response List Api Keys V1 Orgs  Org Id  Api Keys Get",
+                  "title": "Response 200 List Api Keys V1 Orgs  Org Id  Api Keys Get",
                   "type": "array"
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "Active (unrevoked) keys, newest first."
           },
           "422": {
             "content": {
@@ -1949,13 +2754,17 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "$ref": "#/components/schemas/APIKeyCreateResponse",
                   "additionalProperties": true,
                   "title": "Response Create New Api Key V1 Orgs  Org Id  Api Keys Post",
                   "type": "object"
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "The created key, including the secret \u2014 shown only this once."
+          },
+          "400": {
+            "description": "Unknown role, non-org role, or a scope outside the role's permissions."
           },
           "422": {
             "content": {
@@ -2006,6 +2815,9 @@
         "responses": {
           "204": {
             "description": "Successful Response"
+          },
+          "404": {
+            "description": "API key not found or already revoked."
           },
           "422": {
             "content": {
@@ -2434,7 +3246,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectListResponse"
+                }
               }
             },
             "description": "Successful Response"
@@ -2474,13 +3288,18 @@
           "required": true
         },
         "responses": {
-          "200": {
+          "201": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectRow"
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "The created project row."
+          },
+          "409": {
+            "description": "A project with this name already exists."
           },
           "422": {
             "content": {
@@ -2526,7 +3345,13 @@
                 "schema": {}
               }
             },
-            "description": "Successful Response"
+            "description": "Deleted. Body is `{\"message\": \"Project deleted\"}`."
+          },
+          "403": {
+            "description": "Not authorized to delete this project."
+          },
+          "404": {
+            "description": "Project not found (or not visible to the caller)."
           },
           "422": {
             "content": {
@@ -2567,10 +3392,15 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectRow"
+                }
               }
             },
             "description": "Successful Response"
+          },
+          "404": {
+            "description": "Project not found (or not visible to the caller)."
           },
           "422": {
             "content": {
@@ -2621,10 +3451,18 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectRow"
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "The updated project row."
+          },
+          "400": {
+            "description": "No fields to update."
+          },
+          "404": {
+            "description": "Project not found (or not visible to the caller)."
           },
           "422": {
             "content": {
