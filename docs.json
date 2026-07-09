@@ -147,7 +147,8 @@
               "api/projects",
               "api/connectors",
               "api/branches",
-              "api/operations"
+              "api/operations",
+              "api/operations-generated"
             ]
           },
           {
