@@ -34,7 +34,7 @@ Three things matter here:
 In your Supabase dashboard, click **Connect** in the top right. Select the **Direct** tab, choose **Direct connection**, and set Type to **URI**.
 
 <Warning>
-  The pooler connection string will not work. Replication needs a direct Postgres connection.
+  The pooler connection string — host ending in `pooler.supabase.com`, usually port `6543` — will not work. Ardent replicates your data over a direct, long-lived Postgres connection; poolers only forward regular queries and can't carry replication.
 </Warning>
 
 </Step>
