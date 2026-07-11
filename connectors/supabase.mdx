@@ -5,7 +5,16 @@ description: "The Supabase-specific parts of connecting to Ardent"
 
 Ardent works with Supabase Postgres. This page covers only what's specific to Supabase — the full walkthrough is the [Quickstart](/quickstart).
 
-<Accordion defaultOpen={false} title="Using Claude Code or Cursor? Paste this prompt and it does the checks for you">
+<Accordion defaultOpen={false} title="Using Claude Code or Cursor? It can do the checks for you">
+With the [ardent-cli skill](/workflows/ai-agents#let-the-agent-drive-set-it-up-once) installed, a short ask is enough — the skill fetches this page and runs the checks:
+
+```
+Check if my Supabase database is ready to connect to Ardent.
+My connection string: [paste here]
+```
+
+Without the skill, paste the full directions:
+
 ```
 Check if my Supabase database is ready to connect to Ardent.
 My connection string: [paste here]
@@ -31,7 +40,12 @@ Three things matter here:
 <Steps>
 <Step title="Use the direct connection, not the pooler">
 
-In your Supabase dashboard, click **Connect** in the top right. Select the **Direct** tab, choose **Direct connection**, and set Type to **URI**.
+In your Supabase dashboard:
+
+1. Click **Connect** in the top right.
+2. Select the **Direct** tab.
+3. Choose **Direct connection**.
+4. Set Type to **URI**.
 
 <Warning>
   The pooler connection string — host ending in `pooler.supabase.com`, usually port `6543` — will not work. Ardent replicates your data over a direct, long-lived Postgres connection; poolers only forward regular queries and can't carry replication.
@@ -41,7 +55,10 @@ In your Supabase dashboard, click **Connect** in the top right. Select the **Dir
 
 <Step title="Check IPv4">
 
-Scroll down in the Connect dialog to the **IPv4 compatible** indicator. If it shows a checkmark, you're good. If not, click **IPv4 settings** and enable the dedicated IPv4 add-on — Ardent needs a direct IPv4 route to your database.
+Scroll down in the Connect dialog to the **IPv4 compatible** indicator.
+
+- **Checkmark** — you're good.
+- **No checkmark** — click **IPv4 settings** and enable the dedicated IPv4 add-on. Ardent needs a direct IPv4 route to your database.
 
 </Step>
 
