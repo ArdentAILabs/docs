@@ -58,7 +58,11 @@ curl -s https://docs.tryardent.com/skills/ardent-cli-skill.txt \
   -o .claude/skills/ardent-cli/SKILL.md
 ```
 
-The skill keeps itself current: each time it runs, it fetches the latest version of itself from these docs and follows that copy. If the fetch fails (offline, blocked network), it falls back to the directions already installed. To pin the installed copy and skip the self-update, set `SKIP_ARDENT_SKILL_SYNC=1` in the environment.
+The skill keeps itself current: each time it runs, it fetches the latest version of itself from these docs and follows that copy. If the fetch fails (offline, blocked network), it falls back to the directions already installed.
+
+<Warning>
+  To pin the installed copy and skip the self-update, set `SKIP_ARDENT_SKILL_SYNC=1` in the environment.
+</Warning>
 
 Skills load when the task looks relevant — so a request that never mentions the database might skip it. To guarantee it's used, add this to your project's `CLAUDE.md`, which Claude Code reads every session:
 
