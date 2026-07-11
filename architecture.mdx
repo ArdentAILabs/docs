@@ -40,7 +40,7 @@ Always operated by Ardent. Orchestration, policies, routing, and visibility acro
 
 - **Branch lifecycle:** Create, suspend, delete, and route traffic to the right branch. Connection URLs route through Ardent's proxy. Every session is tied to an account, policies apply per branch, and raw URLs never leak.
 - **Replication coordination:** Ardent watches replication health and scales the Kafka layer that backs it, so you never have to size or operate brokers yourself.
-- **Connector setup:** When you connect a database, Ardent inspects and validates it, and gives you connector-level settings: the default database name for new branches, and any SQL to run on each new branch.
+- **Connector setup:** When you connect a database, Ardent inspects and validates it, and gives you connector-level settings: the default database name for new branches, and [any SQL to run on each new branch](/cli/settings).
 - **Auth, usage, and billing:** Org access, API keys, and usage tracking. Per-user and per-branch visibility Postgres does not give you out of the box.
 
 ### Data plane

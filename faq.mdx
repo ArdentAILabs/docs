@@ -6,7 +6,7 @@ description: "Common questions answered"
 <AccordionGroup>
 
 <Accordion title="What databases does Ardent support?">
-  Postgres, including Supabase, AWS RDS, PlanetScale, and self-hosted. More databases coming soon.
+  Postgres, including [Supabase](/connectors/supabase), [AWS RDS](/connectors/rds), [PlanetScale](/connectors/planetscale), and [self-hosted](/connectors/self-hosted). More databases coming soon.
 </Accordion>
 
 <Accordion title="How long does it take to create a branch?">
@@ -36,11 +36,11 @@ description: "Common questions answered"
 </Accordion>
 
 <Accordion title="Does my team share branches?">
-  Yes, just like git. Everyone on your team can see, switch to, and collaborate on branches. Use `ardent invite` to add people to your org.
+  Yes, just like git. Everyone on your team can see, switch to, and collaborate on branches. Use [`ardent invite`](/cli/org) to add people to your org.
 </Accordion>
 
 <Accordion title="What Postgres features work on branches?">
-  Most of it. Branches include schema, data, grants, RLS, functions, triggers, and supported extensions. Two things need an explicit choice during connector setup: replica identity for tables without a primary key, and some provider-specific extensions. Both are decided before you branch.
+  Most of it. Branches include schema, data, grants, RLS, functions, triggers, and supported extensions. Two things need an explicit choice during connector setup: [replica identity](/cli/connectors#replica-identity-decisions) for tables without a primary key, and some provider-specific extensions. Both are decided before you branch.
 </Accordion>
 
 <Accordion title="Can I build this myself?">

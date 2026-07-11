@@ -7,7 +7,7 @@ Unit tests with mocked data miss the bugs that only appear with real data at rea
 
 ## How it works
 
-`ardent branch create` prints a Postgres URL for the new branch. If you need it again, run `ardent branch info regression-run` (or `ardent branch info` when that branch is already checked out).
+[`ardent branch create`](/cli/branches) prints a Postgres URL for the new branch. If you need it again, run `ardent branch info regression-run` (or `ardent branch info` when that branch is already checked out).
 
 <Warning>
   The examples below assume your tests read `DATABASE_URL` (Django, SQLAlchemy, Prisma, and most pytest setups do). If yours uses a different variable or a `.env` file, substitute that.

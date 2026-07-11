@@ -113,3 +113,5 @@ DATABASE_URL="$(node -e 'console.log(JSON.parse(process.argv[1]).branch_url)' "$
 - **Isolation:** each PR gets its own database.
 - **Fast branch creation:** once a connector is ready, branch creation is independent of source database size.
 - **Clean teardown:** branches can be deleted after each run and auto-suspend when idle.
+
+Running destructive test suites rather than PR checks? See [Regression testing](/workflows/regression-testing).

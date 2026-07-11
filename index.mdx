@@ -76,7 +76,7 @@ If a command errors, fix it. Docs: https://docs.tryardent.com/quickstart
 
 ## How it works
 
-Ardent replicates your database into a read replica, then creates isolated **branches** from that replica in seconds. Each branch is a full Postgres database with your real data — like branches in git.
+Ardent replicates your database into a [read replica](/architecture), then creates isolated **branches** from that replica in seconds. Each branch is a full Postgres database with your real data — like branches in git.
 
 ```
 Production DB → Replication → Read replica → Many branches (each in seconds)
@@ -84,7 +84,7 @@ Production DB → Replication → Read replica → Many branches (each in second
 
 The workflow mirrors git:
 
-- **`ardent branch create`** — spin up an isolated database copy
+- **[`ardent branch create`](/cli/branches)** — spin up an isolated database copy
 - **`ardent branch switch`** — move between branches
 - **`ardent branch info`** — see the connection URL and status
 - **`ardent branch delete`** — clean up when you're done

@@ -13,7 +13,7 @@ Branches are isolated Postgres databases created from a connector. Use them for 
 | `POST` | [`/v1/branch/create`](/api/branches/create) | Create a branch |
 | `GET` | [`/v1/branches/{connector_id}`](/api/branches/list) | List branches for a connector |
 
-Branch deletion is CLI-only today: `ardent branch delete`. Switching (`ardent branch switch`) is a CLI concept — the API has no notion of a current branch.
+Branch deletion is CLI-only today: [`ardent branch delete`](/cli/branches). Switching (`ardent branch switch`) is a CLI concept — the API has no notion of a current branch.
 
 <Accordion defaultOpen={false} title="Client TLS settings for branch connections">
 Branch connections go through Ardent's routing layer, where TLS terminates. Configure SQL clients and IDEs accordingly:

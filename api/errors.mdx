@@ -29,7 +29,7 @@ Validation errors may include structured field details from the request validato
 
 ## Long-running operation failures
 
-For async work, the HTTP request may succeed while the operation later fails. Always poll the operation and inspect `status` and `error`:
+For async work, the HTTP request may succeed while the operation later fails. Always [poll the operation](/api/operations) and inspect `status` and `error`:
 
 ```json
 {
