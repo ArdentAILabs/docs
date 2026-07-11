@@ -16,7 +16,7 @@ Branches are isolated Postgres databases created from a connector. Use them for 
 Branch deletion is CLI-only today: [`ardent branch delete`](/cli/branches). Switching (`ardent branch switch`) is a CLI concept — the API has no notion of a current branch.
 
 <Accordion defaultOpen={false} title="Client TLS settings for branch connections">
-Branch connections go through Ardent's routing layer, where TLS terminates. Configure SQL clients and IDEs accordingly:
+Branch connections go through Ardent's routing layer, where TLS ends. Configure SQL clients and IDEs accordingly:
 
 - Set SSL mode to `require`. This encrypts the connection; without a custom root certificate it does not validate a CA chain.
 - Leave root certificate, CA bundle, and `sslrootcert` fields blank. A source database CA bundle can't verify the routing host and causes TLS errors.

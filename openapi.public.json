@@ -1420,7 +1420,7 @@
             "description": "The connector's engine isn't ready to branch."
           },
           "503": {
-            "description": "Dispatch failed \u2014 safe to retry."
+            "description": "Ardent could not start the work \u2014 safe to retry."
           }
         },
         "security": [
@@ -1718,7 +1718,7 @@
             "description": "Validation Error"
           },
           "503": {
-            "description": "Dispatch failed \u2014 safe to retry."
+            "description": "Ardent could not start the work \u2014 safe to retry."
           }
         },
         "security": [
@@ -1996,7 +1996,7 @@
             "description": "Discovery prerequisites failed."
           },
           "503": {
-            "description": "Dispatch failed \u2014 safe to retry."
+            "description": "Ardent could not start the work \u2014 safe to retry."
           }
         },
         "security": [
@@ -2061,7 +2061,7 @@
             "description": "Setup prerequisites failed (for example, unresolved replica identity decisions)."
           },
           "503": {
-            "description": "Dispatch failed \u2014 safe to retry."
+            "description": "Ardent could not start the work \u2014 safe to retry."
           }
         },
         "security": [

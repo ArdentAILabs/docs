@@ -55,4 +55,4 @@ See [Operations](/api/operations) for the polling model and the `?wait=` paramet
 
 Retries are safe. Send an `X-Idempotency-Key` header with the create request; re-sending the same connector, service type, and name resumes the original request instead of creating a duplicate.
 
-Create can fail with: `400` (a required field is missing), `409` (this create is already in flight, or the idempotency key was reused for a different request), `422` (the connector's engine isn't ready to branch), or `503` (dispatch failed — retry).
+Create can fail with: `400` (a required field is missing), `409` (this create is already in flight, or the idempotency key was reused for a different request), `422` (the connector's engine isn't ready to branch), or `503` (Ardent could not start the work — retry).

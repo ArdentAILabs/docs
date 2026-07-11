@@ -76,7 +76,7 @@ jobs:
 ## Why this shape works
 
 - `ARDENT_TOKEN` authenticates the CLI with no login step or stored session.
-- `ardent project switch` and `ardent connector switch` make the workflow deterministic.
+- `ardent project switch` and `ardent connector switch` make the workflow predictable.
 - `ardent branch create --print-url` prints only the URL, so there's no human output to parse.
 - The branch name includes both PR number and run ID so re-runs and concurrent jobs do not collide.
 - Cleanup runs with `if: always()` so failed tests still delete the branch.
