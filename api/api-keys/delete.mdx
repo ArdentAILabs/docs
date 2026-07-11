@@ -1,0 +1,8 @@
+---
+title: "Revoke an API key"
+sidebarTitle: "Revoke key"
+description: "Revoke an API key immediately"
+openapi: "/openapi.public.json DELETE /v1/orgs/{org_id}/api-keys/{api_key_id}"
+---
+
+Revocation is immediate — the next request with that token fails authentication.

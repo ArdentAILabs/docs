@@ -1,0 +1,14 @@
+---
+title: "List branches"
+sidebarTitle: "List branches"
+description: "List a connector's branches with their connection URLs"
+openapi: "/openapi.public.json GET /v1/branches/{connector_id}"
+---
+
+Returns a JSON array of branch rows. Each row includes the branch's metadata (`id`, `name`, `status`, `created_at`, and more) plus `branch_url` and the pooled URL fields when available.
+
+Use this to populate internal dashboards or cleanup tools. For shell scripts that only need a URL, the CLI is simpler:
+
+```bash
+DATABASE_URL="$(ardent branch create pr-123 --print-url)"
+```

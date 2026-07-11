@@ -144,18 +144,61 @@
             "group": "Core resources",
             "icon": "box",
             "pages": [
-              "api/projects",
-              "api/connectors",
-              "api/branches",
-              "api/operations",
-              "api/operations-generated"
+              {
+                "group": "Projects",
+                "pages": [
+                  "api/projects",
+                  "api/projects/create",
+                  "api/projects/list",
+                  "api/projects/get",
+                  "api/projects/update",
+                  "api/projects/delete"
+                ]
+              },
+              {
+                "group": "Connectors",
+                "pages": [
+                  "api/connectors",
+                  "api/connectors/preflight",
+                  "api/connectors/create",
+                  "api/connectors/list",
+                  "api/connectors/get",
+                  "api/connectors/update",
+                  "api/connectors/discover",
+                  "api/connectors/selection",
+                  "api/connectors/replica-identity-decisions",
+                  "api/connectors/engine-setup",
+                  "api/connectors/delete",
+                  "api/connectors/lock",
+                  "api/connectors/unlock",
+                  "api/connectors/quarantine-list",
+                  "api/connectors/quarantine-release"
+                ]
+              },
+              {
+                "group": "Branches",
+                "pages": [
+                  "api/branches",
+                  "api/branches/create",
+                  "api/branches/list"
+                ]
+              },
+              "api/operations"
             ]
           },
           {
             "group": "Administration",
             "icon": "shield",
             "pages": [
-              "api/api-keys",
+              {
+                "group": "API keys",
+                "pages": [
+                  "api/api-keys",
+                  "api/api-keys/create",
+                  "api/api-keys/list",
+                  "api/api-keys/delete"
+                ]
+              },
               "api/orgs"
             ]
           }
