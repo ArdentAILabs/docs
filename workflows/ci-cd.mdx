@@ -94,7 +94,9 @@ export DATABASE_URL="$(ardent branch create "$CI_BRANCH_NAME" --print-url)"
 ardent branch delete "$CI_BRANCH_NAME"
 ```
 
-Store `ARDENT_TOKEN` in your CI provider's secret manager. Do not commit tokens to the repository.
+<Warning>
+  Store `ARDENT_TOKEN` in your CI provider's secret manager. Do not commit tokens to the repository.
+</Warning>
 
 ## JSON variant
 

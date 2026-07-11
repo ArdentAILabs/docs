@@ -49,7 +49,9 @@ curl -H "Authorization: Bearer $ARDENT_TOKEN"   "https://api.tryardent.com/v1/op
 
 See [Operations](/api/operations) for the polling model and the `?wait=` parameter.
 
-Treat `branch_url` as sensitive, and use it exactly as returned — including `sslmode=require` and `channel_binding=disable`.
+<Warning>
+  Treat `branch_url` as sensitive, and use it exactly as returned — including `sslmode=require` and `channel_binding=disable`.
+</Warning>
 
 Retries are safe. Send an `X-Idempotency-Key` header with the create request; re-sending the same connector, service type, and name resumes the original request instead of creating a duplicate.
 
