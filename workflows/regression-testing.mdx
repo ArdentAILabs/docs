@@ -5,7 +5,7 @@ description: "Run destructive tests against real production data without touchin
 
 Unit tests with mocked data miss the bugs that only appear with real data at real scale. Ardent lets you run your full test suite, including destructive operations, against an exact copy of production.
 
-## The pattern
+## How it works
 
 `ardent branch create` prints a Postgres URL for the new branch. If you need it again, run `ardent branch info regression-run` (or `ardent branch info` when that branch is already checked out).
 
