@@ -36,6 +36,42 @@ commit or push, and treat merging to `main` as customer-facing publication.
   verified on the live site.
 - Run `mint broken-links` before committing page moves or renames.
 
+## Editorial rules
+
+These generalize the copy standards this site holds. Apply them to new
+writing, and sweep for them when editing near a violation.
+
+- **Plain words over insider jargon.** If a plain word loses no precision,
+  use it: coordinate not orchestrate, outbound IP not egress IP, "TLS ends
+  at" not "terminates TLS", temporary not transient, predictable not
+  deterministic, "safe to run more than once" not idempotent. Keep
+  domain-essential Postgres/product terms (logical replication, WAL,
+  replication slot, replica identity, pooler, data residency) — the precise
+  term IS the subject there. Test: does the plain word change the meaning?
+  If not, the jargon goes.
+- **Structure what the reader performs.** A sequence of hand-actions (UI
+  clicks, if/else checks) becomes a numbered list or outcome bullets, not a
+  paragraph. Summaries of steps that live on another page stay prose.
+- **Callouts are rare and typed.** `<Warning>` only for will-bite content
+  (credential leaks, prod-touching mistakes, actions that force rebuilds).
+  `<Tip>` only for optional shortcuts and easier alternatives — never for
+  prescriptive guidance. Boxing routine content dilutes every other box.
+- **First mention links.** The first prose mention of a concept documented
+  elsewhere on the site links to that page (or anchor). No page should be
+  reachable only through the sidebar.
+- **Literals are formatted.** Commands, flags, env vars, paths, config
+  params, field names, and literal values get backticks in prose; anything
+  a reader would copy gets a fenced block.
+- **Agent prompts come in two sizes.** Wherever the docs offer a paste-in
+  agent prompt, lead with the short with-skill ask (linking the skill's
+  section on /workflows/ai-agents) and keep the full prompt below it for
+  readers without the skill.
+- **Generated and hand-written wording must agree.** Response descriptions
+  in the spec come from mono's route metadata. If page commentary rewords
+  an error or status ("Ardent could not start the work"), change the mono
+  description too and resync the snapshot — otherwise the same page says it
+  two ways.
+
 ## Keeping the AI skill in sync
 
 The Ardent CLI skill ships to customers' machines, so it must never go
