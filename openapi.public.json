@@ -5,14 +5,17 @@
         "additionalProperties": true,
         "properties": {
           "api_key": {
+            "description": "The full secret key; shown only this once \u2014 store it now.",
             "title": "Api Key",
             "type": "string"
           },
           "api_key_id": {
+            "description": "ID of the created key.",
             "title": "Api Key Id",
             "type": "string"
           },
           "created_at": {
+            "description": "When the key was created.",
             "title": "Created At",
             "type": "string"
           },
@@ -25,25 +28,31 @@
                 "type": "null"
               }
             ],
+            "description": "When the key expires. Null when it does not expire.",
             "title": "Expires At"
           },
           "key_prefix": {
+            "description": "First characters of the key, for identifying it in lists.",
             "title": "Key Prefix",
             "type": "string"
           },
           "name": {
+            "description": "Human-readable key name.",
             "title": "Name",
             "type": "string"
           },
           "role_id": {
+            "description": "ID of the role granted to the key.",
             "title": "Role Id",
             "type": "string"
           },
           "role_key": {
+            "description": "The role's stable key, for example `role_org_member`.",
             "title": "Role Key",
             "type": "string"
           },
           "scopes": {
+            "description": "Permission scopes granted to the key.",
             "items": {
               "type": "string"
             },
@@ -51,6 +60,7 @@
             "type": "array"
           },
           "warning": {
+            "description": "Reminder that the secret cannot be retrieved again.",
             "title": "Warning",
             "type": "string"
           }
@@ -73,6 +83,7 @@
         "additionalProperties": true,
         "properties": {
           "created_at": {
+            "description": "When the key was created.",
             "title": "Created At",
             "type": "string"
           },
@@ -85,13 +96,16 @@
                 "type": "null"
               }
             ],
+            "description": "When the key expires. Null when it does not expire.",
             "title": "Expires At"
           },
           "id": {
+            "description": "API key ID.",
             "title": "Id",
             "type": "string"
           },
           "key_prefix": {
+            "description": "First characters of the key; the secret itself is never returned.",
             "title": "Key Prefix",
             "type": "string"
           },
@@ -104,9 +118,11 @@
                 "type": "null"
               }
             ],
+            "description": "When the key last authenticated a request. Null when never used.",
             "title": "Last Used At"
           },
           "name": {
+            "description": "Human-readable key name.",
             "title": "Name",
             "type": "string"
           },
@@ -119,9 +135,11 @@
                 "type": "null"
               }
             ],
+            "description": "When the key was revoked. Null for active keys.",
             "title": "Revoked At"
           },
           "scopes": {
+            "description": "Permission scopes granted to the key.",
             "items": {
               "type": "string"
             },
@@ -138,6 +156,7 @@
                 "type": "null"
               }
             ],
+            "description": "Who created the key: `{email, full_name}`.",
             "title": "Users"
           }
         },
@@ -162,9 +181,11 @@
                 "type": "null"
               }
             ],
+            "description": "When the operation finished. Null until then.",
             "title": "Completed At"
           },
           "created_at": {
+            "description": "When the operation was created.",
             "title": "Created At",
             "type": "string"
           },
@@ -177,13 +198,16 @@
                 "type": "null"
               }
             ],
+            "description": "Error message when the operation failed.",
             "title": "Error"
           },
           "id": {
+            "description": "Operation ID.",
             "title": "Id",
             "type": "string"
           },
           "org_id": {
+            "description": "Organization the operation belongs to.",
             "title": "Org Id",
             "type": "string"
           },
@@ -198,6 +222,7 @@
                 "type": "null"
               }
             ],
+            "description": "Best-effort completion percentage. Null when no estimate is available.",
             "title": "Progress"
           },
           "resource_id": {
@@ -209,6 +234,7 @@
                 "type": "null"
               }
             ],
+            "description": "ID of the resource the operation acts on (the branch ID for branch create).",
             "title": "Resource Id"
           },
           "result": {
@@ -221,6 +247,7 @@
                 "type": "null"
               }
             ],
+            "description": "Result payload on completion; for branch create, includes `branch_url`.",
             "title": "Result"
           },
           "setup_status": {
@@ -233,6 +260,7 @@
                 "type": "null"
               }
             ],
+            "description": "Connector setup progress detail. Present only for connector engine setup.",
             "title": "Setup Status"
           },
           "stage": {
@@ -244,6 +272,7 @@
                 "type": "null"
               }
             ],
+            "description": "Raw progress token, kept for released CLIs. Read `stage_label` instead.",
             "title": "Stage"
           },
           "stage_label": {
@@ -255,6 +284,7 @@
                 "type": "null"
               }
             ],
+            "description": "Human-readable stage; null means the operation has not started yet.",
             "title": "Stage Label"
           },
           "started_at": {
@@ -266,15 +296,19 @@
                 "type": "null"
               }
             ],
+            "description": "When work started. Null until then.",
             "title": "Started At"
           },
           "status": {
-            "$ref": "#/components/schemas/OperationStatus"
+            "$ref": "#/components/schemas/OperationStatus",
+            "description": "Current status. `completed` and `failed` are terminal."
           },
           "type": {
-            "$ref": "#/components/schemas/OperationType"
+            "$ref": "#/components/schemas/OperationType",
+            "description": "The kind of work this operation tracks, for example `branch_create`."
           },
           "updated_at": {
+            "description": "When the operation was last updated.",
             "title": "Updated At",
             "type": "string"
           }
@@ -303,17 +337,21 @@
                 "type": "null"
               }
             ],
+            "description": "Direct connection URL for the branch; sensitive \u2014 use exactly as returned.",
             "title": "Branch Url"
           },
           "connector_id": {
+            "description": "Connector this branch was created from.",
             "title": "Connector Id",
             "type": "string"
           },
           "created_at": {
+            "description": "When the branch was created.",
             "title": "Created At",
             "type": "string"
           },
           "id": {
+            "description": "Branch ID.",
             "title": "Id",
             "type": "string"
           },
@@ -326,6 +364,7 @@
                 "type": "null"
               }
             ],
+            "description": "Most recent activity on the branch. Null when none has been recorded.",
             "title": "Last Branch Activity"
           },
           "masked_ready_at": {
@@ -337,9 +376,11 @@
                 "type": "null"
               }
             ],
+            "description": "When masked data became ready. Null until then.",
             "title": "Masked Ready At"
           },
           "name": {
+            "description": "Branch name, as given at create.",
             "title": "Name",
             "type": "string"
           },
@@ -352,6 +393,7 @@
                 "type": "null"
               }
             ],
+            "description": "Prisma-formatted pooled URL; null when the provider has no pooled endpoint.",
             "title": "Pooled Branch Prisma Url"
           },
           "pooled_branch_url": {
@@ -363,6 +405,7 @@
                 "type": "null"
               }
             ],
+            "description": "Pooled connection URL. Null when the provider has no pooled endpoint.",
             "title": "Pooled Branch Url"
           },
           "read_ready_at": {
@@ -374,13 +417,16 @@
                 "type": "null"
               }
             ],
+            "description": "When the branch became ready for reads. Null until then.",
             "title": "Read Ready At"
           },
           "service_type": {
+            "description": "Branched service. `postgres` for Postgres branches.",
             "title": "Service Type",
             "type": "string"
           },
           "status": {
+            "description": "Current branch status.",
             "title": "Status",
             "type": "string"
           },
@@ -393,6 +439,7 @@
                 "type": "null"
               }
             ],
+            "description": "When the branch became ready for writes. Null until then.",
             "title": "Write Ready At"
           }
         },
@@ -419,6 +466,7 @@
                 "type": "null"
               }
             ],
+            "description": "Why the connector is locked, up to 500 characters.",
             "title": "Reason"
           }
         },
@@ -428,7 +476,8 @@
       "ConnectorEnvelope": {
         "properties": {
           "connector": {
-            "$ref": "#/components/schemas/ConnectorRow"
+            "$ref": "#/components/schemas/ConnectorRow",
+            "description": "The connector's current row."
           }
         },
         "required": [
@@ -440,6 +489,7 @@
       "ConnectorListResponse": {
         "properties": {
           "connectors": {
+            "description": "Connectors in the organization, visible to the caller.",
             "items": {
               "$ref": "#/components/schemas/ConnectorRow"
             },
@@ -465,6 +515,7 @@
                 "type": "null"
               }
             ],
+            "description": "Whether the caller may delete this connector.",
             "title": "Can Delete"
           },
           "can_update": {
@@ -476,6 +527,7 @@
                 "type": "null"
               }
             ],
+            "description": "Whether the caller may update this connector.",
             "title": "Can Update"
           },
           "created_at": {
@@ -487,17 +539,21 @@
                 "type": "null"
               }
             ],
+            "description": "When the connector was created.",
             "title": "Created At"
           },
           "id": {
+            "description": "Connector ID.",
             "title": "Id",
             "type": "string"
           },
           "name": {
+            "description": "Connector name.",
             "title": "Name",
             "type": "string"
           },
           "org_id": {
+            "description": "Organization the connector belongs to.",
             "title": "Org Id",
             "type": "string"
           },
@@ -510,9 +566,11 @@
                 "type": "null"
               }
             ],
+            "description": "Project the connector belongs to.",
             "title": "Project Id"
           },
           "service_name": {
+            "description": "Service type. `postgresql` today.",
             "title": "Service Name",
             "type": "string"
           },
@@ -525,6 +583,7 @@
                 "type": "null"
               }
             ],
+            "description": "Current connector status.",
             "title": "Status"
           }
         },
@@ -565,7 +624,7 @@
           },
           "scopes": {
             "default": [],
-            "description": "Optional scope restrictions (subset of role permissions). Empty = use all role permissions.",
+            "description": "Permission keys like `connectors.read`, a subset of the role's; empty uses all.",
             "items": {
               "type": "string"
             },
@@ -584,11 +643,13 @@
         "properties": {
           "allow_high_rtt_placement": {
             "default": false,
+            "description": "Allow customer-cloud placement far from the worker region.",
             "title": "Allow High Rtt Placement",
             "type": "boolean"
           },
           "connection_details": {
             "additionalProperties": true,
+            "description": "Connection details for the source database.",
             "title": "Connection Details",
             "type": "object"
           },
@@ -604,6 +665,7 @@
                 "type": "null"
               }
             ],
+            "description": "Source extensions to drop on branches instead of installing.",
             "title": "Drop Extensions"
           },
           "environment_id": {
@@ -615,9 +677,11 @@
                 "type": "null"
               }
             ],
+            "description": "Customer-cloud environment; required when your org has more than one.",
             "title": "Environment Id"
           },
           "name": {
+            "description": "Connector name.",
             "title": "Name",
             "type": "string"
           },
@@ -630,6 +694,7 @@
                 "type": "null"
               }
             ],
+            "description": "Organization to create the connector in. Inferred from your auth when omitted.",
             "title": "Org Id"
           },
           "private_link_id": {
@@ -641,18 +706,22 @@
                 "type": "null"
               }
             ],
+            "description": "Private connection for the source database; needs `use_environment`.",
             "title": "Private Link Id"
           },
           "project_id": {
+            "description": "Project to create the connector in.",
             "title": "Project Id",
             "type": "string"
           },
           "service_name": {
+            "description": "Service type. `postgresql` is the only supported value today.",
             "title": "Service Name",
             "type": "string"
           },
           "use_environment": {
             "default": false,
+            "description": "Create the connector in a customer-cloud environment.",
             "title": "Use Environment",
             "type": "boolean"
           }
@@ -669,6 +738,7 @@
       "CreateProjectRequest": {
         "properties": {
           "name": {
+            "description": "Project name (1-100 characters).",
             "maxLength": 100,
             "minLength": 1,
             "title": "Name",
@@ -683,6 +753,7 @@
                 "type": "null"
               }
             ],
+            "description": "Organization to create the project in. Inferred from your auth when omitted.",
             "title": "Org Id"
           }
         },
@@ -695,6 +766,7 @@
       "DiscoverAccepted": {
         "properties": {
           "operation_id": {
+            "description": "Operation to poll at `GET /v1/operations/{operation_id}`.",
             "title": "Operation Id",
             "type": "string"
           },
@@ -708,6 +780,7 @@
                 "type": "null"
               }
             ],
+            "description": "Pre-discovery prerequisite check results.",
             "title": "Prerequisites"
           },
           "resource_id": {
@@ -719,6 +792,7 @@
                 "type": "null"
               }
             ],
+            "description": "ID of the resource being created or acted on (the branch ID for branch create).",
             "title": "Resource Id"
           },
           "source_metadata": {
@@ -731,13 +805,16 @@
                 "type": "null"
               }
             ],
+            "description": "Metadata gathered from the source.",
             "title": "Source Metadata"
           },
           "status": {
-            "$ref": "#/components/schemas/OperationStatus"
+            "$ref": "#/components/schemas/OperationStatus",
+            "description": "Status at acceptance time."
           },
           "type": {
-            "$ref": "#/components/schemas/OperationType"
+            "$ref": "#/components/schemas/OperationType",
+            "description": "The kind of work this operation tracks, for example `branch_create`."
           }
         },
         "required": [
@@ -785,6 +862,7 @@
       "OperationHandle": {
         "properties": {
           "operation_id": {
+            "description": "Operation to poll at `GET /v1/operations/{operation_id}`.",
             "title": "Operation Id",
             "type": "string"
           },
@@ -797,13 +875,16 @@
                 "type": "null"
               }
             ],
+            "description": "ID of the resource being created or acted on (the branch ID for branch create).",
             "title": "Resource Id"
           },
           "status": {
-            "$ref": "#/components/schemas/OperationStatus"
+            "$ref": "#/components/schemas/OperationStatus",
+            "description": "Status at acceptance time."
           },
           "type": {
-            "$ref": "#/components/schemas/OperationType"
+            "$ref": "#/components/schemas/OperationType",
+            "description": "The kind of work this operation tracks, for example `branch_create`."
           }
         },
         "required": [
@@ -849,11 +930,13 @@
         "properties": {
           "allow_high_rtt_placement": {
             "default": false,
+            "description": "Allow customer-cloud placement far from the worker region.",
             "title": "Allow High Rtt Placement",
             "type": "boolean"
           },
           "connection_details": {
             "additionalProperties": true,
+            "description": "Connection details for the source database. Nothing is stored.",
             "title": "Connection Details",
             "type": "object"
           },
@@ -866,6 +949,7 @@
                 "type": "null"
               }
             ],
+            "description": "Database to render in the grant script. Affects only `grant_script`.",
             "title": "Database"
           },
           "environment_id": {
@@ -877,6 +961,7 @@
                 "type": "null"
               }
             ],
+            "description": "Customer-cloud environment; required when your org has more than one.",
             "title": "Environment Id"
           },
           "org_id": {
@@ -888,6 +973,7 @@
                 "type": "null"
               }
             ],
+            "description": "Organization to preflight for. Inferred from your auth when omitted.",
             "title": "Org Id"
           },
           "private_link_id": {
@@ -899,6 +985,7 @@
                 "type": "null"
               }
             ],
+            "description": "Private connection for the source database; needs `use_environment`.",
             "title": "Private Link Id"
           },
           "selected_schemas": {
@@ -913,14 +1000,17 @@
                 "type": "null"
               }
             ],
+            "description": "Schemas to render in the grant script. Affects only `grant_script`.",
             "title": "Selected Schemas"
           },
           "service_name": {
+            "description": "Service type. `postgresql` is the only supported value today.",
             "title": "Service Name",
             "type": "string"
           },
           "use_environment": {
             "default": false,
+            "description": "Route preflight through a customer-cloud environment.",
             "title": "Use Environment",
             "type": "boolean"
           }
@@ -944,6 +1034,7 @@
                 "type": "null"
               }
             ],
+            "description": "True when the checks required for branching pass.",
             "title": "Branching Prerequisites Pass"
           },
           "checks": {
@@ -956,6 +1047,7 @@
                 "type": "null"
               }
             ],
+            "description": "Individual check results, keyed by check name.",
             "title": "Checks"
           },
           "grant_script": {
@@ -967,6 +1059,7 @@
                 "type": "null"
               }
             ],
+            "description": "Ready-to-run SQL grant script for the source database.",
             "title": "Grant Script"
           },
           "preflight_pass": {
@@ -978,6 +1071,7 @@
                 "type": "null"
               }
             ],
+            "description": "True when every preflight check passes.",
             "title": "Preflight Pass"
           },
           "source_metadata": {
@@ -990,6 +1084,7 @@
                 "type": "null"
               }
             ],
+            "description": "Metadata gathered from the source during preflight.",
             "title": "Source Metadata"
           },
           "source_placement": {
@@ -1025,6 +1120,7 @@
                 "type": "null"
               }
             ],
+            "description": "Detected source provider, for example `supabase` or `vanilla`.",
             "title": "Source Provider"
           }
         },
@@ -1034,6 +1130,7 @@
       "ProjectListResponse": {
         "properties": {
           "projects": {
+            "description": "Projects visible to the caller.",
             "items": {
               "$ref": "#/components/schemas/ProjectRow"
             },
@@ -1051,18 +1148,22 @@
         "additionalProperties": true,
         "properties": {
           "created_at": {
+            "description": "When the project was created.",
             "title": "Created At",
             "type": "string"
           },
           "id": {
+            "description": "Project ID.",
             "title": "Id",
             "type": "string"
           },
           "name": {
+            "description": "Project name.",
             "title": "Name",
             "type": "string"
           },
           "org_id": {
+            "description": "Organization the project belongs to.",
             "title": "Org Id",
             "type": "string"
           }
@@ -1079,6 +1180,7 @@
       "QuarantineListResponse": {
         "properties": {
           "quarantines": {
+            "description": "Active (still paused) quarantines for the connector.",
             "items": {
               "$ref": "#/components/schemas/QuarantineRow"
             },
@@ -1096,6 +1198,7 @@
         "additionalProperties": true,
         "properties": {
           "connector_id": {
+            "description": "Connector the quarantine belongs to.",
             "title": "Connector Id",
             "type": "string"
           },
@@ -1108,9 +1211,11 @@
                 "type": "null"
               }
             ],
+            "description": "Replication deployment that was paused.",
             "title": "Deployment Name"
           },
           "id": {
+            "description": "Quarantine ID.",
             "title": "Id",
             "type": "string"
           },
@@ -1123,6 +1228,7 @@
                 "type": "null"
               }
             ],
+            "description": "Human-readable status message.",
             "title": "Message"
           },
           "released_at": {
@@ -1134,6 +1240,7 @@
                 "type": "null"
               }
             ],
+            "description": "When the quarantine was released. Null while paused.",
             "title": "Released At"
           },
           "released_by": {
@@ -1145,9 +1252,11 @@
                 "type": "null"
               }
             ],
+            "description": "Who released the quarantine. Null while paused.",
             "title": "Released By"
           },
           "status": {
+            "description": "`quarantined` while paused, `released` after release.",
             "title": "Status",
             "type": "string"
           }
@@ -1166,6 +1275,7 @@
             "additionalProperties": {
               "type": "string"
             },
+            "description": "Per-table decision: `exclude`, `add_pk`, or `replica_identity_full`.",
             "title": "Decisions",
             "type": "object"
           }
@@ -1179,6 +1289,7 @@
       "SelectionRequest": {
         "properties": {
           "selected_paths": {
+            "description": "Discovered paths to replicate. Use `[\"*\"]` to select everything.",
             "items": {
               "type": "string"
             },
@@ -1204,6 +1315,7 @@
                 "type": "null"
               }
             ],
+            "description": "Replacement connection details for the source database.",
             "title": "Connection Details"
           },
           "drop_extensions": {
@@ -1218,6 +1330,7 @@
                 "type": "null"
               }
             ],
+            "description": "Extensions to drop on branches; omit to leave unchanged, `[]` clears.",
             "title": "Drop Extensions"
           },
           "name": {
@@ -1229,6 +1342,7 @@
                 "type": "null"
               }
             ],
+            "description": "New connector name.",
             "title": "Name"
           },
           "project_id": {
@@ -1240,6 +1354,7 @@
                 "type": "null"
               }
             ],
+            "description": "Move the connector to this project.",
             "title": "Project Id"
           }
         },
@@ -1289,6 +1404,7 @@
                 "type": "null"
               }
             ],
+            "description": "New project name (1-100 characters).",
             "title": "Name"
           }
         },
@@ -1382,7 +1498,7 @@
                     "type": "string"
                   },
                   "service_type": {
-                    "description": "Service to branch. For Postgres branches this is `postgres` \u2014 not the connector type `postgresql`.",
+                    "description": "Service to branch; `postgres`, not the connector type `postgresql`.",
                     "title": "Service Type",
                     "type": "string"
                   }

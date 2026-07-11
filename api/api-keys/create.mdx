@@ -9,4 +9,4 @@ openapi: "/openapi.public.json POST /v1/orgs/{org_id}/api-keys"
   The secret token is shown only once, in the create response. Copy it directly into your secret manager.
 </Warning>
 
-The key's role determines what it can do; `scopes` optionally restricts it to a subset of the role's permissions. List available roles with [`GET /v1/orgs/{org_id}/roles`](/api/orgs).
+The key's role determines what it can do; `scopes` optionally restricts it to a subset of the role's permissions. Scopes are permission keys like `connectors.read` — each role's `permissions` array from [`GET /v1/orgs/{org_id}/roles`](/api/orgs) lists the valid values.
