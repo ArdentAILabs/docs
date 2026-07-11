@@ -29,14 +29,16 @@ npm test
 ardent branch delete regression-run
 ```
 
-**One-liner:** `DATABASE_URL='…' npm test` sets the variable for just that command. `export` is easier when you'll run more than one.
+<Tip>
+  **One-liner:** `DATABASE_URL='…' npm test` sets the variable for just that command. `export` is easier when you'll run more than one.
+</Tip>
 
 **In CI:** create the branch in the job, assign the URL to `DATABASE_URL` (or wire it into your framework), run your test command, then delete the branch. See [CI / CD](/workflows/ci-cd) for a GitHub Actions–shaped example.
 
 ## What this unlocks
 
 - **Migration safety:** run `ALTER TABLE`, `DROP COLUMN`, schema changes against real data before you ship
-- **Destructive queries:** `DELETE`, `TRUNCATE`, bulk updates; test the blast radius safely
+- **Destructive queries:** `DELETE`, `TRUNCATE`, bulk updates; see how much damage they would do — safely
 - **Index validation:** try a new index and see if it actually speeds up your real queries
 - **Data-dependent bugs:** catch edge cases that only exist in production data, not fixtures
 
