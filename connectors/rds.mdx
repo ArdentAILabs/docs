@@ -81,4 +81,7 @@ From here, continue with the [Quickstart](/quickstart): run preflight, run the g
 Two RDS-specific notes:
 
 - If preflight says the source is a **read replica**, use the writer endpoint instead.
-- **WAL retention:** replication slots retain WAL while a consumer is behind. A very low retention limit can invalidate the slot under heavy writes or long transactions, forcing a connector rebuild. Leave enough headroom and watch long-running transactions.
+
+<Warning>
+  **WAL retention:** Replication slots retain WAL while a consumer is behind. A very low retention limit can invalidate the slot under heavy writes or long transactions, forcing a full connector rebuild and resnapshot. Leave enough headroom and monitor long-running transactions.
+</Warning>

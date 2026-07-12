@@ -31,7 +31,7 @@ postgresql://user:***@my-feature-postgres.routing.tryardent.com:5432/db?sslmode=
 | `--url-type <type>` | Which URL to print: `direct` (default), `pooled`, or `prisma` |
 | `-s, --service <type>` | Branch service type. Default `postgres` — not the same as the connector type `postgresql`. Leave it alone unless Ardent support says otherwise |
 
-`--print-url` and `--format` can't be combined. `--url-type` can't be combined with `--format json` — the JSON already includes every URL.
+`--print-url` and `--format` can't be combined. `--url-type` works with `--print-url` (for example `--print-url --url-type pooled`) but not with `--format json`, which already includes every URL.
 
 ### Use in scripts
 

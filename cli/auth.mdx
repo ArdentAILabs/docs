@@ -59,7 +59,14 @@ steps:
   - run: npm install -g ardent-cli
   - run: ardent project switch my-project
   - run: ardent connector switch prod-db
-  - run: echo "DATABASE_URL=$(ardent branch create pr-${{ github.run_id }} --print-url)" >> "$GITHUB_ENV"
+  - name: Create database branch
+    run: |
+      DATABASE_URL="$(ardent branch create pr-${{ github.run_id }} --print-url)"
+      if [ -z "$DATABASE_URL" ]; then
+        echo "Ardent did not return a database URL" >&2
+        exit 1
+      fi
+      echo "DATABASE_URL=$DATABASE_URL" >> "$GITHUB_ENV"
 ```
 
 Create and revoke tokens in the dashboard under **Settings > API keys**. Keep them in your secret manager, and rotate any token that leaks.

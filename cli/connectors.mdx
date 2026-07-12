@@ -70,7 +70,7 @@ ardent connector create postgresql 'postgresql://user:***@host:5432/mydb' --name
 | Option | Description |
 | --- | --- |
 | `-n, --name <name>` | Connector name. Leave it off and Ardent derives one from your project and database |
-| `--byoc [environment-id]` | Create in a customer-owned Ardent environment |
+| `--byoc` | Create in a customer-owned Ardent environment |
 | `--environment-id <id>` | Which environment (needs `--byoc`) |
 | `--private-link-id <id>` | Which private connection. Auto-picked when the environment has exactly one |
 | `--allow-high-rtt-placement` | Allow a far-away placement despite higher latency (needs `--byoc`) |
@@ -157,6 +157,10 @@ Status:    Ready
 </Accordion>
 
 `validating` means source checks or setup are running right now.
+
+<Note>
+  `connector status` won't surface paused replication. If a connector looks degraded or replication has stalled, also check [Locks and quarantines](#locks-and-quarantines) below.
+</Note>
 
 ## ardent connector switch
 
