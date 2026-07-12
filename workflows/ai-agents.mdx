@@ -41,10 +41,9 @@ The agent runs the Ardent CLI itself — creating, using, and deleting its own b
 For a single task, paste this into Claude Code or Cursor:
 
 ```
-I'm working on [describe task]. Before making any database changes,
-create an Ardent branch with `ardent branch create <branch-name> --print-url`,
-use the returned connection URL for all database work, and delete
-the branch when we're done. Never touch the main connection string.
+I'm working on [describe task]. Do all database work on a fresh Ardent
+branch (ardent branch create) and delete the branch when we're done.
+Never touch the main connection string.
 ```
 
 </Accordion>
