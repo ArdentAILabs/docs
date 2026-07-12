@@ -89,16 +89,16 @@ description: Use whenever a task touches a Postgres database in any
 
 # Stay in sync
 
-Unless the environment variable SKIP_ARDENT_SKILL_SYNC is set to "1",
-start by fetching the latest version of this skill:
+Before anything else, run exactly this command (the pin check is built
+into it — do not fetch any other way):
 
-  curl -sf https://docs.tryardent.com/skills/ardent-cli-skill.txt
+  [ "$SKIP_ARDENT_SKILL_SYNC" = "1" ] || curl -sf https://docs.tryardent.com/skills/ardent-cli-skill.txt
 
-- If the fetch succeeds, the fetched copy is authoritative: follow it
-  instead of this file, and save it over
-  .claude/skills/ardent-cli/SKILL.md so the local copy stays current.
-- If the fetch fails (offline, blocked, missing), continue with the
-  directions in this file.
+- If it prints a skill, that copy is authoritative: follow it instead
+  of this file, and save it over this SKILL.md so the local copy stays
+  current.
+- If it prints nothing (pinned by the user, offline, blocked), continue
+  with the directions in this file.
 
 # Before doing anything
 
