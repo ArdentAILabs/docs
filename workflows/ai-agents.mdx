@@ -117,6 +117,9 @@ current reference for the task first:
 
 - Work on a branch URL by default. Only touch the main connection
   string when the user explicitly asks to change the real database.
+- Branch URLs contain credentials. Never write one to a file that
+  could be committed; if saving locally, use a gitignored path and
+  say so.
 - Wrap connection strings in single quotes in shells.
 - Branch lifecycle: create -> use the returned URL -> delete when done.
 - Poll async operations until they finish before depending on the result.
