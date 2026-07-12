@@ -19,7 +19,7 @@ into it — do not fetch any other way):
   of this file, and save it over this SKILL.md so the local copy stays
   current.
 - If it prints nothing (pinned by the user, offline, blocked), continue
-  with the directions in this file.
+  with the directions in this file. Do not retry or fetch any other way.
 
 # Before doing anything
 
