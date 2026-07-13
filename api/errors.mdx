@@ -29,7 +29,7 @@ Validation errors may include structured field details from the request validato
 
 ## Long-running operation failures
 
-For async work, the HTTP request may succeed while the operation later fails. Always poll the operation and inspect `status` and `error`:
+For async work, the HTTP request may succeed while the operation later fails. Always [poll the operation](/api/operations) and inspect `status` and `error`:
 
 ```json
 {
@@ -44,7 +44,10 @@ Treat `failed` as terminal. Fix the cause and start a new operation or retry the
 
 ## Automation guidance
 
+<Warning>
+  Never substitute a production database URL as a fallback when a branch URL is missing — fail loudly instead.
+</Warning>
+
 - Fail loudly when required IDs, operation IDs, or branch URLs are missing.
-- Do not substitute production database URLs as a fallback.
-- Retry only transient failures, and cap retries.
+- Retry only temporary failures, and cap retries.
 - Log request IDs or timestamps in your own systems so support can help correlate issues.

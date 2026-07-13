@@ -18,7 +18,13 @@ Check a database **before** connecting it. Preflight creates nothing and stores 
 ardent connector preflight postgresql 'postgresql://user:***@host:5432/mydb'
 ```
 
-It answers one question: can Ardent safely branch this database? It checks the connection, permissions, and replication settings. When something is missing, it tells you the exact fix — and prints a ready-to-run SQL grant script when grants are the problem.
+**It answers one question: can Ardent safely branch this database?** It checks:
+
+- **Connection** — the host is reachable and the credentials work
+- **Permissions** — the role can read the tables you want to replicate
+- **Replication settings** — `wal_level`, free replication slots, WAL senders, and the `wal2json` plugin
+
+When something is missing, it tells you the exact fix — and prints a ready-to-run SQL grant script when grants are the problem.
 
 <Accordion defaultOpen={false} title="Example output">
 ```text
@@ -70,7 +76,7 @@ ardent connector create postgresql 'postgresql://user:***@host:5432/mydb' --name
 | Option | Description |
 | --- | --- |
 | `-n, --name <name>` | Connector name. Leave it off and Ardent derives one from your project and database |
-| `--byoc` | Create in a customer-owned Ardent environment |
+| `--byoc [environment-id]` | Create in a customer-owned Ardent environment |
 | `--environment-id <id>` | Which environment (needs `--byoc`) |
 | `--private-link-id <id>` | Which private connection. Auto-picked when the environment has exactly one |
 | `--allow-high-rtt-placement` | Allow a far-away placement despite higher latency (needs `--byoc`) |
@@ -78,7 +84,7 @@ ardent connector create postgresql 'postgresql://user:***@host:5432/mydb' --name
 | `--accept-replica-identity-defaults` | Accept the default decision for every table, without prompting |
 | `--write-replica-plan <path>` | Write the recommended decisions to a file and stop, so you can review before setup |
 
-The last three can't be combined — pass one.
+The last three are different ways to answer replica identity decisions — use at most one. With none, the CLI walks you through the choices interactively.
 
 <Accordion defaultOpen={false} title="Example output">
 ```text
@@ -93,11 +99,11 @@ First-time setup copies your data, so it can take minutes to hours depending on 
 
 ### Replica identity decisions
 
-Some tables have no primary key or valid unique index, so Postgres can't tell which row an UPDATE or DELETE touched. When Ardent finds tables like this, the CLI asks what to do with each one. In scripts (no terminal), it exits with code `1` instead of guessing — pass one of the three flags above.
+Some tables have no primary key or valid unique index, so Postgres can't tell which row an UPDATE or DELETE touched. When Ardent finds tables like this, the CLI asks what to do with each one. In scripts (no terminal), it exits with code `1` instead of guessing — pass one of the three flags above. You can also answer ahead of time: `--replica-identity-decisions` takes a JSON file mapping each table to a choice.
 
 Most databases have keys on every table and never hit this.
 
-<Accordion defaultOpen={false} title="The decisions file, and what each choice means">
+<Accordion defaultOpen={false} title="What each choice means, and the decisions file format">
 A valid unique index means unique, NOT NULL on every column, non-partial, and non-deferrable. Tables without a primary key or an index like that need a decision:
 
 ```json
@@ -157,10 +163,6 @@ Status:    Ready
 </Accordion>
 
 `validating` means source checks or setup are running right now.
-
-<Note>
-  `connector status` won't surface paused replication. If a connector looks degraded or replication has stalled, also check [Locks and quarantines](#locks-and-quarantines) below.
-</Note>
 
 ## ardent connector switch
 

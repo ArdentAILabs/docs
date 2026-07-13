@@ -1,0 +1,3453 @@
+{
+  "components": {
+    "schemas": {
+      "APIKeyCreateResponse": {
+        "additionalProperties": true,
+        "properties": {
+          "api_key": {
+            "description": "The full secret key; shown only this once \u2014 store it now.",
+            "title": "Api Key",
+            "type": "string"
+          },
+          "api_key_id": {
+            "description": "ID of the created key.",
+            "title": "Api Key Id",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "When the key was created.",
+            "title": "Created At",
+            "type": "string"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "When the key expires. Null when it does not expire.",
+            "title": "Expires At"
+          },
+          "key_prefix": {
+            "description": "First characters of the key, for identifying it in lists.",
+            "title": "Key Prefix",
+            "type": "string"
+          },
+          "name": {
+            "description": "Human-readable key name.",
+            "title": "Name",
+            "type": "string"
+          },
+          "role_id": {
+            "description": "ID of the role granted to the key.",
+            "title": "Role Id",
+            "type": "string"
+          },
+          "role_key": {
+            "description": "The role's stable key, for example `role_org_member`.",
+            "title": "Role Key",
+            "type": "string"
+          },
+          "scopes": {
+            "description": "Permission scopes granted to the key.",
+            "items": {
+              "type": "string"
+            },
+            "title": "Scopes",
+            "type": "array"
+          },
+          "warning": {
+            "description": "Reminder that the secret cannot be retrieved again.",
+            "title": "Warning",
+            "type": "string"
+          }
+        },
+        "required": [
+          "api_key_id",
+          "api_key",
+          "name",
+          "key_prefix",
+          "scopes",
+          "created_at",
+          "warning",
+          "role_id",
+          "role_key"
+        ],
+        "title": "APIKeyCreateResponse",
+        "type": "object"
+      },
+      "APIKeyListItem": {
+        "additionalProperties": true,
+        "properties": {
+          "created_at": {
+            "description": "When the key was created.",
+            "title": "Created At",
+            "type": "string"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "When the key expires. Null when it does not expire.",
+            "title": "Expires At"
+          },
+          "id": {
+            "description": "API key ID.",
+            "title": "Id",
+            "type": "string"
+          },
+          "key_prefix": {
+            "description": "First characters of the key; the secret itself is never returned.",
+            "title": "Key Prefix",
+            "type": "string"
+          },
+          "last_used_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "When the key last authenticated a request. Null when never used.",
+            "title": "Last Used At"
+          },
+          "name": {
+            "description": "Human-readable key name.",
+            "title": "Name",
+            "type": "string"
+          },
+          "revoked_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "When the key was revoked. Null for active keys.",
+            "title": "Revoked At"
+          },
+          "scopes": {
+            "description": "Permission scopes granted to the key.",
+            "items": {
+              "type": "string"
+            },
+            "title": "Scopes",
+            "type": "array"
+          },
+          "users": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Who created the key: `{email, full_name}`.",
+            "title": "Users"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "key_prefix",
+          "scopes",
+          "created_at"
+        ],
+        "title": "APIKeyListItem",
+        "type": "object"
+      },
+      "AsyncOperationResponse": {
+        "properties": {
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "When the operation finished. Null until then.",
+            "title": "Completed At"
+          },
+          "created_at": {
+            "description": "When the operation was created.",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Error message when the operation failed.",
+            "title": "Error"
+          },
+          "id": {
+            "description": "Operation ID.",
+            "title": "Id",
+            "type": "string"
+          },
+          "org_id": {
+            "description": "Organization the operation belongs to.",
+            "title": "Org Id",
+            "type": "string"
+          },
+          "progress": {
+            "anyOf": [
+              {
+                "maximum": 100.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Best-effort completion percentage. Null when no estimate is available.",
+            "title": "Progress"
+          },
+          "resource_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "ID of the resource the operation acts on (the branch ID for branch create).",
+            "title": "Resource Id"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Result payload on completion; for branch create, includes `branch_url`.",
+            "title": "Result"
+          },
+          "setup_status": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Connector setup progress detail. Present only for connector engine setup.",
+            "title": "Setup Status"
+          },
+          "stage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Raw progress token, kept for released CLIs. Read `stage_label` instead.",
+            "title": "Stage"
+          },
+          "stage_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Human-readable stage; null means the operation has not started yet.",
+            "title": "Stage Label"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "When work started. Null until then.",
+            "title": "Started At"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OperationStatus",
+            "description": "Current status. `completed` and `failed` are terminal."
+          },
+          "type": {
+            "$ref": "#/components/schemas/OperationType",
+            "description": "The kind of work this operation tracks, for example `branch_create`."
+          },
+          "updated_at": {
+            "description": "When the operation was last updated.",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "org_id",
+          "type",
+          "resource_id",
+          "status",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "AsyncOperationResponse",
+        "type": "object"
+      },
+      "BranchRow": {
+        "additionalProperties": true,
+        "properties": {
+          "branch_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Direct connection URL for the branch; sensitive \u2014 use exactly as returned.",
+            "title": "Branch Url"
+          },
+          "connector_id": {
+            "description": "Connector this branch was created from.",
+            "title": "Connector Id",
+            "type": "string"
+          },
+          "created_at": {
+            "description": "When the branch was created.",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "description": "Branch ID.",
+            "title": "Id",
+            "type": "string"
+          },
+          "last_branch_activity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Most recent activity on the branch. Null when none has been recorded.",
+            "title": "Last Branch Activity"
+          },
+          "masked_ready_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "When masked data became ready. Null until then.",
+            "title": "Masked Ready At"
+          },
+          "name": {
+            "description": "Branch name, as given at create.",
+            "title": "Name",
+            "type": "string"
+          },
+          "pooled_branch_prisma_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Prisma-formatted pooled URL; null when the provider has no pooled endpoint.",
+            "title": "Pooled Branch Prisma Url"
+          },
+          "pooled_branch_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Pooled connection URL. Null when the provider has no pooled endpoint.",
+            "title": "Pooled Branch Url"
+          },
+          "read_ready_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "When the branch became ready for reads. Null until then.",
+            "title": "Read Ready At"
+          },
+          "service_type": {
+            "description": "Branched service. `postgres` for Postgres branches.",
+            "title": "Service Type",
+            "type": "string"
+          },
+          "status": {
+            "description": "Current branch status.",
+            "title": "Status",
+            "type": "string"
+          },
+          "write_ready_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "When the branch became ready for writes. Null until then.",
+            "title": "Write Ready At"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "connector_id",
+          "service_type",
+          "status",
+          "created_at"
+        ],
+        "title": "BranchRow",
+        "type": "object"
+      },
+      "ConnectorDeletionLockRequest": {
+        "properties": {
+          "reason": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Why the connector is locked, up to 500 characters.",
+            "title": "Reason"
+          }
+        },
+        "title": "ConnectorDeletionLockRequest",
+        "type": "object"
+      },
+      "ConnectorEnvelope": {
+        "properties": {
+          "connector": {
+            "$ref": "#/components/schemas/ConnectorRow",
+            "description": "The connector's current row."
+          }
+        },
+        "required": [
+          "connector"
+        ],
+        "title": "ConnectorEnvelope",
+        "type": "object"
+      },
+      "ConnectorListResponse": {
+        "properties": {
+          "connectors": {
+            "description": "Connectors in the organization, visible to the caller.",
+            "items": {
+              "$ref": "#/components/schemas/ConnectorRow"
+            },
+            "title": "Connectors",
+            "type": "array"
+          }
+        },
+        "required": [
+          "connectors"
+        ],
+        "title": "ConnectorListResponse",
+        "type": "object"
+      },
+      "ConnectorRow": {
+        "additionalProperties": true,
+        "properties": {
+          "can_delete": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whether the caller may delete this connector.",
+            "title": "Can Delete"
+          },
+          "can_update": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whether the caller may update this connector.",
+            "title": "Can Update"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "When the connector was created.",
+            "title": "Created At"
+          },
+          "id": {
+            "description": "Connector ID.",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "description": "Connector name.",
+            "title": "Name",
+            "type": "string"
+          },
+          "org_id": {
+            "description": "Organization the connector belongs to.",
+            "title": "Org Id",
+            "type": "string"
+          },
+          "project_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Project the connector belongs to.",
+            "title": "Project Id"
+          },
+          "service_name": {
+            "description": "Service type. `postgresql` today.",
+            "title": "Service Name",
+            "type": "string"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Current connector status.",
+            "title": "Status"
+          }
+        },
+        "required": [
+          "id",
+          "org_id",
+          "name",
+          "service_name"
+        ],
+        "title": "ConnectorRow",
+        "type": "object"
+      },
+      "CreateAPIKeyRequest": {
+        "properties": {
+          "expires_days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Days until expiration (null = never expires)",
+            "title": "Expires Days"
+          },
+          "name": {
+            "description": "Descriptive name for the key",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "role_id": {
+            "description": "Role ID to grant to this API key (e.g., role_org_member)",
+            "title": "Role Id",
+            "type": "string"
+          },
+          "scopes": {
+            "default": [],
+            "description": "Permission keys like `connectors.read`, a subset of the role's; empty uses all.",
+            "items": {
+              "type": "string"
+            },
+            "title": "Scopes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "role_id"
+        ],
+        "title": "CreateAPIKeyRequest",
+        "type": "object"
+      },
+      "CreateConnectorRequest": {
+        "properties": {
+          "allow_high_rtt_placement": {
+            "default": false,
+            "description": "Allow customer-cloud placement far from the worker region.",
+            "title": "Allow High Rtt Placement",
+            "type": "boolean"
+          },
+          "connection_details": {
+            "additionalProperties": true,
+            "description": "Connection details for the source database.",
+            "title": "Connection Details",
+            "type": "object"
+          },
+          "drop_extensions": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Source extensions to drop on branches instead of installing.",
+            "title": "Drop Extensions"
+          },
+          "environment_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Customer-cloud environment; required when your org has more than one.",
+            "title": "Environment Id"
+          },
+          "name": {
+            "description": "Connector name.",
+            "title": "Name",
+            "type": "string"
+          },
+          "org_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Organization to create the connector in. Inferred from your auth when omitted.",
+            "title": "Org Id"
+          },
+          "private_link_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Private connection for the source database; needs `use_environment`.",
+            "title": "Private Link Id"
+          },
+          "project_id": {
+            "description": "Project to create the connector in.",
+            "title": "Project Id",
+            "type": "string"
+          },
+          "service_name": {
+            "description": "Service type. `postgresql` is the only supported value today.",
+            "title": "Service Name",
+            "type": "string"
+          },
+          "use_environment": {
+            "default": false,
+            "description": "Create the connector in a customer-cloud environment.",
+            "title": "Use Environment",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "project_id",
+          "name",
+          "service_name",
+          "connection_details"
+        ],
+        "title": "CreateConnectorRequest",
+        "type": "object"
+      },
+      "CreateProjectRequest": {
+        "properties": {
+          "name": {
+            "description": "Project name (1-100 characters).",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "org_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Organization to create the project in. Inferred from your auth when omitted.",
+            "title": "Org Id"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "CreateProjectRequest",
+        "type": "object"
+      },
+      "DiscoverAccepted": {
+        "properties": {
+          "operation_id": {
+            "description": "Operation to poll at `GET /v1/operations/{operation_id}`.",
+            "title": "Operation Id",
+            "type": "string"
+          },
+          "prerequisites": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Pre-discovery prerequisite check results.",
+            "title": "Prerequisites"
+          },
+          "resource_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "ID of the resource being created or acted on (the branch ID for branch create).",
+            "title": "Resource Id"
+          },
+          "source_metadata": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Metadata gathered from the source.",
+            "title": "Source Metadata"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OperationStatus",
+            "description": "Status at acceptance time."
+          },
+          "type": {
+            "$ref": "#/components/schemas/OperationType",
+            "description": "The kind of work this operation tracks, for example `branch_create`."
+          }
+        },
+        "required": [
+          "operation_id",
+          "status",
+          "type",
+          "resource_id"
+        ],
+        "title": "DiscoverAccepted",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "InviteUserRequest": {
+        "properties": {
+          "email": {
+            "description": "Email address to invite",
+            "title": "Email",
+            "type": "string"
+          },
+          "role_key": {
+            "default": "member",
+            "description": "Role to assign (owner/admin/member/viewer)",
+            "title": "Role Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "title": "InviteUserRequest",
+        "type": "object"
+      },
+      "OperationHandle": {
+        "properties": {
+          "operation_id": {
+            "description": "Operation to poll at `GET /v1/operations/{operation_id}`.",
+            "title": "Operation Id",
+            "type": "string"
+          },
+          "resource_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "ID of the resource being created or acted on (the branch ID for branch create).",
+            "title": "Resource Id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OperationStatus",
+            "description": "Status at acceptance time."
+          },
+          "type": {
+            "$ref": "#/components/schemas/OperationType",
+            "description": "The kind of work this operation tracks, for example `branch_create`."
+          }
+        },
+        "required": [
+          "operation_id",
+          "status",
+          "type",
+          "resource_id"
+        ],
+        "title": "OperationHandle",
+        "type": "object"
+      },
+      "OperationStatus": {
+        "enum": [
+          "pending",
+          "running",
+          "completed",
+          "failed"
+        ],
+        "title": "OperationStatus",
+        "type": "string"
+      },
+      "OperationType": {
+        "enum": [
+          "connector_engine_setup",
+          "connector_reset",
+          "connector_deep_reset",
+          "connector_discovery",
+          "connector_delete",
+          "connector_secret_purge",
+          "connector_rollout",
+          "connector_replication_rollback",
+          "connector_debezium_cutover",
+          "connector_debezium_shadow_cleanup",
+          "environment_deploy",
+          "environment_destroy",
+          "branch_create",
+          "branch_delete"
+        ],
+        "title": "OperationType",
+        "type": "string"
+      },
+      "PreflightConnectorRequest": {
+        "properties": {
+          "allow_high_rtt_placement": {
+            "default": false,
+            "description": "Allow customer-cloud placement far from the worker region.",
+            "title": "Allow High Rtt Placement",
+            "type": "boolean"
+          },
+          "connection_details": {
+            "additionalProperties": true,
+            "description": "Connection details for the source database. Nothing is stored.",
+            "title": "Connection Details",
+            "type": "object"
+          },
+          "database": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Database to render in the grant script. Affects only `grant_script`.",
+            "title": "Database"
+          },
+          "environment_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Customer-cloud environment; required when your org has more than one.",
+            "title": "Environment Id"
+          },
+          "org_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Organization to preflight for. Inferred from your auth when omitted.",
+            "title": "Org Id"
+          },
+          "private_link_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Private connection for the source database; needs `use_environment`.",
+            "title": "Private Link Id"
+          },
+          "selected_schemas": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Schemas to render in the grant script. Affects only `grant_script`.",
+            "title": "Selected Schemas"
+          },
+          "service_name": {
+            "description": "Service type. `postgresql` is the only supported value today.",
+            "title": "Service Name",
+            "type": "string"
+          },
+          "use_environment": {
+            "default": false,
+            "description": "Route preflight through a customer-cloud environment.",
+            "title": "Use Environment",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "service_name",
+          "connection_details"
+        ],
+        "title": "PreflightConnectorRequest",
+        "type": "object"
+      },
+      "PreflightReport": {
+        "additionalProperties": true,
+        "properties": {
+          "branching_prerequisites_pass": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "True when the checks required for branching pass.",
+            "title": "Branching Prerequisites Pass"
+          },
+          "checks": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Individual check results, keyed by check name.",
+            "title": "Checks"
+          },
+          "grant_script": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Ready-to-run SQL grant script for the source database.",
+            "title": "Grant Script"
+          },
+          "preflight_pass": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "True when every preflight check passes.",
+            "title": "Preflight Pass"
+          },
+          "source_metadata": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Metadata gathered from the source during preflight.",
+            "title": "Source Metadata"
+          },
+          "source_placement": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Placement"
+          },
+          "source_preflight": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Preflight"
+          },
+          "source_provider": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Detected source provider, for example `supabase` or `vanilla`.",
+            "title": "Source Provider"
+          }
+        },
+        "title": "PreflightReport",
+        "type": "object"
+      },
+      "ProjectListResponse": {
+        "properties": {
+          "projects": {
+            "description": "Projects visible to the caller.",
+            "items": {
+              "$ref": "#/components/schemas/ProjectRow"
+            },
+            "title": "Projects",
+            "type": "array"
+          }
+        },
+        "required": [
+          "projects"
+        ],
+        "title": "ProjectListResponse",
+        "type": "object"
+      },
+      "ProjectRow": {
+        "additionalProperties": true,
+        "properties": {
+          "created_at": {
+            "description": "When the project was created.",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "description": "Project ID.",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "description": "Project name.",
+            "title": "Name",
+            "type": "string"
+          },
+          "org_id": {
+            "description": "Organization the project belongs to.",
+            "title": "Org Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "org_id",
+          "name",
+          "created_at"
+        ],
+        "title": "ProjectRow",
+        "type": "object"
+      },
+      "QuarantineListResponse": {
+        "properties": {
+          "quarantines": {
+            "description": "Active (still paused) quarantines for the connector.",
+            "items": {
+              "$ref": "#/components/schemas/QuarantineRow"
+            },
+            "title": "Quarantines",
+            "type": "array"
+          }
+        },
+        "required": [
+          "quarantines"
+        ],
+        "title": "QuarantineListResponse",
+        "type": "object"
+      },
+      "QuarantineRow": {
+        "additionalProperties": true,
+        "properties": {
+          "connector_id": {
+            "description": "Connector the quarantine belongs to.",
+            "title": "Connector Id",
+            "type": "string"
+          },
+          "deployment_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Replication deployment that was paused.",
+            "title": "Deployment Name"
+          },
+          "id": {
+            "description": "Quarantine ID.",
+            "title": "Id",
+            "type": "string"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Human-readable status message.",
+            "title": "Message"
+          },
+          "released_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "When the quarantine was released. Null while paused.",
+            "title": "Released At"
+          },
+          "released_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Who released the quarantine. Null while paused.",
+            "title": "Released By"
+          },
+          "status": {
+            "description": "`quarantined` while paused, `released` after release.",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "connector_id",
+          "status"
+        ],
+        "title": "QuarantineRow",
+        "type": "object"
+      },
+      "ReplicaIdentityDecisionsRequest": {
+        "properties": {
+          "decisions": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Per-table decision: `exclude`, `add_pk`, or `replica_identity_full`.",
+            "title": "Decisions",
+            "type": "object"
+          }
+        },
+        "required": [
+          "decisions"
+        ],
+        "title": "ReplicaIdentityDecisionsRequest",
+        "type": "object"
+      },
+      "SelectionRequest": {
+        "properties": {
+          "selected_paths": {
+            "description": "Discovered paths to replicate. Use `[\"*\"]` to select everything.",
+            "items": {
+              "type": "string"
+            },
+            "title": "Selected Paths",
+            "type": "array"
+          }
+        },
+        "required": [
+          "selected_paths"
+        ],
+        "title": "SelectionRequest",
+        "type": "object"
+      },
+      "UpdateConnectorRequest": {
+        "properties": {
+          "connection_details": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Replacement connection details for the source database.",
+            "title": "Connection Details"
+          },
+          "drop_extensions": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Extensions to drop on branches; omit to leave unchanged, `[]` clears.",
+            "title": "Drop Extensions"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "New connector name.",
+            "title": "Name"
+          },
+          "project_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Move the connector to this project.",
+            "title": "Project Id"
+          }
+        },
+        "title": "UpdateConnectorRequest",
+        "type": "object"
+      },
+      "UpdateMemberRoleRequest": {
+        "properties": {
+          "role_key": {
+            "description": "New role to assign (owner/admin/member/viewer)",
+            "title": "Role Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "role_key"
+        ],
+        "title": "UpdateMemberRoleRequest",
+        "type": "object"
+      },
+      "UpdateOrgRequest": {
+        "properties": {
+          "name": {
+            "description": "New organization name",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "UpdateOrgRequest",
+        "type": "object"
+      },
+      "UpdateProjectRequest": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "New project name (1-100 characters).",
+            "title": "Name"
+          }
+        },
+        "title": "UpdateProjectRequest",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "description": "Ardent API key (sk-ard_live_\u2026 / sk-ard_test_\u2026) or a dashboard session token.",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "Public Ardent API. Generated by scripts/export_public_openapi.py \u2014 do not edit by hand.",
+    "title": "Ardent API",
+    "version": "v1"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/v1/branch/create": {
+      "post": {
+        "operationId": "create_service_branch_v1_branch_create_post",
+        "parameters": [
+          {
+            "description": "Makes retries safe: re-sending the same connector, service type, and name resumes the original request instead of creating a duplicate.",
+            "in": "header",
+            "name": "X-Idempotency-Key",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "description": "Body of POST /v1/branch/create.\n\nSpec-only today: the handler parses the raw body by hand so a missing\nfield keeps returning the documented 400, not Pydantic's 422. Keep the\nfields in sync with the hand parsing below.",
+                "properties": {
+                  "connector_id": {
+                    "description": "Connector to branch from.",
+                    "title": "Connector Id",
+                    "type": "string"
+                  },
+                  "name": {
+                    "description": "Branch name, unique per connector.",
+                    "title": "Name",
+                    "type": "string"
+                  },
+                  "service_type": {
+                    "description": "Service to branch; `postgres`, not the connector type `postgresql`.",
+                    "title": "Service Type",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "connector_id",
+                  "service_type",
+                  "name"
+                ],
+                "title": "BranchCreateRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationHandle"
+                }
+              }
+            },
+            "description": "Create accepted. Poll `GET /v1/operations/{operation_id}` for the branch details. Idempotent replays carry an `X-Idempotency-Replay: true` response header."
+          },
+          "400": {
+            "description": "A required field is missing, or the branch name or idempotency key is invalid."
+          },
+          "409": {
+            "description": "This create is already in flight, or the idempotency key was reused for a different request."
+          },
+          "422": {
+            "description": "The connector's engine isn't ready to branch."
+          },
+          "503": {
+            "description": "Ardent could not start the work \u2014 safe to retry."
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Create Service Branch",
+        "tags": [
+          "v1-branching"
+        ]
+      }
+    },
+    "/v1/branches/{connector_id}": {
+      "get": {
+        "operationId": "get_branches_v1_branches__connector_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "connector_id",
+            "required": true,
+            "schema": {
+              "title": "Connector Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/BranchRow"
+                  },
+                  "title": "Response 200 Get Branches V1 Branches  Connector Id  Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Up to 100 branch rows for the connector. Rows may carry additional columns beyond the documented core."
+          },
+          "404": {
+            "description": "Connector not found (or not visible to the caller)."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get Branches",
+        "tags": [
+          "v1-branching"
+        ]
+      }
+    },
+    "/v1/connectors": {
+      "get": {
+        "operationId": "list_connectors_endpoint_v1_connectors_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "org_id",
+            "required": true,
+            "schema": {
+              "title": "Org Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "connector_category",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Connector Category"
+            }
+          },
+          {
+            "in": "query",
+            "name": "service_name",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Service Name"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List Connectors Endpoint",
+        "tags": [
+          "v1-connectors"
+        ]
+      },
+      "post": {
+        "operationId": "create_connector_endpoint_v1_connectors_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateConnectorRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorRow"
+                }
+              }
+            },
+            "description": "The created connector row plus `can_update`/`can_delete`."
+          },
+          "400": {
+            "description": "Validation, placement, or private-network configuration error."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreflightReport"
+                }
+              }
+            },
+            "description": "Preflight hasn't passed for this source; the body is the full preflight report. (A malformed request body also returns 422.)"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Create Connector Endpoint",
+        "tags": [
+          "v1-connectors"
+        ]
+      }
+    },
+    "/v1/connectors/preflight": {
+      "post": {
+        "operationId": "preflight_connector_endpoint_v1_connectors_preflight_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreflightConnectorRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreflightReport"
+                }
+              }
+            },
+            "description": "The full preflight report. A failed gate is still a 200 \u2014 read `preflight_pass`."
+          },
+          "400": {
+            "description": "Unsupported service, or the connection details failed validation."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Preflight Connector Endpoint",
+        "tags": [
+          "v1-connectors"
+        ]
+      }
+    },
+    "/v1/connectors/{connector_id}": {
+      "delete": {
+        "operationId": "delete_connector_endpoint_v1_connectors__connector_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "connector_id",
+            "required": true,
+            "schema": {
+              "title": "Connector Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "force",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Force",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationHandle"
+                }
+              }
+            },
+            "description": "Delete accepted (or already in progress). Poll `GET /v1/operations/{operation_id}`."
+          },
+          "403": {
+            "description": "No delete permission on this connector."
+          },
+          "404": {
+            "description": "Connector not found (or not visible to the caller)."
+          },
+          "409": {
+            "description": "Deletion is locked, or a conflicting delete is active."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "503": {
+            "description": "Ardent could not start the work \u2014 safe to retry."
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Delete Connector Endpoint",
+        "tags": [
+          "v1-connectors"
+        ]
+      },
+      "get": {
+        "operationId": "get_connector_endpoint_v1_connectors__connector_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "connector_id",
+            "required": true,
+            "schema": {
+              "title": "Connector Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorRow"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Connector not found (or not visible to the caller)."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get Connector Endpoint",
+        "tags": [
+          "v1-connectors"
+        ]
+      },
+      "put": {
+        "operationId": "update_connector_endpoint_v1_connectors__connector_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "connector_id",
+            "required": true,
+            "schema": {
+              "title": "Connector Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateConnectorRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorRow"
+                }
+              }
+            },
+            "description": "The updated connector row."
+          },
+          "400": {
+            "description": "Validation error."
+          },
+          "404": {
+            "description": "Connector not found (or not visible to the caller)."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Update Connector Endpoint",
+        "tags": [
+          "v1-connectors"
+        ]
+      }
+    },
+    "/v1/connectors/{connector_id}/deletion-lock": {
+      "delete": {
+        "operationId": "unlock_connector_deletion_endpoint_v1_connectors__connector_id__deletion_lock_delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "connector_id",
+            "required": true,
+            "schema": {
+              "title": "Connector Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorEnvelope"
+                }
+              }
+            },
+            "description": "The unlocked connector."
+          },
+          "403": {
+            "description": "No update permission on this connector."
+          },
+          "404": {
+            "description": "Connector not found (or not visible to the caller)."
+          },
+          "409": {
+            "description": "A delete is already in progress."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Unlock Connector Deletion Endpoint",
+        "tags": [
+          "v1-connectors"
+        ]
+      },
+      "post": {
+        "operationId": "lock_connector_deletion_endpoint_v1_connectors__connector_id__deletion_lock_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "connector_id",
+            "required": true,
+            "schema": {
+              "title": "Connector Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectorDeletionLockRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorEnvelope"
+                }
+              }
+            },
+            "description": "The locked connector."
+          },
+          "403": {
+            "description": "No update permission on this connector."
+          },
+          "404": {
+            "description": "Connector not found (or not visible to the caller)."
+          },
+          "409": {
+            "description": "A delete is already in progress."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Lock Connector Deletion Endpoint",
+        "tags": [
+          "v1-connectors"
+        ]
+      }
+    },
+    "/v1/connectors/{connector_id}/discover": {
+      "post": {
+        "operationId": "discover_connector_endpoint_v1_connectors__connector_id__discover_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "connector_id",
+            "required": true,
+            "schema": {
+              "title": "Connector Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiscoverAccepted"
+                }
+              }
+            },
+            "description": "Discovery started (or joined, if one is already running). Poll the operation."
+          },
+          "400": {
+            "description": "The connector isn't in a state that can be discovered."
+          },
+          "404": {
+            "description": "Connector not found (or not visible to the caller)."
+          },
+          "422": {
+            "description": "Discovery prerequisites failed."
+          },
+          "503": {
+            "description": "Ardent could not start the work \u2014 safe to retry."
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Discover Connector Endpoint",
+        "tags": [
+          "v1-connectors"
+        ]
+      }
+    },
+    "/v1/connectors/{connector_id}/engine-setup": {
+      "post": {
+        "operationId": "engine_setup_endpoint_v1_connectors__connector_id__engine_setup_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "connector_id",
+            "required": true,
+            "schema": {
+              "title": "Connector Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorRow"
+                }
+              }
+            },
+            "description": "Nothing to do: the engine is already set up. Returns the connector row with a `message`."
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationHandle"
+                }
+              }
+            },
+            "description": "Setup started (or joined). Poll `GET /v1/operations/{operation_id}`."
+          },
+          "400": {
+            "description": "The connector isn't in a state that can run setup."
+          },
+          "403": {
+            "description": "No update permission on this connector."
+          },
+          "404": {
+            "description": "Connector not found (or not visible to the caller)."
+          },
+          "409": {
+            "description": "A conflicting setup operation exists."
+          },
+          "422": {
+            "description": "Setup prerequisites failed (for example, unresolved replica identity decisions)."
+          },
+          "503": {
+            "description": "Ardent could not start the work \u2014 safe to retry."
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Engine Setup Endpoint",
+        "tags": [
+          "v1-connectors"
+        ]
+      }
+    },
+    "/v1/connectors/{connector_id}/quarantine": {
+      "get": {
+        "operationId": "list_connector_quarantines_endpoint_v1_connectors__connector_id__quarantine_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "connector_id",
+            "required": true,
+            "schema": {
+              "title": "Connector Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuarantineListResponse"
+                }
+              }
+            },
+            "description": "Active (paused) replication deployments."
+          },
+          "404": {
+            "description": "Connector not found (or not visible to the caller)."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List Connector Quarantines Endpoint",
+        "tags": [
+          "v1-connectors"
+        ]
+      }
+    },
+    "/v1/connectors/{connector_id}/quarantine/{quarantine_id}/release": {
+      "post": {
+        "operationId": "release_quarantine_endpoint_v1_connectors__connector_id__quarantine__quarantine_id__release_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "connector_id",
+            "required": true,
+            "schema": {
+              "title": "Connector Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "quarantine_id",
+            "required": true,
+            "schema": {
+              "title": "Quarantine Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuarantineRow"
+                }
+              }
+            },
+            "description": "The released quarantine entry."
+          },
+          "403": {
+            "description": "No update permission on this connector."
+          },
+          "404": {
+            "description": "Connector or quarantine entry not found."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Release Quarantine Endpoint",
+        "tags": [
+          "v1-connectors"
+        ]
+      }
+    },
+    "/v1/connectors/{connector_id}/replica-identity-decisions": {
+      "put": {
+        "operationId": "set_replica_identity_decisions_endpoint_v1_connectors__connector_id__replica_identity_decisions_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "connector_id",
+            "required": true,
+            "schema": {
+              "title": "Connector Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReplicaIdentityDecisionsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorRow"
+                }
+              }
+            },
+            "description": "The refreshed connector row, including `replica_identity_preflight`."
+          },
+          "400": {
+            "description": "A decision is invalid, covers an unknown table, or the map is incomplete."
+          },
+          "403": {
+            "description": "No update permission on this connector."
+          },
+          "404": {
+            "description": "Connector not found (or not visible to the caller)."
+          },
+          "409": {
+            "description": "The decisions could not be applied \u2014 state changed underneath; retry."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Set Replica Identity Decisions Endpoint",
+        "tags": [
+          "v1-connectors"
+        ]
+      }
+    },
+    "/v1/connectors/{connector_id}/selection": {
+      "post": {
+        "operationId": "set_selection_endpoint_v1_connectors__connector_id__selection_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "connector_id",
+            "required": true,
+            "schema": {
+              "title": "Connector Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SelectionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectorRow"
+                }
+              }
+            },
+            "description": "The connector row with the applied selection fields."
+          },
+          "400": {
+            "description": "No discovered schema to select from, or an invalid selection."
+          },
+          "404": {
+            "description": "Connector not found (or not visible to the caller)."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Set Selection Endpoint",
+        "tags": [
+          "v1-connectors"
+        ]
+      }
+    },
+    "/v1/operations/{operation_id}": {
+      "get": {
+        "operationId": "get_operation_endpoint_v1_operations__operation_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "operation_id",
+            "required": true,
+            "schema": {
+              "title": "Operation Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Optionally wait up to this many seconds for a terminal operation state. Omit for the existing immediate poll response.",
+            "in": "query",
+            "name": "wait",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 10.0,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Optionally wait up to this many seconds for a terminal operation state. Omit for the existing immediate poll response.",
+              "title": "Wait"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AsyncOperationResponse"
+                }
+              }
+            },
+            "description": "Current operation state. On `completed`, `result` holds the outcome \u2014 for `branch_create`, the full branch details."
+          },
+          "404": {
+            "description": "Operation not found (or not visible to the caller)."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get Operation Endpoint",
+        "tags": [
+          "v1-operations"
+        ]
+      }
+    },
+    "/v1/orgs/{org_id}": {
+      "delete": {
+        "operationId": "delete_org_v1_orgs__org_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "required": true,
+            "schema": {
+              "title": "Org Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Delete Org",
+        "tags": [
+          "v1-orgs"
+        ]
+      },
+      "get": {
+        "operationId": "get_org_details_v1_orgs__org_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "required": true,
+            "schema": {
+              "title": "Org Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Org Details V1 Orgs  Org Id  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get Org Details",
+        "tags": [
+          "v1-orgs"
+        ]
+      },
+      "patch": {
+        "operationId": "update_org_v1_orgs__org_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "required": true,
+            "schema": {
+              "title": "Org Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOrgRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Update Org",
+        "tags": [
+          "v1-orgs"
+        ]
+      }
+    },
+    "/v1/orgs/{org_id}/api-keys": {
+      "get": {
+        "operationId": "list_api_keys_v1_orgs__org_id__api_keys_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "required": true,
+            "schema": {
+              "title": "Org Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/APIKeyListItem",
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response 200 List Api Keys V1 Orgs  Org Id  Api Keys Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Active (unrevoked) keys, newest first."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List Api Keys",
+        "tags": [
+          "v1-api-keys"
+        ]
+      },
+      "post": {
+        "operationId": "create_new_api_key_v1_orgs__org_id__api_keys_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "required": true,
+            "schema": {
+              "title": "Org Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAPIKeyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIKeyCreateResponse",
+                  "additionalProperties": true,
+                  "title": "Response Create New Api Key V1 Orgs  Org Id  Api Keys Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The created key, including the secret \u2014 shown only this once."
+          },
+          "400": {
+            "description": "Unknown role, non-org role, or a scope outside the role's permissions."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Create New Api Key",
+        "tags": [
+          "v1-api-keys"
+        ]
+      }
+    },
+    "/v1/orgs/{org_id}/api-keys/{api_key_id}": {
+      "delete": {
+        "operationId": "revoke_api_key_endpoint_v1_orgs__org_id__api_keys__api_key_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "required": true,
+            "schema": {
+              "title": "Org Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "api_key_id",
+            "required": true,
+            "schema": {
+              "title": "Api Key Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "API key not found or already revoked."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Revoke Api Key Endpoint",
+        "tags": [
+          "v1-api-keys"
+        ]
+      }
+    },
+    "/v1/orgs/{org_id}/invite": {
+      "post": {
+        "operationId": "invite_user_to_org_v1_orgs__org_id__invite_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "required": true,
+            "schema": {
+              "title": "Org Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteUserRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Invite User To Org V1 Orgs  Org Id  Invite Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Invite User To Org",
+        "tags": [
+          "v1-orgs"
+        ]
+      }
+    },
+    "/v1/orgs/{org_id}/invites": {
+      "get": {
+        "operationId": "list_pending_invites_v1_orgs__org_id__invites_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "required": true,
+            "schema": {
+              "title": "Org Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response List Pending Invites V1 Orgs  Org Id  Invites Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List Pending Invites",
+        "tags": [
+          "v1-orgs"
+        ]
+      }
+    },
+    "/v1/orgs/{org_id}/invites/{invite_id}": {
+      "delete": {
+        "operationId": "revoke_invite_v1_orgs__org_id__invites__invite_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "required": true,
+            "schema": {
+              "title": "Org Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "invite_id",
+            "required": true,
+            "schema": {
+              "title": "Invite Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Revoke Invite",
+        "tags": [
+          "v1-orgs"
+        ]
+      }
+    },
+    "/v1/orgs/{org_id}/members": {
+      "get": {
+        "operationId": "list_org_members_v1_orgs__org_id__members_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "required": true,
+            "schema": {
+              "title": "Org Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response List Org Members V1 Orgs  Org Id  Members Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List Org Members",
+        "tags": [
+          "v1-orgs"
+        ]
+      }
+    },
+    "/v1/orgs/{org_id}/members/{target_user_id}": {
+      "delete": {
+        "operationId": "remove_org_member_v1_orgs__org_id__members__target_user_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "required": true,
+            "schema": {
+              "title": "Org Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "target_user_id",
+            "required": true,
+            "schema": {
+              "title": "Target User Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Remove Org Member",
+        "tags": [
+          "v1-orgs"
+        ]
+      },
+      "patch": {
+        "operationId": "update_member_role_v1_orgs__org_id__members__target_user_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "required": true,
+            "schema": {
+              "title": "Org Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "target_user_id",
+            "required": true,
+            "schema": {
+              "title": "Target User Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMemberRoleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Update Member Role V1 Orgs  Org Id  Members  Target User Id  Patch",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Update Member Role",
+        "tags": [
+          "v1-orgs"
+        ]
+      }
+    },
+    "/v1/orgs/{org_id}/roles": {
+      "get": {
+        "operationId": "list_org_roles_v1_orgs__org_id__roles_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "required": true,
+            "schema": {
+              "title": "Org Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "title": "Response List Org Roles V1 Orgs  Org Id  Roles Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List Org Roles",
+        "tags": [
+          "v1-orgs"
+        ]
+      }
+    },
+    "/v1/projects": {
+      "get": {
+        "operationId": "list_projects_endpoint_v1_projects_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "org_id",
+            "required": true,
+            "schema": {
+              "title": "Org Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List Projects Endpoint",
+        "tags": [
+          "v1-projects"
+        ]
+      },
+      "post": {
+        "operationId": "create_project_endpoint_v1_projects_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProjectRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectRow"
+                }
+              }
+            },
+            "description": "The created project row."
+          },
+          "409": {
+            "description": "A project with this name already exists."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Create Project Endpoint",
+        "tags": [
+          "v1-projects"
+        ]
+      }
+    },
+    "/v1/projects/{project_id}": {
+      "delete": {
+        "operationId": "delete_project_endpoint_v1_projects__project_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Deleted. Body is `{\"message\": \"Project deleted\"}`."
+          },
+          "403": {
+            "description": "Not authorized to delete this project."
+          },
+          "404": {
+            "description": "Project not found (or not visible to the caller)."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Delete Project Endpoint",
+        "tags": [
+          "v1-projects"
+        ]
+      },
+      "get": {
+        "operationId": "get_project_endpoint_v1_projects__project_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectRow"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Project not found (or not visible to the caller)."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get Project Endpoint",
+        "tags": [
+          "v1-projects"
+        ]
+      },
+      "patch": {
+        "operationId": "update_project_endpoint_v1_projects__project_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProjectRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectRow"
+                }
+              }
+            },
+            "description": "The updated project row."
+          },
+          "400": {
+            "description": "No fields to update."
+          },
+          "404": {
+            "description": "Project not found (or not visible to the caller)."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Update Project Endpoint",
+        "tags": [
+          "v1-projects"
+        ]
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.tryardent.com"
+    }
+  ]
+}

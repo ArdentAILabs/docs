@@ -1,0 +1,58 @@
+---
+title: "Create a branch"
+sidebarTitle: "Create branch"
+description: "Start an async branch create and get an operation handle"
+openapi: "/openapi.public.json POST /v1/branch/create"
+---
+
+Branch creation is asynchronous: the create call returns an operation handle, and polling that operation gives you the branch's connection details.
+
+All three body fields are required. For Postgres branches, `service_type` is `postgres` — not the connector type `postgresql`.
+
+The response is `202 Accepted` with an operation handle:
+
+```json
+{
+  "operation_id": "op_123",
+  "status": "pending",
+  "type": "branch_create",
+  "resource_id": "br_123"
+}
+```
+
+Poll the operation until it finishes. On `completed`, its `result` holds the branch details:
+
+```bash
+curl -H "Authorization: Bearer $ARDENT_TOKEN"   "https://api.tryardent.com/v1/operations/op_123?wait=10"
+```
+
+```json
+{
+  "id": "op_123",
+  "status": "completed",
+  "result": {
+    "branch_id": "br_123",
+    "name": "pr-123",
+    "connector_id": "conn_123",
+    "service_type": "postgres",
+    "status": "active",
+    "branch_url": "postgresql://user:***@pr-123-postgres.routing.tryardent.com:5432/db?sslmode=require&channel_binding=disable",
+    "pooled_branch_url": null,
+    "pooled_branch_prisma_url": null,
+    "created_at": "2026-06-01T12:00:00Z",
+    "read_ready_at": "2026-06-01T12:00:05Z",
+    "write_ready_at": "2026-06-01T12:00:05Z",
+    "masked_ready_at": null
+  }
+}
+```
+
+See [Operations](/api/operations) for the polling model and the `?wait=` parameter.
+
+<Warning>
+  Treat `branch_url` as sensitive, and use it exactly as returned — including `sslmode=require` and `channel_binding=disable`. A `completed` operation can still return a null `result` or a null `branch_url`, so confirm `result.branch_url` is present and non-empty before using it. If it's missing, fail closed: never fall back to the main connection string or any other configured URL.
+</Warning>
+
+Retries are safe. Send an `X-Idempotency-Key` header with the create request; re-sending the same connector, service type, and name resumes the original request instead of creating a duplicate.
+
+Create can fail with: `400` (a required field is missing), `409` (this create is already in flight, or the idempotency key was reused for a different request), `422` (the connector's engine isn't ready to branch), or `503` (Ardent could not start the work — retry).

@@ -1,6 +1,6 @@
 ---
 title: "API keys API"
-sidebarTitle: "API keys"
+sidebarTitle: "Overview"
 description: "Create, list, and revoke organization API keys"
 ---
 
@@ -10,32 +10,6 @@ API keys let automation call Ardent without a human browser login. Create the na
 
 | Method | Path | Description |
 | --- | --- | --- |
-| `GET` | `/v1/orgs/{org_id}/api-keys` | List API keys. Secret values are not returned |
-| `POST` | `/v1/orgs/{org_id}/api-keys` | Create an API key. The secret is returned once |
-| `DELETE` | `/v1/orgs/{org_id}/api-keys/{api_key_id}` | Revoke an API key |
-
-## Create an API key
-
-```bash
-curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/orgs/org_123/api-keys   -H 'Content-Type: application/json'   -d '{"name":"github-actions-main","role_id":"role_org_member","scopes":["branches:write","connectors:read"],"expires_days":90}'
-```
-
-<Warning>
-  The secret token is shown only once, in the create response. Copy it directly into your secret manager.
-</Warning>
-
-## List API keys
-
-```bash
-curl -H "Authorization: Bearer $ARDENT_TOKEN" https://api.tryardent.com/v1/orgs/org_123/api-keys
-```
-
-List responses include each key's name, key prefix, scopes, creation time, expiration, and last-used time — never the secret token.
-
-## Revoke an API key
-
-```bash
-curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X DELETE https://api.tryardent.com/v1/orgs/org_123/api-keys/key_123
-```
-
-Revocation is immediate — the next request with that token fails authentication.
+| `GET` | [`/v1/orgs/{org_id}/api-keys`](/api/api-keys/list) | List API keys. Secret values are not returned |
+| `POST` | [`/v1/orgs/{org_id}/api-keys`](/api/api-keys/create) | Create an API key. The secret is returned once |
+| `DELETE` | [`/v1/orgs/{org_id}/api-keys/{api_key_id}`](/api/api-keys/delete) | Revoke an API key |

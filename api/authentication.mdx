@@ -4,7 +4,7 @@ sidebarTitle: "Authentication"
 description: "Authenticate API requests with bearer tokens and manage access safely"
 ---
 
-The API uses bearer tokens. Create them in **Ardent dashboard > Settings > API keys** and store them in a secret manager. Keys start with `sk-ard_live_` (or `sk-ard_test_` in test environments) and go in an `Authorization: Bearer` header on every request.
+The API uses bearer tokens. Create them in **Ardent dashboard > Settings > API keys** (or via the [API keys endpoints](/api/api-keys)) and store them in a secret manager. Keys start with `sk-ard_live_` (or `sk-ard_test_` in test environments) and go in an `Authorization: Bearer` header on every request.
 
 ```bash
 curl -H "Authorization: Bearer $ARDENT_TOKEN" https://api.tryardent.com/v1/projects
@@ -26,7 +26,7 @@ curl -H "Authorization: Bearer $ARDENT_TOKEN" https://api.tryardent.com/v1/proje
 | `role_org_admin` | Administrative automation, including team and API-key management |
 | `role_org_owner` | Full organization control |
 
-List the roles available in your organization with `GET /v1/orgs/{org_id}/roles`.
+List the roles available in your organization with [`GET /v1/orgs/{org_id}/roles`](/api/orgs).
 
 ## CLI and API tokens
 

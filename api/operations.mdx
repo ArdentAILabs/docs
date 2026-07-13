@@ -2,15 +2,12 @@
 title: "Operations API"
 sidebarTitle: "Operations"
 description: "Poll long-running Ardent work to completion"
+openapi: "/openapi.public.json GET /v1/operations/{operation_id}"
 ---
 
 Some Ardent work takes longer than a single request: connector discovery, connector setup, resets, and environment operations. Those endpoints return an operation ID that you can poll.
 
-## Get an operation
-
-```bash
-curl -H "Authorization: Bearer $ARDENT_TOKEN" https://api.tryardent.com/v1/operations/op_123
-```
+Add `?wait=10` to long-poll: the server holds the request up to that many seconds (max 10) and answers early if the operation finishes. This cuts most polling loops to a single line.
 
 Add `?wait=10` to long-poll: the server holds the request up to that many seconds (max 10) and answers early if the operation finishes. This cuts most polling loops to a single line.
 

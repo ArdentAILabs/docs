@@ -5,7 +5,16 @@ description: "The RDS-specific parts of connecting to Ardent"
 
 Ardent works with AWS RDS for PostgreSQL. This page covers only what's specific to RDS — the full walkthrough is the [Quickstart](/quickstart).
 
-<Accordion defaultOpen={false} title="Using Claude Code or Cursor? Paste this prompt and it does the checks for you">
+<Accordion defaultOpen={false} title="Using Claude Code or Cursor? It can do the checks for you">
+With the [ardent-cli skill](/workflows/ai-agents#let-the-agent-drive-set-it-up-once) installed, a short ask is enough — the skill fetches this page and runs the checks:
+
+```
+Check if my AWS RDS Postgres database is ready to connect to Ardent.
+My connection string: [paste here]
+```
+
+Without the skill, paste the full directions:
+
 ```
 Check if my AWS RDS Postgres database is ready to connect to Ardent.
 My connection string: [paste here]
@@ -51,9 +60,11 @@ Apply the parameter group to your instance.
 
 <Step title="Allow network access">
 
-In the RDS console, open **Databases > your instance > Connectivity & security** and confirm the endpoint and port. Allow Ardent's egress IP to reach the instance on the Postgres port, usually `5432`. Ask your Ardent contact for the current egress IP if you don't have it.
+In the RDS console, open **Databases > your instance > Connectivity & security** and confirm the endpoint and port. Allow Ardent's outbound IP to reach the instance on the Postgres port, usually `5432`. Ask your Ardent contact for the current outbound IP if you don't have it.
 
-If your instance is private-only, use a BYOC environment and PrivateLink instead of opening public ingress.
+<Tip>
+  If your instance is private-only, use a BYOC environment and PrivateLink instead of allowing public inbound connections.
+</Tip>
 
 </Step>
 
@@ -81,7 +92,4 @@ From here, continue with the [Quickstart](/quickstart): run preflight, run the g
 Two RDS-specific notes:
 
 - If preflight says the source is a **read replica**, use the writer endpoint instead.
-
-<Warning>
-  **WAL retention:** Replication slots retain WAL while a consumer is behind. A very low retention limit can invalidate the slot under heavy writes or long transactions, forcing a full connector rebuild and resnapshot. Leave enough headroom and monitor long-running transactions.
-</Warning>
+- **WAL retention:** replication slots retain WAL while a consumer is behind. A very low retention limit can invalidate the slot under heavy writes or long transactions, forcing a connector rebuild. Leave enough headroom and watch long-running transactions.

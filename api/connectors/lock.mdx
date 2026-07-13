@@ -1,0 +1,8 @@
+---
+title: "Lock deletion"
+sidebarTitle: "Lock deletion"
+description: "Protect a connector from deletion"
+openapi: "/openapi.public.json POST /v1/connectors/{connector_id}/deletion-lock"
+---
+
+While locked, [delete](/api/connectors/delete) refuses with `409` until the lock is removed. Use it to protect production sources from accidental cleanup.

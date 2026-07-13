@@ -31,7 +31,7 @@ postgresql://user:***@my-feature-postgres.routing.tryardent.com:5432/db?sslmode=
 | `--url-type <type>` | Which URL to print: `direct` (default), `pooled`, or `prisma` |
 | `-s, --service <type>` | Branch service type. Default `postgres` — not the same as the connector type `postgresql`. Leave it alone unless Ardent support says otherwise |
 
-`--print-url` and `--format` can't be combined. `--url-type` works with `--print-url` (for example `--print-url --url-type pooled`) but not with `--format json`, which already includes every URL.
+`--print-url` and `--format` can't be combined. `--url-type` can't be combined with `--format json` — the JSON already includes every URL.
 
 ### Use in scripts
 
@@ -70,7 +70,7 @@ Two settings matter in database GUIs and IDEs:
 - **Channel binding:** `disable`, if your client has the setting.
 
 <Accordion defaultOpen={false} title="Why branch connections need these settings">
-Branch connections go through Ardent's routing layer, which terminates TLS. Your connection is encrypted, but it isn't signed by your source database's certificate authority — so a client configured to verify against your source's CA bundle will reject it. Clearing the certificate fields keeps the connection encrypted without that check.
+Branch connections go through Ardent's routing layer, where TLS ends. Your connection is encrypted, but it isn't signed by your source database's certificate authority — so a client configured to verify against your source's CA bundle will reject it. Clearing the certificate fields keeps the connection encrypted without that check.
 
 The same routing layer is why clients that force channel binding can reject an otherwise valid connection. `channel_binding=disable` in the URL handles it; set the IDE option too if there is one.
 </Accordion>

@@ -1,0 +1,12 @@
+---
+title: "Create an API key"
+sidebarTitle: "Create key"
+description: "Create an API key with a role and optional scopes"
+openapi: "/openapi.public.json POST /v1/orgs/{org_id}/api-keys"
+---
+
+<Warning>
+  The secret token is shown only once, in the create response. Copy it directly into your secret manager.
+</Warning>
+
+The key's role determines what it can do; `scopes` optionally restricts it to a subset of the role's permissions. Scopes are permission keys like `connectors.read` — each role's `permissions` array from [`GET /v1/orgs/{org_id}/roles`](/api/orgs) lists the valid values.

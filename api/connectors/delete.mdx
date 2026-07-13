@@ -1,0 +1,12 @@
+---
+title: "Delete a connector"
+sidebarTitle: "Delete"
+description: "Start an async connector delete"
+openapi: "/openapi.public.json DELETE /v1/connectors/{connector_id}"
+---
+
+Deletion is asynchronous: the call returns `202 Accepted` with an operation handle. Poll it like any other [operation](/api/operations).
+
+By default, Ardent waits for in-progress replication to finish before deleting. Add `?force=true` to skip that wait and abandon un-replicated changes.
+
+Two things block a delete: a deletion lock (`409` — unlock it first) and, without `force`, replication that hasn't finished yet.

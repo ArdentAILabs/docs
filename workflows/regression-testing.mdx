@@ -5,11 +5,13 @@ description: "Run destructive tests against real production data without touchin
 
 Unit tests with mocked data miss the bugs that only appear with real data at real scale. Ardent lets you run your full test suite, including destructive operations, against an exact copy of production.
 
-## The pattern
+## How it works
 
-`ardent branch create` prints a Postgres URL for the new branch. If you need it again, run `ardent branch info regression-run` (or `ardent branch info` when that branch is already checked out).
+[`ardent branch create`](/cli/branches) prints a Postgres URL for the new branch. If you need it again, run `ardent branch info regression-run` (or `ardent branch info` when that branch is already checked out).
 
-Most test runners read the database from `DATABASE_URL` — Django, SQLAlchemy, Prisma, and most pytest setups already do. If yours uses a different variable or a `.env` file, substitute that below.
+<Warning>
+  The examples below assume your tests read `DATABASE_URL` (Django, SQLAlchemy, Prisma, and most pytest setups do). If yours uses a different variable or a `.env` file, substitute that.
+</Warning>
 
 ```bash
 # Branch from production and export the returned URL
@@ -27,21 +29,31 @@ npm test
 ardent branch delete regression-run
 ```
 
-**One-liner:** `DATABASE_URL='…' npm test` sets the variable for just that command. `export` is easier when you'll run more than one.
+<Tip>
+  **One-liner:** `DATABASE_URL='…' npm test` sets the variable for just that command. `export` is easier when you'll run more than one.
+</Tip>
 
 **In CI:** create the branch in the job, assign the URL to `DATABASE_URL` (or wire it into your framework), run your test command, then delete the branch. See [CI / CD](/workflows/ci-cd) for a GitHub Actions–shaped example.
 
 ## What this unlocks
 
 - **Migration safety:** run `ALTER TABLE`, `DROP COLUMN`, schema changes against real data before you ship
-- **Destructive queries:** `DELETE`, `TRUNCATE`, bulk updates; test the blast radius safely
+- **Destructive queries:** `DELETE`, `TRUNCATE`, bulk updates; see how much damage they would do — safely
 - **Index validation:** try a new index and see if it actually speeds up your real queries
 - **Data-dependent bugs:** catch edge cases that only exist in production data, not fixtures
 
-## Copy this into Claude Code or Cursor
+## Hand it to an AI agent
+
+With the [ardent-cli skill](/workflows/ai-agents#let-the-agent-drive-set-it-up-once) installed, a short ask is enough:
 
 ```
 Run a regression test on [describe change] against a real copy of our database.
-Create an Ardent branch with `ardent branch create regression-run --print-url`, run the
-tests using the returned connection URL, report what broke, then delete the branch.
+```
+
+Without the skill, paste the full directions:
+
+```
+Run a regression test on [describe change] against a real copy of our database.
+Create an Ardent branch (ardent branch create), run the tests against it,
+report what broke, then delete the branch.
 ```

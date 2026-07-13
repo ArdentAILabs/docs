@@ -1,0 +1,8 @@
+---
+title: "Discover schema"
+sidebarTitle: "Discover"
+description: "Start async schema discovery on a connector"
+openapi: "/openapi.public.json POST /v1/connectors/{connector_id}/discover"
+---
+
+Starts async discovery of the source's schemas and tables. Returns an operation handle — poll it like any other [operation](/api/operations). If discovery is already running, the call joins it instead of starting another.

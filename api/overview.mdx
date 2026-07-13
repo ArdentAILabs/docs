@@ -24,7 +24,7 @@ Pass an API token with each request:
 curl -H "Authorization: Bearer $ARDENT_TOKEN" https://api.tryardent.com/v1/projects
 ```
 
-Create and revoke tokens in **Ardent dashboard > Settings > API keys**. See [Authentication](/api/authentication) for token handling, roles, and troubleshooting.
+Create and revoke tokens in **Ardent dashboard > Settings > API keys**, or via the [API keys endpoints](/api/api-keys). See [Authentication](/api/authentication) for token handling, roles, and troubleshooting.
 
 ## Resource model
 
@@ -66,4 +66,4 @@ See [Operations](/api/operations) for the full polling model.
 
 ## Stability notes
 
-Read the fields you need and ignore unknown ones — the API may add fields over time. Treat missing required fields, failed operations, and empty branch URLs as hard failures in automation.
+Read the fields you need and ignore unknown ones — the API may add fields over time. Treat missing required fields, failed operations, and empty branch URLs as hard failures in automation. See [Errors](/api/errors) for status codes and retry guidance.

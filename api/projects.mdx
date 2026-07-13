@@ -1,6 +1,6 @@
 ---
 title: "Projects API"
-sidebarTitle: "Projects"
+sidebarTitle: "Overview"
 description: "Create, list, update, and delete Ardent projects"
 ---
 
@@ -10,37 +10,11 @@ Projects organize related connectors and branches inside an organization. Most t
 
 | Method | Path | Description |
 | --- | --- | --- |
-| `POST` | `/v1/projects` | Create a project |
-| `GET` | `/v1/projects` | List projects visible to the token |
-| `GET` | `/v1/projects/{project_id}` | Get one project |
-| `PATCH` | `/v1/projects/{project_id}` | Rename a project |
-| `DELETE` | `/v1/projects/{project_id}` | Delete a project |
-
-## Create a project
-
-```bash
-curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/projects   -H 'Content-Type: application/json'   -d '{"name":"my-app","org_id":"org_123"}'
-```
-
-`org_id` is optional when the token has exactly one clear organization. Pass it explicitly in automation.
-
-## List projects
-
-```bash
-curl -H "Authorization: Bearer $ARDENT_TOKEN"   'https://api.tryardent.com/v1/projects?org_id=org_123'
-```
-
-## Update a project
-
-```bash
-curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X PATCH https://api.tryardent.com/v1/projects/project_123   -H 'Content-Type: application/json'   -d '{"name":"my-app-production"}'
-```
-
-## Delete a project
-
-```bash
-curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X DELETE https://api.tryardent.com/v1/projects/project_123
-```
+| `POST` | [`/v1/projects`](/api/projects/create) | Create a project |
+| `GET` | [`/v1/projects`](/api/projects/list) | List projects visible to the token |
+| `GET` | [`/v1/projects/{project_id}`](/api/projects/get) | Get one project |
+| `PATCH` | [`/v1/projects/{project_id}`](/api/projects/update) | Rename a project |
+| `DELETE` | [`/v1/projects/{project_id}`](/api/projects/delete) | Delete a project |
 
 <Warning>
   Deleting a project takes everything under it with it. For routine cleanup, delete branches or unused connectors instead.

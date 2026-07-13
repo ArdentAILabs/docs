@@ -15,7 +15,16 @@ ardent connector preflight postgresql 'postgresql://user:[YOUR-PASSWORD]@host:54
   Preflight is fast and non-destructive — it stores no credentials and creates nothing. It prints a pass/fail checklist and a **Grant script** with the exact SQL for your database and schemas.
 </Info>
 
-<Accordion defaultOpen={false} title="Using Claude Code or Cursor? Paste this prompt and it does the checks for you">
+<Accordion defaultOpen={false} title="Using Claude Code or Cursor? It can do the checks for you">
+With the [ardent-cli skill](/workflows/ai-agents#let-the-agent-drive-set-it-up-once) installed, a short ask is enough — the skill fetches this page and runs the checks:
+
+```
+Check whether my self-hosted Postgres database is ready to connect to Ardent.
+My connection string: [paste here]
+```
+
+Without the skill, paste the full directions:
+
 ```
 Check whether my self-hosted Postgres database is ready to connect to Ardent.
 My connection string: [paste here]
@@ -25,7 +34,7 @@ ardent connector preflight postgresql '<connection-string>' --schemas public
 
 Then verify these source requirements and tell me exactly what to fix:
 1. The host is reachable from Ardent over TLS on the Postgres port.
-2. pg_hba.conf allows both normal and replication connections from Ardent's egress IP.
+2. pg_hba.conf allows both normal and replication connections from Ardent's outbound IP.
 3. wal_level is logical, max_wal_senders >= 10, max_replication_slots >= 10 (or higher if already higher, since these are minimums Ardent expects), and at least one replication slot is free.
 4. wal2json is available. If you create a temporary slot to test it, immediately drop it; if the drop fails, stop and run SELECT pg_drop_replication_slot('ardent_probe'); before doing anything else.
 5. The connection is to a writable primary, not a read replica: SELECT pg_is_in_recovery(); must return false.
@@ -41,16 +50,16 @@ ardent connector create postgresql '<connection-string>'
 
 <Step title="Allow inbound from Ardent">
 
-Ardent connects from a static egress IP for your environment. If your network restricts inbound traffic, allow that IP on the Postgres port, usually `5432`. Ask your Ardent contact for the current egress IP if you don't have it.
+Ardent connects from a static outbound IP for your environment. If your network restricts inbound traffic, allow that IP on the Postgres port, usually `5432`. Ask your Ardent contact for the current outbound IP if you don't have it.
 
 Make sure `ssl = on` and `pg_hba.conf` accepts **both** regular SQL sessions and logical replication sessions from Ardent. Postgres treats them as different connection types, so both lines matter:
 
 ```conf
 # regular connections: discovery, grants, and bookkeeping
-hostssl all          ardent_replication  <egress_ip>/32  scram-sha-256
+hostssl all          ardent_replication  <outbound_ip>/32  scram-sha-256
 
 # replication connections: logical WAL streaming
-hostssl replication  ardent_replication  <egress_ip>/32  scram-sha-256
+hostssl replication  ardent_replication  <outbound_ip>/32  scram-sha-256
 ```
 
 After editing `pg_hba.conf`, reload Postgres — a reload is enough, no restart needed:
@@ -146,7 +155,7 @@ No rows should come back.
 <Step title="Create the Ardent role">
 
 <Warning>
-  Today, vanilla self-hosted Postgres requires the Ardent role to create event triggers, which is restricted to `SUPERUSER`. That's a broad permission — a Postgres superuser can read and modify anything on the cluster. Use a dedicated role, restrict network access to Ardent's egress IP, rotate the password deliberately, and prefer a dedicated source cluster or database if your security model requires stricter isolation.
+  Today, vanilla self-hosted Postgres requires the Ardent role to create event triggers, which is restricted to `SUPERUSER`. That's a broad permission — a Postgres superuser can read and modify anything on the cluster. Use a dedicated role, restrict network access to Ardent's outbound IP, rotate the password deliberately, and prefer a dedicated source cluster or database if your security model requires stricter isolation.
 </Warning>
 
 ```sql

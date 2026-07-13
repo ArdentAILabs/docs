@@ -5,7 +5,7 @@ description: "How Ardent's split-plane architecture keeps your data safe and you
 
 Ardent separates the **control plane** from the **data plane**:
 
-- **Control plane:** Operated by Ardent. Handles branch orchestration, replication health monitoring, connection routing, auto-scaling, and policy enforcement. Spans across all deployments.
+- **Control plane:** Operated by Ardent. Handles branch coordination, replication health monitoring, connection routing, auto-scaling, and policy enforcement. Spans across all deployments.
 - **Data plane:** Where your data lives. Includes Ardent's replication pipeline, your read replica, and your branches. Can be deployed on your cloud or ours.
 
 Only metadata (schema structure, replication status, branch state) flows from the data plane to the control plane. Your actual data never leaves the data plane.
@@ -17,7 +17,7 @@ Only metadata (schema structure, replication status, branch state) flows from th
 flowchart TB
     subgraph CP["Control plane"]
         direction TB
-        ORCH["Branch orchestration"]
+        ORCH["Branch coordination"]
         PRXY["Branch proxy"]
         ROUTE["Connection routing"]
         HEALTH["Health and WAL monitoring"]
@@ -36,11 +36,11 @@ flowchart TB
 
 ### Control plane
 
-Always operated by Ardent. Orchestration, policies, routing, and visibility across every branch and connection.
+Always operated by Ardent. Coordination, policies, routing, and visibility across every branch and connection.
 
 - **Branch lifecycle:** Create, suspend, delete, and route traffic to the right branch. Connection URLs route through Ardent's proxy. Every session is tied to an account, policies apply per branch, and raw URLs never leak.
 - **Replication coordination:** Ardent watches replication health and scales the Kafka layer that backs it, so you never have to size or operate brokers yourself.
-- **Connector setup:** When you connect a database, Ardent inspects and validates it, and gives you connector-level settings: the default database name for new branches, and any SQL to run on each new branch.
+- **Connector setup:** When you connect a database, Ardent inspects and validates it, and gives you connector-level settings: the default database name for new branches, and [any SQL to run on each new branch](/cli/settings).
 - **Auth, usage, and billing:** Org access, API keys, and usage tracking. Per-user and per-branch visibility Postgres does not give you out of the box.
 
 ### Data plane
@@ -56,13 +56,13 @@ Where your data physically lives and where branches are served from. Runs on Ard
 - **Branches (compute and storage):** Each branch is a full Postgres instance cloned from the replica with **compute that auto-scales with load**. Branches share storage from the same replica through copy-on-write, so scaling to many branches is efficient for both compute and storage.
 - **Isolation:** Your data stays inside this boundary. Only metadata crosses to the control plane. This means in **managed, your cloud** mode you can maintain residency of all your data without losing Ardent's ability to manage the service.
 
-You connect your database and open branches. The control plane orchestrates; the data plane runs replication, the replica, and branches.
+You connect your database and open branches. The control plane coordinates; the data plane runs replication, the replica, and branches.
 
 ---
 
 ## Deployment options
 
-Ardent orchestrates everything from our control plane. The data plane is the only thing that moves.
+Ardent manages everything from our control plane. The data plane is the only thing that moves.
 
 | | **Fully managed** | **Managed, your cloud** |
 |---|---|---|
@@ -72,4 +72,4 @@ Ardent orchestrates everything from our control plane. The data plane is the onl
 
 **Fully managed.** We host the entire data plane. Connect your database and we handle the Ardent Replicator, Kafka pipeline, read replica, and branch compute.
 
-**Managed, your cloud.** Same managed experience, but the data plane deploys into your own cloud account. Your data never leaves your infrastructure. The control plane still orchestrates everything via API; all replication and branch compute runs inside your network.
+**Managed, your cloud.** Same managed experience, but the data plane deploys into your own cloud account. Your data never leaves your infrastructure. The control plane still manages everything via API; all replication and branch compute runs inside your network.

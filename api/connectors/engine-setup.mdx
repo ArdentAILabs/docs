@@ -1,0 +1,8 @@
+---
+title: "Start setup"
+sidebarTitle: "Engine setup"
+description: "Start async connector setup"
+openapi: "/openapi.public.json POST /v1/connectors/{connector_id}/engine-setup"
+---
+
+Starts async setup and returns an operation handle — poll it like any other [operation](/api/operations). If setup is already running, the call joins it. If the engine is already set up, the call returns `200` with the connector and a message instead of starting anything.

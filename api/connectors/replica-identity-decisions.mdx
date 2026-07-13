@@ -1,0 +1,27 @@
+---
+title: "Submit replica identity decisions"
+sidebarTitle: "Replica identity"
+description: "Resolve tables that need an identity decision"
+openapi: "/openapi.public.json PUT /v1/connectors/{connector_id}/replica-identity-decisions"
+---
+
+If Ardent reports tables that need a decision, submit a table-to-decision map:
+
+```json
+{
+  "decisions": {
+    "public.audit_events": "exclude",
+    "public.invoice_line_items": "replica_identity_full"
+  }
+}
+```
+
+Decision values:
+
+| Value | Meaning |
+| --- | --- |
+| `exclude` | Do not replicate this table yet |
+| `add_pk` | You will add a primary key or valid unique key on source before retrying |
+| `replica_identity_full` | Opt into `REPLICA IDENTITY FULL` for this table |
+
+The map is a full replace: tables you omit revert to `exclude`.

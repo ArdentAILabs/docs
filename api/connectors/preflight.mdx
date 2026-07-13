@@ -1,0 +1,10 @@
+---
+title: "Preflight a source"
+sidebarTitle: "Preflight"
+description: "Check a database before connecting it — creates nothing"
+openapi: "/openapi.public.json POST /v1/connectors/preflight"
+---
+
+Preflight checks reachability, writer status, logical replication settings, slot capacity, plugin availability, permissions, and whether the source is already connected — without creating anything.
+
+A failed check is still a `200` — read `preflight_pass` in the response. When grants are the problem, `grant_script` holds ready-to-run SQL that fixes them.
