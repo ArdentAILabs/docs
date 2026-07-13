@@ -16,5 +16,10 @@ if [ ! -f "$src" ]; then
   exit 1
 fi
 
+if ! python3 -m json.tool "$src" >/dev/null; then
+  echo "Invalid JSON: $src" >&2
+  exit 1
+fi
+
 cp "$src" "$docs_root/openapi.public.json"
 echo "Updated $docs_root/openapi.public.json"
