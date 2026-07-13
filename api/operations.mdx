@@ -9,6 +9,8 @@ Some Ardent work takes longer than a single request: connector discovery, connec
 
 Add `?wait=10` to long-poll: the server holds the request up to that many seconds (max 10) and answers early if the operation finishes. This cuts most polling loops to a single line.
 
+Add `?wait=10` to long-poll: the server holds the request up to that many seconds (max 10) and answers early if the operation finishes. This cuts most polling loops to a single line.
+
 Representative response:
 
 ```json
