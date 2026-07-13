@@ -1,0 +1,117 @@
+---
+title: "Configuration & automation"
+sidebarTitle: "Configuration"
+description: "Environment variables, exit codes, and JSON output for scripts, CI, and agents"
+---
+
+Everything on this page is optional. The defaults work for everyday use — come here when you're wiring the CLI into a script, CI job, or agent.
+
+## Which credentials the CLI uses
+
+In order:
+
+1. The `ARDENT_TOKEN` environment variable, if set.
+2. Otherwise, the login stored on this machine from `ardent login`.
+
+The environment variable always wins. In CI, just set `ARDENT_TOKEN` — you don't need to log out first or clean up old logins.
+
+The API endpoint works the same way: `ARDENT_API_URL` wins if set, then any stored value, then the default `https://api.tryardent.com`.
+
+## Where the CLI keeps its state
+
+One file: `~/.ardent/config.json`. It holds your token, API URL, current selections, and a cache for offline use.
+
+`ardent logout` deletes this file. It does **not** revoke API tokens — do that in the dashboard under **Settings > API keys**.
+
+## Exit codes
+
+| Code | Meaning |
+| --- | --- |
+| `0` | Success |
+| `1` | Something failed while running — network, API error, timeout |
+| `2` | The command itself was wrong — unknown flag, bad value. Also used by `connector preflight` when checks fail and `connector list --fail-on-warnings` when there are warnings |
+
+## JSON output
+
+`branch create` and `branch info` accept `--format json`:
+
+```bash
+ardent branch create pr-123 --format json
+```
+
+```json
+{
+  "schema_version": 3,
+  "id": "br_123",
+  "name": "pr-123",
+  "connector_id": "conn_123",
+  "service_type": "postgres",
+  "status": "active",
+  "branch_url": "postgresql://user:***@pr-123-postgres.routing.tryardent.com:5432/db?sslmode=require&channel_binding=disable",
+  "pooled_branch_url": "postgresql://user:***@pr-123-pooler.routing.tryardent.com:5432/db?sslmode=require&channel_binding=disable",
+  "pooled_branch_prisma_url": "postgresql://user:***@pr-123-pooler.routing.tryardent.com:5432/db?sslmode=require&channel_binding=disable",
+  "created_at": "2026-06-01T12:00:00Z",
+  "read_ready_at": "2026-06-01T12:00:05Z",
+  "write_ready_at": "2026-06-01T12:00:05Z",
+  "masked_ready_at": null,
+  "last_branch_activity": null,
+  "current": true,
+  "warning": null
+}
+```
+
+Three rules keep your scripts stable:
+
+- Read the fields you need; ignore the rest. New fields may be added.
+- Fields that don't apply are `null`, never missing.
+- Errors are JSON too, with a stable `code`:
+
+```json
+{
+  "schema_version": 3,
+  "error": {
+    "code": "timeout",
+    "message": "Branch creation did not complete within 65 minutes. ..."
+  }
+}
+```
+
+<Accordion defaultOpen={false} title="All error codes">
+| Code | When |
+| --- | --- |
+| `offline` | No network and no usable cache |
+| `not_authenticated` | No token found |
+| `not_found` | The named branch doesn't exist |
+| `no_current_project` / `no_projects` | Nothing selected, or nothing to select |
+| `no_connectors` / `connector_unavailable` | No connector selected or it isn't usable |
+| `no_current_branch` | No branch named and none selected |
+| `invalid_name` / `invalid_arguments` | The name or arguments failed validation |
+| `branch_url_missing` | Branch created but the server returned no URL |
+| `create_succeeded_but_details_missing` | Branch created but its details couldn't be fetched |
+| `timeout` | The operation is still running server-side; the CLI stopped waiting |
+| `api_error` | Any other API failure |
+</Accordion>
+
+<Note>
+Flag mistakes — an unknown `--format` value, two flags that can't be combined — print a plain-text error and exit `2`. They are never wrapped in JSON, because they happen before JSON mode starts.
+</Note>
+
+`--print-url` is the simpler option when you only want the URL: it prints one line and nothing else. You can't combine it with `--format`.
+
+## Timeouts and polling
+
+Branch creates and deletes run on Ardent's servers; the CLI waits and checks progress. By default it waits up to **65 minutes** for a create and **10 minutes** for a delete. If the CLI stops waiting, the work usually finishes server-side anyway — the [Branches page](/cli/branches) covers what to do.
+
+Most CI jobs never need to change this. If yours does:
+
+<Accordion defaultOpen={false} title="Polling environment variables">
+| Variable | Default | What it does |
+| --- | --- | --- |
+| `ARDENT_BRANCH_CREATE_MAX_WAIT_MS` | `3900000` (65 min) | How long `branch create` waits before giving up |
+| `ARDENT_BRANCH_CREATE_POLL_INTERVAL_MS` | adaptive | Fixed time between progress checks during create |
+| `ARDENT_BRANCH_CREATE_OPERATION_WAIT_SECONDS` | `5` (max `10`) | How long each progress check is willing to wait server-side |
+| `ARDENT_BRANCH_DELETE_MAX_WAIT_MS` | `600000` (10 min) | How long `branch delete` waits before giving up |
+| `ARDENT_BRANCH_DELETE_POLL_INTERVAL_MS` | `2000` (2 s) | Fixed time between progress checks during delete |
+
+Always use positive whole numbers. Zero, negative, and non-numeric values are either rejected or fall back to defaults — and a zero or negative interval can hammer the API in a tight loop.
+</Accordion>

@@ -4,9 +4,9 @@ description: "Branch your Postgres database in a few minutes"
 ---
 
 <Info>
-  **Prerequisites:**
-  - Node.js (LTS recommended)
-  - A Postgres connection string (Supabase, RDS, PlanetScale, or self-hosted)
+  **You'll need:**
+  - Node.js 18 or newer
+  - Access to your Postgres database (Supabase, RDS, PlanetScale, or self-hosted)
 </Info>
 
 <Steps>
@@ -24,61 +24,108 @@ npm install -g ardent-cli
 ardent login
 ```
 
-This opens your browser to authenticate with GitHub or email. If you only have one project and one connector, Ardent auto-selects them after login so you can go straight to branching.
+Your browser opens — sign in or create your account there, then come back to the terminal.
+
+<Accordion defaultOpen={false} title="What success looks like">
+```text
+✓ Logged in as you@company.com
+
+No projects found.
+Create one with: ardent project create <name>
+```
+On a fresh account, create a project first: `ardent project create my-app`. If you already have exactly one project and connector, Ardent selects them for you.
+</Accordion>
+
+</Step>
+
+<Step title="Get your connection string">
+
+Save it in your shell so the next two commands can reuse it:
+
+```bash
+export ARDENT_DB_URL='postgresql://user:password@host:5432/mydb'
+```
+
+Keep the single quotes — passwords often contain characters your shell would eat.
+
+Where to find it, and the one thing that usually blocks the next step:
+
+<Tabs>
+<Tab title="Supabase">
+In your Supabase dashboard, open **Connect** and copy the **direct connection** string — not the pooler one. The pooler can't do replication, and preflight will fail on it. Details: [Supabase setup](/connectors/supabase).
+</Tab>
+<Tab title="RDS / Aurora">
+Logical replication is usually off by default. Set `rds.logical_replication = 1` in your parameter group and reboot before running preflight. Details: [RDS setup](/connectors/rds).
+</Tab>
+<Tab title="PlanetScale">
+Use your Postgres connection string from the PlanetScale dashboard. Details: [PlanetScale setup](/connectors/planetscale).
+</Tab>
+<Tab title="Self-hosted">
+Make sure `wal_level = logical` in your Postgres config (needs a restart if you change it). Details: [Self-hosted setup](/connectors/self-hosted).
+</Tab>
+</Tabs>
 
 </Step>
 
 <Step title="Preflight your database">
 
 ```bash
-ardent connector preflight postgresql 'postgresql://user:[YOUR-PASSWORD]@host:5432/mydb'
+ardent connector preflight postgresql "$ARDENT_DB_URL"
 ```
 
-Preflight checks whether Ardent can reach and replicate from your source database. It does **not** create a connector, store credentials, or start replication. If grants are missing, Ardent prints the SQL to run.
+Preflight checks whether Ardent can branch this database. It creates nothing and stores no credentials — it just tells you what, if anything, to fix.
 
-Wrap the URL in **single quotes** so special characters in the password or query string are not interpreted by your shell.
+If a check fails:
+
+- **Missing grants** — preflight prints the SQL. Run it on your database, then run preflight again.
+- **`wal level` fails** — logical replication is off. See your provider tab above.
+- **"Already connected"** — this database has a connector. Run `ardent connector list`.
 
 </Step>
 
 <Step title="Connect your database">
 
-When preflight passes, create the connector:
+When preflight passes:
 
 ```bash
-ardent connector create postgresql 'postgresql://user:[YOUR-PASSWORD]@host:5432/mydb'
+ardent connector create postgresql "$ARDENT_DB_URL"
 ```
 
-Ardent replicates your database during initial setup. You only do this once. Setup time depends on data size, write rate, and network throughput. Small sources are ready in minutes; large production databases take longer. After setup, every branch creates in under 6 seconds, regardless of data size.
+This copies your data into Ardent once. Small databases take minutes; large ones take longer. Setup runs on Ardent's servers — if your terminal disconnects or you interrupt the command, nothing is lost. Run `ardent connector retry-setup <name>` and it picks up where it left off.
 
-<Note>The new connector is automatically selected as your active connector.</Note>
+<Note>The new connector becomes your active connector automatically.</Note>
 
 </Step>
 
-<Step title="Create your first branch">
-
-When the connector is ready:
+<Step title="Create a branch and use it">
 
 ```bash
 ardent branch create my-feature
 ```
 
-Done. You now have an isolated copy of your production database. The CLI returns a connection string you can use anywhere: psql, your app, an ORM, or an agent.
+That's an isolated copy of your database, created in seconds. Prove it — connect and query:
+
+```bash
+psql "$(ardent branch info --print-url)" -c 'select count(*) from <your-biggest-table>;'
+```
+
+Real data, real Postgres, and nothing you do here touches your source database.
 
 </Step>
 </Steps>
 
 ## What's next
 
-- Feed the branch URL to Claude Code or Cursor. Test if your migration breaks, try a new index, or validate schema changes against realistic data
-- Run `ardent branch info` to see the connection URL and status for your current branch
-- Create more branches for different tasks. They auto-suspend when idle, so don't worry about cleanup
-- Working across multiple databases or environments? Use `ardent project switch` and `ardent connector switch` to move between them
-
-<CardGroup cols={2}>
-  <Card title="Connector docs" icon="unplug" href="/connectors/supabase">
-    Provider-specific setup for Supabase, RDS, PlanetScale, and self-hosted Postgres.
+<CardGroup cols={3}>
+  <Card title="Give it to a coding agent" icon="bot" href="/workflows/ai-agents">
+    Let Claude Code or Cursor test migrations and schema changes on a branch.
   </Card>
-  <Card title="CLI Reference" icon="terminal" href="/cli/overview">
-    Commands, flags, automation output, and configuration knobs.
+  <Card title="A branch per pull request" icon="git-pull-request" href="/workflows/ci-cd">
+    Create and clean up branches automatically in CI.
+  </Card>
+  <Card title="Branch-based local dev" icon="laptop" href="/workflows/local-dev">
+    Point your local stack at branches instead of a shared staging database.
   </Card>
 </CardGroup>
+
+Branches suspend on their own when idle, so there's no cleanup pressure — create one per task and move on.

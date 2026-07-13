@@ -10,7 +10,7 @@ description: "Common questions answered"
 </Accordion>
 
 <Accordion title="How long does it take to create a branch?">
-  Branch creation is under 6 seconds, regardless of source database size. First-time connector setup is a separate, one-time step. It takes longer depending on data size and write rate, but you only do it once.
+  Branch creation is under 6 seconds, regardless of source database size. First-time connector setup is separate and runs once; how long it takes scales with your data size and write rate.
 </Accordion>
 
 <Accordion title="Does branching affect my production database?">
@@ -24,11 +24,11 @@ description: "Common questions answered"
 <Accordion title="Can I use branches with AI agents?">
   Yes. Create a branch and pass the connection URL to Claude Code, Cursor, or any agent. They can read, write, and run migrations without touching production.
 
-  Ardent generates a unique connection string for each branch. Your real database credentials are never exposed. If a branch URL is ever compromised, your production data stays safe because the branch connection string has no access to the original database. An LLM will never see or have access to your real credentials.
+  Each branch gets its own connection string with no access to your source database. A leaked branch URL — or one handed to an LLM — can't reach production or your real credentials.
 </Accordion>
 
 <Accordion title="Do branches stay in sync with production?">
-  No. Branches are created from a continuously synced replica of your production database, but once a branch is created it's an isolated snapshot. Changes you make on the branch don't affect production or any other branch.
+  No. A branch is a point-in-time snapshot taken from a continuously synced replica. After creation it's isolated: your changes don't affect production, and production changes don't flow in.
 </Accordion>
 
 <Accordion title="How many branches can I create?">
@@ -40,11 +40,11 @@ description: "Common questions answered"
 </Accordion>
 
 <Accordion title="What Postgres features work on branches?">
-  Most of it. Branches include schema, data, grants, RLS, functions, triggers, and supported extensions. A few source features need an explicit setup choice: replica identity for tables without a primary key, and a small set of provider-specific extensions. Ardent flags these during connector setup so they're decided before you branch.
+  Most of it. Branches include schema, data, grants, RLS, functions, triggers, and supported extensions. Two things need an explicit choice during connector setup: replica identity for tables without a primary key, and some provider-specific extensions. Both are decided before you branch.
 </Accordion>
 
 <Accordion title="Can I build this myself?">
-  Yes. You'd need to set up logical replication (WAL configuration, replication slots, schema drift, failure recovery; database replication is a nightmare), build a branching engine, build a connection proxy that routes to the right branch, handle auto-suspend and resume, manage credential isolation, and build a CLI on top of all of it. We've spent thousands of engineering hours building and maintaining this infrastructure. Ardent gives you all of it in one `npm install`.
+  Yes — it's just a lot. You'd need logical replication (WAL config, replication slots, schema drift, failure recovery), a branching engine, a connection proxy that routes to the right branch, auto-suspend and resume, credential isolation, and a CLI on top. Ardent is all of that in one `npm install`.
 </Accordion>
 
 <Accordion title="Is my production data safe?">
@@ -56,5 +56,5 @@ description: "Common questions answered"
 ## Still have questions?
 
 <Card title="Contact us" icon="envelope" href="mailto:vikram@tryardent.com" horizontal>
-  Reach out at vikram@tryardent.com. We're happy to help.
+  Reach out at vikram@tryardent.com.
 </Card>

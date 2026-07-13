@@ -1,12 +1,10 @@
 ---
 title: "Connectors"
 sidebarTitle: "Connectors"
-description: "Preflight, create, monitor, and update Postgres connectors"
+description: "Check, connect, monitor, and manage your Postgres sources"
 ---
 
-A connector links Ardent to one Postgres source server. Once a connector is ready, every branch you create comes from that source.
-
-For production databases, start with preflight. It checks the source and prints the SQL to fix missing grants **without** creating a connector or storing credentials.
+A connector links Ardent to one Postgres server. Once it's ready, every branch you create comes from that source.
 
 <Info>
   Currently supported connector type: `postgresql`.
@@ -14,34 +12,13 @@ For production databases, start with preflight. It checks the source and prints 
 
 ## ardent connector preflight
 
-Validate a Postgres source before creating a connector:
+Check a database **before** connecting it. Preflight creates nothing and stores no credentials:
 
 ```bash
 ardent connector preflight postgresql 'postgresql://user:***@host:5432/mydb'
 ```
 
-Preflight answers one question: “Can Ardent safely create a working connector for this database?” It checks:
-
-- connection and authentication
-- whether the URL points at a writer, not a read replica
-- logical replication settings
-- replication slot and WAL sender capacity
-- `wal2json` plugin availability
-- table-read permissions and Ardent metadata-schema permissions
-- whether this server is already connected to Ardent
-
-If anything is missing, Ardent tells you exactly what to fix. When missing grants can be fixed with SQL, preflight prints a grant script you can copy, review, run, and then re-run preflight.
-
-```bash
-ardent connector preflight postgresql 'postgresql://user:***@host:5432/mydb'   --schemas public,billing
-```
-
-| Option | Description |
-| --- | --- |
-| `--schemas <list>` | Comma-separated schemas to check, for example `public,billing` |
-| `--byoc` | Route preflight through your customer-owned Ardent environment |
-| `--environment-id <id>` | Environment to use for BYOC/private-network preflight |
-| `--private-link-id <id>` | Private connection to use. Required when the environment has active private links |
+It answers one question: can Ardent safely branch this database? It checks the connection, permissions, and replication settings. When something is missing, it tells you the exact fix — and prints a ready-to-run SQL grant script when grants are the problem.
 
 <Accordion defaultOpen={false} title="Example output">
 ```text
@@ -70,30 +47,38 @@ Detected source provider: vanilla
 ```
 </Accordion>
 
-For BYOC/private-network sources, route the check through the same environment and private connection you will use for connector creation:
+| Option | Description |
+| --- | --- |
+| `--schemas <list>` | Only check these schemas, e.g. `public,billing` |
+| `--byoc` | Run the check through your customer-owned Ardent environment |
+| `--environment-id <id>` | Which environment to use (needs `--byoc`) |
+| `--private-link-id <id>` | Which private connection to use (needs `--byoc`) |
+| `--allow-high-rtt-placement` | Allow a far-away placement despite higher latency (needs `--byoc`) |
 
-```bash
-ardent connector preflight postgresql '<url>'   --byoc   --environment-id env_123   --private-link-id epl_123
-```
+Preflight exits `0` when everything passes and `2` when it doesn't, so you can use it in scripts.
 
 ## ardent connector create
 
-Create a connector after preflight passes:
+When preflight passes, connect the database:
 
 ```bash
 ardent connector create postgresql 'postgresql://user:***@host:5432/mydb' --name prod-db
 ```
 
-**Shell quoting:** Wrap the connection URL in **single quotes**. Real connection strings often contain `?`, `&`, `#`, `!`, `$`, parentheses, or spaces inside passwords. Single quotes keep your shell from interpreting those characters.
+**Wrap the URL in single quotes.** Passwords often contain characters your shell would otherwise interpret.
 
 | Option | Description |
 | --- | --- |
-| `-n, --name <name>` | Friendly connector name |
-| `--byoc` | Create the connector in a customer-owned Ardent environment |
-| `--environment-id <id>` | Environment for BYOC/private-network connectors |
-| `--private-link-id <id>` | Private connection to use for connector traffic |
-| `--replica-identity-decisions <path>` | JSON file with table-level replica identity decisions |
-| `--accept-replica-identity-defaults` | Non-interactively accept current/default decisions. Undecided tables are excluded |
+| `-n, --name <name>` | Connector name. Leave it off and Ardent derives one from your project and database |
+| `--byoc` | Create in a customer-owned Ardent environment |
+| `--environment-id <id>` | Which environment (needs `--byoc`) |
+| `--private-link-id <id>` | Which private connection. Auto-picked when the environment has exactly one |
+| `--allow-high-rtt-placement` | Allow a far-away placement despite higher latency (needs `--byoc`) |
+| `--replica-identity-decisions <path>` | JSON file of table decisions — see below |
+| `--accept-replica-identity-defaults` | Accept the default decision for every table, without prompting |
+| `--write-replica-plan <path>` | Write the recommended decisions to a file and stop, so you can review before setup |
+
+The last three can't be combined — pass one.
 
 <Accordion defaultOpen={false} title="Example output">
 ```text
@@ -104,17 +89,16 @@ ardent connector create postgresql 'postgresql://user:***@host:5432/mydb' --name
 ```
 </Accordion>
 
-Initial setup can take minutes to hours depending on source size, write rate, and network throughput. After setup, branch creation is fast and independent of source database size.
+First-time setup copies your data, so it can take minutes to hours depending on database size, write rate, and network speed. After that, branches are created in seconds regardless of size.
 
 ### Replica identity decisions
 
-Some tables cannot safely replicate UPDATE or DELETE events unless Postgres can identify the affected row. If Ardent finds tables without a primary key, valid unique NOT NULL index, or `REPLICA IDENTITY FULL`, the CLI asks what to do.
+Some tables have no primary key or valid unique index, so Postgres can't tell which row an UPDATE or DELETE touched. When Ardent finds tables like this, the CLI asks what to do with each one. In scripts (no terminal), it exits with code `1` instead of guessing — pass one of the three flags above.
 
-For non-interactive flows, pass a complete decision file:
+Most databases have keys on every table and never hit this.
 
-```bash
-ardent connector create postgresql '<url>'   --replica-identity-decisions ./replica-identity-decisions.json
-```
+<Accordion defaultOpen={false} title="The decisions file, and what each choice means">
+A valid unique index means unique, NOT NULL on every column, non-partial, and non-deferrable. Tables without a primary key or an index like that need a decision:
 
 ```json
 {
@@ -124,84 +108,92 @@ ardent connector create postgresql '<url>'   --replica-identity-decisions ./repl
 }
 ```
 
-Decision values are:
-
 | Value | Meaning |
 | --- | --- |
-| `exclude` | Do not replicate this table yet |
-| `add_pk` | You will add a primary key or valid unique key on source before retrying |
-| `replica_identity_full` | Opt into `REPLICA IDENTITY FULL` for this table |
+| `exclude` | Don't replicate this table yet |
+| `add_pk` | You'll add a primary key or unique key on the source, then retry |
+| `replica_identity_full` | Use `REPLICA IDENTITY FULL` for this table |
+
+The file must cover every listed table. With `--accept-replica-identity-defaults`, undecided tables are excluded.
 
 <Warning>
-  `REPLICA IDENTITY FULL` increases WAL volume for UPDATE and DELETE on that table. Use it deliberately; Ardent never changes replica identity on your source automatically.
+  `REPLICA IDENTITY FULL` makes UPDATE and DELETE write more to your database's WAL. Choose it deliberately. Ardent never changes replica identity on your source — when a change is needed, it prints the SQL for you to run.
 </Warning>
+</Accordion>
 
 ## ardent connector list
-
-List all connectors in the current project:
 
 ```bash
 ardent connector list
 ```
 
-The active connector is highlighted and prefixed with `*`. `●` means the connector is ready to branch from; `○` means it is not. Warnings appear under the connector name.
+Your active connector is green and marked `*`. Status icons:
+
+| Icon | Meaning |
+| --- | --- |
+| `●` green | Ready to branch |
+| `●` yellow | Working, but degraded — some source objects are left out of branches |
+| `◐` cyan | Setup still in progress |
+| `○` red | Broken — failed or unreachable |
+
+Warnings appear under the connector, with a `⚠` count next to the name. A `[delete locked]` marker means deletion is locked (see below).
+
+In CI, add `--fail-on-warnings` to exit with code `2` when any connector has warnings.
+
+## ardent connector status
+
+Show one connector's health and setup progress:
+
+```bash
+ardent connector status prod-db
+```
 
 <Accordion defaultOpen={false} title="Example output">
-  <div className="font-mono text-[13px] leading-normal rounded-md border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-950">
-    <div className="text-zinc-800 dark:text-zinc-200">Connectors:</div>
-    <div className="text-green-600 dark:text-green-400">
-      <div>* ● prod-db</div>
-      <div>{"    "}postgresql</div>
-    </div>
-    <div className="h-3" aria-hidden />
-    <div className="text-zinc-500 dark:text-zinc-400">
-      <div>{"  "}○ staging-db</div>
-      <div>{"    "}postgresql</div>
-    </div>
-  </div>
+```text
+Connector: prod-db
+Service:   postgresql
+Status:    Ready
+```
 </Accordion>
+
+`validating` means source checks or setup are running right now.
+
+<Note>
+  `connector status` won't surface paused replication. If a connector looks degraded or replication has stalled, also check [Locks and quarantines](#locks-and-quarantines) below.
+</Note>
 
 ## ardent connector switch
 
-Switch the active connector without changing projects:
+Change the active connector without changing projects:
 
 ```bash
 ardent connector switch staging-db
 ```
 
-<Accordion defaultOpen={false} title="Example output">
-```text
-Switched from 'prod-db' to 'staging-db'
-```
-</Accordion>
-
 ## ardent connector retry-setup
 
-Recover setup for a connector that is still pending, failed source checks, or became unhealthy. The command preserves the existing connector row, credentials, and recovery handles; do not delete and recreate a connector just to retry setup.
+Finish or repair setup without deleting the connector. Your credentials and configuration are kept.
 
 ```bash
 ardent connector retry-setup prod-db
 ```
 
-When source checks are stale, failed, or unhealthy, the CLI first re-checks the source database, then starts engine setup. When setup is already healthy, the backend can short-circuit and the CLI prints that no work was needed.
+What happens depends on the connector's state:
 
-If setup is already in progress, `retry-setup` is still safe to run. Ardent reuses the active server-side setup operation instead of starting a duplicate. In connector status output, `validating` means source validation or setup is already in progress. If the connector is already `validating` and a replica-identity decision is still required, the CLI exits with code `1` and prints that decisions cannot be changed while setup is already in progress; wait for the current setup attempt to finish, then retry if the connector still shows setup pending.
+- **Checks are stale or failed** — the CLI re-checks the source first, then runs setup.
+- **Already healthy** — nothing to do; the CLI says so and exits.
+- **Setup already running** — safe to run anyway; it joins the running setup instead of starting another. If that setup still needs replica identity decisions, the CLI exits with code `1` — decisions can't change mid-setup. Wait for it to finish, then retry.
 
-If the original setup needed replica identity decisions, pass the same JSON file when retrying:
-
-```bash
-ardent connector retry-setup prod-db   --replica-identity-decisions ./replica-identity-decisions.json
-```
-
-You can also accept current/default decisions non-interactively during retry:
+If the original setup needed replica identity decisions, pass the same file or flag again:
 
 ```bash
+ardent connector retry-setup prod-db --replica-identity-decisions ./decisions.json
 ardent connector retry-setup prod-db --accept-replica-identity-defaults
 ```
 
 ## ardent connector update
 
-Update connector configuration. For example, omit selected source extensions from future branches:
+Change connector configuration. One setting today: which source extensions to leave out of new branches.
 
 ```bash
 ardent connector update prod-db --drop-extensions pgmq,supabase_vault
@@ -215,20 +207,42 @@ ardent connector update prod-db --drop-extensions ''
 
 ## ardent connector delete
 
-Delete a connector:
-
 ```bash
 ardent connector delete staging-db
 ```
 
-By default, Ardent waits for in-progress replication work to finish so changes are not abandoned. Use `--force` only when you intentionally want to skip that wait.
+By default, Ardent waits for in-progress replication to finish so no changes are lost. `--force` skips the wait and abandons those changes.
+
+Two things can stop a delete:
+
+- **Deletion is locked** — someone ran `connector lock` on it. Unlock first.
+- **A branch has un-replicated changes** — wait, or re-run with `--force`.
+
+## Locks and quarantines
+
+You'll rarely need these two, but you should know they exist.
+
+<Accordion defaultOpen={false} title="ardent connector lock / unlock — protect a connector from deletion">
+```bash
+ardent connector lock prod-db --reason "production source"
+ardent connector unlock prod-db
+```
+
+While locked, `connector delete` refuses and tells you to unlock first. Locked connectors show `[delete locked]` in `connector list`.
+</Accordion>
+
+<Accordion defaultOpen={false} title="ardent connector quarantine — inspect and release paused replication">
+If part of a connector's replication keeps crashing, Ardent pauses (quarantines) it to protect your source. Quarantines don't show in `connector status` — list them directly:
 
 ```bash
-ardent connector delete staging-db --force
+ardent connector quarantine list prod-db
 ```
 
-<Accordion defaultOpen={false} title="Example output">
-```text
-✓ Connector deleted
+Each entry shows what was paused, why, when, and the exact release command:
+
+```bash
+ardent connector quarantine release prod-db <quarantine-id>
 ```
+
+Fix the underlying cause before releasing, or it will likely quarantine again.
 </Accordion>

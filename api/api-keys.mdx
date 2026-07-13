@@ -30,7 +30,7 @@ curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X POST https://api.tryardent.co
 curl -H "Authorization: Bearer $ARDENT_TOKEN" https://api.tryardent.com/v1/orgs/org_123/api-keys
 ```
 
-List responses include metadata such as name, role, creation time, and expiration, but never the secret token.
+List responses include each key's name, key prefix, scopes, creation time, expiration, and last-used time — never the secret token.
 
 ## Revoke an API key
 
@@ -38,4 +38,4 @@ List responses include metadata such as name, role, creation time, and expiratio
 curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X DELETE https://api.tryardent.com/v1/orgs/org_123/api-keys/key_123
 ```
 
-Revocation is immediate. Any CI job or integration using that token will fail authentication on its next request.
+Revocation is immediate — the next request with that token fails authentication.

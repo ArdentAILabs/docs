@@ -1,14 +1,11 @@
 ---
 title: "AWS RDS"
-description: "Connect your RDS Postgres database to Ardent"
+description: "The RDS-specific parts of connecting to Ardent"
 ---
 
-Ardent is compatible with AWS RDS for PostgreSQL.
+Ardent works with AWS RDS for PostgreSQL. This page covers only what's specific to RDS — the full walkthrough is the [Quickstart](/quickstart).
 
-RDS needs a parameter-group change, a replication grant, and network access before Ardent can connect. Start with preflight so Ardent can tell you exactly what's missing before it stores credentials or creates a connector.
-
-**Want Claude or Cursor to help?** Paste this prompt into your agent:
-
+<Accordion defaultOpen={false} title="Using Claude Code or Cursor? Paste this prompt and it does the checks for you">
 ```
 Check if my AWS RDS Postgres database is ready to connect to Ardent.
 My connection string: [paste here]
@@ -27,8 +24,9 @@ Verify:
 After preflight passes, run:
 ardent connector create postgresql '<connection-string>'
 ```
+</Accordion>
 
----
+RDS needs three things before preflight can pass:
 
 <Steps>
 <Step title="Enable logical replication">
@@ -39,91 +37,51 @@ Create or modify a parameter group for your RDS Postgres major version and set:
 rds.logical_replication = 1
 ```
 
-Apply the parameter group to your RDS instance.
+Apply the parameter group to your instance.
 
 <Warning>
-  This requires a reboot before logical replication is actually enabled. Plan a maintenance window.
+  This takes effect only after a reboot. Plan a maintenance window.
 </Warning>
 
 <Tip>
-  Keep enough replication slots and WAL sender capacity for Ardent plus any existing replicas or CDC tools. Do not lower existing values that other replication consumers rely on.
+  Keep enough replication slots and WAL sender capacity for Ardent plus any existing replicas or CDC tools. Don't lower values that other replication consumers rely on.
 </Tip>
 
 </Step>
 
 <Step title="Allow network access">
 
-In the RDS console, open **Databases > your instance > Connectivity & security** and confirm the endpoint and port.
+In the RDS console, open **Databases > your instance > Connectivity & security** and confirm the endpoint and port. Allow Ardent's egress IP to reach the instance on the Postgres port, usually `5432`. Ask your Ardent contact for the current egress IP if you don't have it.
 
-Allow Ardent's egress IP to reach the instance on the Postgres port, usually `5432`. Ask your Ardent contact for the current egress IP if you do not already have it.
-
-If your RDS instance is private-only, use a BYOC environment and PrivateLink rather than opening public ingress.
+If your instance is private-only, use a BYOC environment and PrivateLink instead of opening public ingress.
 
 </Step>
 
-<Step title="Grant replication permissions">
+<Step title="Grant the replication role">
 
-Connect as a role with `rds_superuser` privileges and grant the RDS replication role to the user Ardent will connect as:
+Connect as a role with `rds_superuser` privileges and grant RDS's replication role to the user Ardent will connect as:
 
 ```sql
 GRANT rds_replication TO your_user;
 ```
 
-Ardent may also need per-database and per-schema grants for the schemas you want to replicate. Preflight generates the exact SQL.
+Per-database and per-schema grants may also be needed — preflight generates the exact SQL for those.
 
 </Step>
+</Steps>
 
-<Step title="Run preflight">
-
-Your RDS connection string looks like:
+Your connection string looks like:
 
 ```text
 postgresql://user:[YOUR-PASSWORD]@your-instance.region.rds.amazonaws.com:5432/mydb
 ```
 
-Run:
+From here, continue with the [Quickstart](/quickstart): run preflight, run the grant script if preflight prints one, then create the connector.
 
-```bash
-ardent connector preflight postgresql 'postgresql://user:[YOUR-PASSWORD]@your-instance.region.rds.amazonaws.com:5432/mydb' --schemas public
-```
+Two RDS-specific notes:
 
-Preflight checks reachability, credentials, source writability, logical replication, RDS replication permissions, table grants, and duplicate-source status without creating a connector or storing credentials.
-
-If preflight says the source is a read replica, use the writer endpoint instead. Ardent refuses read replicas because full-fidelity branching needs a source that can support logical replication and schema tracking.
-
-</Step>
-
-<Step title="Run the generated grant script if needed">
-
-If preflight reports missing table or schema grants, copy the **Grant script** section and run it in `psql` as a role allowed to grant those privileges.
-
-Then re-run preflight until it passes.
-
-</Step>
-
-<Step title="Connect your database">
-
-```bash
-ardent connector create postgresql 'postgresql://user:[YOUR-PASSWORD]@your-instance.region.rds.amazonaws.com:5432/mydb'
-```
-
-Ardent stores encrypted credentials, discovers your schema, snapshots selected tables, and starts continuous replication. Initial setup time depends on data size, write rate, and network throughput.
+- If preflight says the source is a **read replica**, use the writer endpoint instead.
 
 <Warning>
-  Logical replication slots retain WAL while a consumer is behind. A very low WAL retention limit can invalidate the slot under heavy writes or long transactions, forcing a connector rebuild / resnapshot. Set retention with enough headroom and monitor long-running transactions.
+  **WAL retention:** Replication slots retain WAL while a consumer is behind. A very low retention limit can invalidate the slot under heavy writes or long transactions, forcing a full connector rebuild and resnapshot. Leave enough headroom and monitor long-running transactions.
 </Warning>
-
-</Step>
-
-<Step title="Create your first branch">
-
-When the connector is ready:
-
-```bash
-ardent branch create my-feature
-```
-
-Done. You now have an isolated copy of your RDS database: schema, data, and all. The CLI returns a connection URL you can use anywhere.
-
-</Step>
-</Steps>

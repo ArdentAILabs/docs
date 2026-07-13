@@ -17,9 +17,13 @@ A connector links Ardent to one Postgres source server. The safest API flow is t
 | Submit replica decisions | `PUT /v1/connectors/{connector_id}/replica-identity-decisions` | Resolves table identity choices |
 | Start setup | `POST /v1/connectors/{connector_id}/engine-setup` | Starts async setup |
 | Inspect connector | `GET /v1/connectors/{connector_id}` | Returns status and readiness information |
-| List connectors | `GET /v1/connectors` | Lists connectors in scope |
+| List connectors | `GET /v1/connectors?org_id={org_id}` | Lists connectors; `org_id` is required |
 | Update connector | `PUT /v1/connectors/{connector_id}` | Updates supported settings |
-| Delete connector | `DELETE /v1/connectors/{connector_id}` | Deletes the connector |
+| Delete connector | `DELETE /v1/connectors/{connector_id}` | Starts an async delete; returns an operation |
+| Lock deletion | `POST /v1/connectors/{connector_id}/deletion-lock` | Blocks deletes until unlocked |
+| Unlock deletion | `DELETE /v1/connectors/{connector_id}/deletion-lock` | Removes the deletion lock |
+| List quarantines | `GET /v1/connectors/{connector_id}/quarantine` | Lists paused replication deployments |
+| Release quarantine | `POST /v1/connectors/{connector_id}/quarantine/{quarantine_id}/release` | Resumes a paused deployment |
 
 ## Preflight a source
 
@@ -27,7 +31,7 @@ A connector links Ardent to one Postgres source server. The safest API flow is t
 curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/connectors/preflight   -H 'Content-Type: application/json'   -d '{"org_id":"org_123","service_name":"postgresql","connection_details":{"url":"postgresql://user:***@host:5432/mydb"},"selected_schemas":["public","billing"]}'
 ```
 
-Preflight does not create a connector. It checks reachability, writer status, logical replication settings, slot capacity, plugin availability, permissions, and whether the source is already connected.
+Preflight checks reachability, writer status, logical replication settings, slot capacity, plugin availability, permissions, and whether the source is already connected — without creating anything.
 
 ## Create a connector
 
@@ -35,15 +39,21 @@ Preflight does not create a connector. It checks reachability, writer status, lo
 curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/connectors   -H 'Content-Type: application/json'   -d '{"org_id":"org_123","project_id":"project_123","name":"prod-db","service_name":"postgresql","connection_details":{"url":"postgresql://user:***@host:5432/mydb"}}'
 ```
 
-For private-network or customer-owned environments, include the environment and private connection IDs that your Ardent team has provisioned:
+If preflight hasn't passed for this source, create fails with `422` and the response body is the full preflight report — fix the failures it lists and retry.
+
+<Accordion defaultOpen={false} title="Private-network and customer-cloud connectors">
+Include the environment and private connection IDs that your Ardent team has provisioned:
 
 ```json
 {
-  "byoc": true,
+  "use_environment": true,
   "environment_id": "env_123",
   "private_link_id": "epl_123"
 }
 ```
+
+`environment_id` and `private_link_id` are only valid together with `use_environment: true`. Add `"allow_high_rtt_placement": true` to accept a far-away placement despite higher latency.
+</Accordion>
 
 ## Replica identity decisions
 
@@ -61,6 +71,8 @@ Decision values:
 | `add_pk` | You will add a primary key or valid unique key on source before retrying |
 | `replica_identity_full` | Opt into `REPLICA IDENTITY FULL` for this table |
 
+The map is a full replace: tables you omit revert to `exclude`.
+
 ## Async setup and discovery
 
 Discovery and setup can return an operation ID. Poll it until terminal:
@@ -77,4 +89,8 @@ See [Operations](/api/operations).
 curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X DELETE https://api.tryardent.com/v1/connectors/conn_123
 ```
 
-By default, Ardent waits for in-progress replication work to finish before deletion. Use force-delete behavior only when your Ardent workflow explicitly supports it and you understand the cleanup impact.
+Deletion is asynchronous: the call returns `202 Accepted` with an operation handle. Poll it like any other [operation](/api/operations).
+
+By default, Ardent waits for in-progress replication to finish before deleting. Add `?force=true` to skip that wait and abandon un-replicated changes.
+
+Two things block a delete: a deletion lock (`409` — unlock it first) and, without `force`, replication that hasn't finished yet.

@@ -13,42 +13,79 @@ Branches are isolated Postgres databases created from a connector. Use them for 
 | `POST` | `/v1/branch/create` | Create a branch |
 | `GET` | `/v1/branches/{connector_id}` | List branches for a connector |
 
-For interactive deletion and switching, use the CLI: `ardent branch delete` and `ardent branch switch`.
+Branch deletion is CLI-only today: `ardent branch delete`. Switching (`ardent branch switch`) is a CLI concept — the API has no notion of a current branch.
 
 ## Create a branch
+
+Branch creation is asynchronous: the create call returns an operation handle, and polling that operation gives you the branch's connection details.
 
 ```bash
 curl -H "Authorization: Bearer $ARDENT_TOKEN"   -X POST https://api.tryardent.com/v1/branch/create   -H 'Content-Type: application/json'   -d '{"connector_id":"conn_123","service_type":"postgres","name":"pr-123"}'
 ```
 
-For Postgres branches, `service_type` is `postgres`. Connector creation uses the connector type `postgresql`; branch creation uses the shorter branch service type.
+All three body fields are required. For Postgres branches, `service_type` is `postgres` — not the connector type `postgresql`.
 
-The response is the branch's connection details:
+The response is `202 Accepted` with an operation handle:
 
 ```json
 {
-  "host": "pr-123-postgres.routing.tryardent.com",
-  "port": 5432,
-  "username": "user",
-  "password": "***",
-  "database": "db",
-  "connection_uri": "postgresql://user:***@pr-123-postgres.routing.tryardent.com:5432/db?sslmode=require&channel_binding=disable"
+  "operation_id": "op_123",
+  "status": "pending",
+  "type": "branch_create",
+  "resource_id": "br_123"
 }
 ```
 
-Treat `connection_uri` and the discrete credential fields as sensitive. Use `connection_uri` exactly as returned, including `sslmode=require` and `channel_binding=disable`. If you assemble a connection string from the discrete fields, add those same query parameters.
+Poll the operation until it finishes. On `completed`, its `result` holds the branch details:
 
-Branch connections go through Ardent's connection routing layer. For branch connections, set SQL clients and IDEs to SSL mode `require`. With no custom root certificate configured, `sslmode=require` encrypts the connection but does not validate a CA chain. Leave custom root certificate, CA bundle, SSL certificate authority, or `sslrootcert` fields blank. Do not reuse a source database CA bundle; it cannot verify the branch routing host and can cause TLS errors. Keep `channel_binding=disable`; clients that force channel binding can reject a valid branch connection because TLS terminates at the routing layer.
+```bash
+curl -H "Authorization: Bearer $ARDENT_TOKEN"   "https://api.tryardent.com/v1/operations/op_123?wait=10"
+```
 
-When the branch is cut from a source whose WAL advanced past the snapshot, the response also includes a `warning` string describing the staleness. It is absent otherwise.
+```json
+{
+  "id": "op_123",
+  "status": "completed",
+  "result": {
+    "branch_id": "br_123",
+    "name": "pr-123",
+    "connector_id": "conn_123",
+    "service_type": "postgres",
+    "status": "active",
+    "branch_url": "postgresql://user:***@pr-123-postgres.routing.tryardent.com:5432/db?sslmode=require&channel_binding=disable",
+    "pooled_branch_url": null,
+    "pooled_branch_prisma_url": null,
+    "created_at": "2026-06-01T12:00:00Z",
+    "read_ready_at": "2026-06-01T12:00:05Z",
+    "write_ready_at": "2026-06-01T12:00:05Z",
+    "masked_ready_at": null
+  }
+}
+```
 
-For branch metadata such as `id`, `status`, and `created_at`, list the connector's branches with `GET /v1/branches/{connector_id}`, or use the CLI's `ardent branch create --format json`.
+See [Operations](/api/operations) for the polling model and the `?wait=` parameter.
+
+Treat `branch_url` as sensitive, and use it exactly as returned — including `sslmode=require` and `channel_binding=disable`.
+
+Retries are safe. Send an `X-Idempotency-Key` header with the create request; re-sending the same connector, service type, and name resumes the original request instead of creating a duplicate.
+
+Create can fail with: `400` (a required field is missing), `409` (this create is already in flight, or the idempotency key was reused for a different request), `422` (the connector's engine isn't ready to branch), or `503` (dispatch failed — retry).
+
+<Accordion defaultOpen={false} title="Client TLS settings for branch connections">
+Branch connections go through Ardent's routing layer, where TLS terminates. Configure SQL clients and IDEs accordingly:
+
+- Set SSL mode to `require`. This encrypts the connection; without a custom root certificate it does not validate a CA chain.
+- Leave root certificate, CA bundle, and `sslrootcert` fields blank. A source database CA bundle can't verify the routing host and causes TLS errors.
+- Keep `channel_binding=disable`. Clients that force channel binding reject valid branch connections.
+</Accordion>
 
 ## List branches
 
 ```bash
 curl -H "Authorization: Bearer $ARDENT_TOKEN" https://api.tryardent.com/v1/branches/conn_123
 ```
+
+Returns a JSON array of branch rows. Each row includes the branch's metadata (`id`, `name`, `status`, `created_at`, and more) plus `branch_url` and the pooled URL fields when available.
 
 Use this to populate internal dashboards or cleanup tools. For shell scripts that only need a URL, the CLI is simpler:
 

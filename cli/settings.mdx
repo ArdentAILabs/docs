@@ -1,32 +1,30 @@
 ---
 title: "Settings"
 sidebarTitle: "Settings"
-description: "Per-connector defaults, branch initialization SQL, and local Supabase linking"
+description: "Defaults for new branches, branch setup SQL, and local Supabase linking"
 ---
 
-Settings control what each **new branch** looks like for the currently selected connector: which database name appears in connection URLs, what SQL runs after branch creation, and how local tooling points at a branch.
+Settings control what each **new branch** looks like, per connector: the database name in its URL, and SQL that runs right after it's created.
 
-The command group is `ardent settings`.
-
-| Key | Description |
+| Key | What it sets |
 | --- | --- |
-| `default_db` | Default database name used in branch connection strings |
-| `branch_sql` | SQL, or `@path/to/file.sql`, executed once on every new branch after it is created |
+| `default_db` | The database name used in branch connection URLs |
+| `branch_sql` | SQL that runs once on every new branch, right after creation |
 
-## Branch configuration and anonymization
+## branch_sql: shape every new branch
 
-`branch_sql` gives teams repeatable control over branch contents without maintaining one-off scripts for every developer.
+`branch_sql` is how teams make every branch come up ready — without each developer keeping their own setup script.
 
 Common uses:
 
 - Redact or anonymize sensitive values on every branch.
-- Add fixtures, baseline rows, or organization-specific setup.
-- Apply guardrail DDL your app expects in isolated environments.
+- Add fixtures or baseline rows.
+- Apply DDL your app expects in test environments.
 
-For security-focused anonymization patterns, see [Security](/security#branch-anonymization).
+For anonymization patterns, see [Security](/security#branch-anonymization).
 
 <Warning>
-  `branch_sql` runs on new branches, not on your source database. Keep the SQL idempotent where possible so branch creation is predictable.
+  `branch_sql` runs on new branches, never on your source database. Keep it idempotent where you can, so branch creation stays predictable.
 </Warning>
 
 ## ardent settings list
@@ -45,22 +43,33 @@ Connector: prod-db
 
 ## ardent settings set
 
-Set the default database name used in branch URLs:
-
 ```bash
 ardent settings set default_db myapp
 ```
 
-Pass a file for `branch_sql`:
+For `branch_sql`, pass SQL inline or point at a file with `@`:
 
 ```bash
 ardent settings set branch_sql @./branch-init.sql
 ```
 
-<Accordion defaultOpen={false} title="Example output">
-```text
-✓ Set default_db → myapp
+<Accordion defaultOpen={false} title="Advanced: run more than one branch_sql script">
+Give each script a name with `--hook`, and control order and context:
+
+```bash
+ardent settings set branch_sql @./anonymize.sql --hook anonymize --order 1
+ardent settings set branch_sql @./fixtures.sql  --hook fixtures  --order 2
 ```
+
+| Flag | What it does |
+| --- | --- |
+| `--hook <name>` | Names this script, so several can exist side by side |
+| `--order <n>` | Run order across scripts (lower runs first) |
+| `--database <db>` | Run against this database instead of the default |
+| `--run-as <role>` | Run as this role |
+| `--no-database`, `--no-run-as` | Clear a previously set override |
+
+Remove a named script with `ardent settings remove branch_sql --hook <name>`.
 </Accordion>
 
 ## ardent settings remove
@@ -69,56 +78,42 @@ ardent settings set branch_sql @./branch-init.sql
 ardent settings remove branch_sql
 ```
 
-<Accordion defaultOpen={false} title="Example output">
-```text
-✓ Removed branch_sql
-```
-</Accordion>
-
 ## Local Supabase linking
 
-If you use Supabase locally, Ardent can point your local Supabase services at an Ardent branch. This is useful when you want local auth, REST, realtime, or edge-function tooling to run against an isolated branch instead of your local Postgres container.
+If you run Supabase locally, Ardent can point its services — auth, REST, realtime, storage — at an Ardent branch instead of the local Postgres container. Useful when you want the full local stack running against isolated, real data.
 
 ### ardent settings supabase status
 
-Check whether a local Supabase project is currently linked:
+Is a local Supabase project linked right now?
 
 ```bash
 ardent settings supabase status
 ```
 
-If more than one local Supabase project is available, pass the project name:
-
-```bash
-ardent settings supabase status --project my-app
-```
+If you have several local Supabase projects, name one with `--project <id>` (the Supabase CLI project id).
 
 ### ardent settings supabase link
 
-Link local Supabase to the current Ardent branch:
+Link local Supabase to the current branch:
 
 ```bash
 ardent settings supabase link
 ```
 
-Or link to a specific branch:
+Or to a specific branch:
 
 ```bash
 ardent settings supabase link my-feature --project my-app
 ```
 
-The CLI checks that local Supabase is reachable before changing configuration. Use `--skip-health-check` only when you know the services are intentionally stopped and you want to update configuration now:
-
-```bash
-ardent settings supabase link my-feature --skip-health-check
-```
+The CLI checks that local Supabase is running before it changes anything. Use `--skip-health-check` only if you've stopped the services yourself.
 
 ### ardent settings supabase unlink
 
-Restore local Supabase to its local database configuration:
+Put local Supabase back on its own local database:
 
 ```bash
 ardent settings supabase unlink
 ```
 
-Use `--project <project>` if the CLI asks you to disambiguate.
+`--project <id>` and `--skip-health-check` work here too.

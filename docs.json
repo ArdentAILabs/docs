@@ -11,6 +11,9 @@
     "library": "lucide"
   },
   "favicon": "/favicon.svg",
+  "contextual": {
+    "options": ["copy", "view", "chatgpt", "claude", "cursor"]
+  },
   "redirects": [
     {
       "source": "/cli-reference",
@@ -85,6 +88,7 @@
             "icon": "terminal",
             "pages": [
               "cli/overview",
+              "cli/configuration",
               {
                 "group": "Workspace",
                 "icon": "folder-key",

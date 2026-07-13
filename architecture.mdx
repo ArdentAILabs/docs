@@ -3,10 +3,10 @@ title: "Architecture"
 description: "How Ardent's split-plane architecture keeps your data safe and your branches fast"
 ---
 
-Ardent follows a split-plane architecture like databricks where the **control plane** and **data plane** are separated:
+Ardent separates the **control plane** from the **data plane**:
 
 - **Control plane:** Operated by Ardent. Handles branch orchestration, replication health monitoring, connection routing, auto-scaling, and policy enforcement. Spans across all deployments.
-- **Data plane:** Where your data lives. Includes Ardent's replication pipeline, your read replica, your branches, and more. Can be deployed on your cloud or ours.
+- **Data plane:** Where your data lives. Includes Ardent's replication pipeline, your read replica, and your branches. Can be deployed on your cloud or ours.
 
 Only metadata (schema structure, replication status, branch state) flows from the data plane to the control plane. Your actual data never leaves the data plane.
 
@@ -49,8 +49,7 @@ Where your data physically lives and where branches are served from. Runs on Ard
 
 - **Ardent Replicator**
   - Takes logical replication from production through a Kafka-backed pipeline into the read replica.
-  - Handles DDL in flight using **custom event triggers** that detect DDL on the primary and replay it **in order** on the replica, so schema changes keep streaming without stalls or silent drift.
-  - Applies changes in order across failures so retries do not leave gaps or duplicates.
+  - Handles DDL in flight using **custom event triggers** that detect DDL on the primary and replay it in order on the replica — schema and data changes stream together with no gaps, duplicates, or silent drift, even across failures and retries.
   - Manages WAL and slot pressure so replication does not destabilize the primary.
   - Quarantines, resumes, and recovers broken streams without manual replay scripts.
 - **Read replica:** Stays in sync with production; branches are always created from the replica, never from production directly, so branch load never hits your primary.
@@ -70,8 +69,6 @@ Ardent orchestrates everything from our control plane. The data plane is the onl
 | **Control plane** | Ardent infrastructure | Ardent infrastructure |
 | **Data plane** | Ardent infrastructure | Your cloud account |
 | **Data residency** | Ardent's cloud | Your cloud |
-
-Both modes are fully managed by Ardent. The difference is where the data plane runs.
 
 **Fully managed.** We host the entire data plane. Connect your database and we handle the Ardent Replicator, Kafka pipeline, read replica, and branch compute.
 

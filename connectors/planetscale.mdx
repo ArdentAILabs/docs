@@ -1,12 +1,11 @@
 ---
 title: "PlanetScale"
-description: "Connect your PlanetScale Postgres database to Ardent"
+description: "The PlanetScale-specific parts of connecting to Ardent"
 ---
 
-Ardent is compatible with PlanetScale Postgres.
+Ardent works with PlanetScale Postgres. This page covers only what's specific to PlanetScale — the full walkthrough is the [Quickstart](/quickstart).
 
-**Want Claude or Cursor to help?** Paste this prompt into your agent:
-
+<Accordion defaultOpen={false} title="Using Claude Code or Cursor? Paste this prompt and it does the checks for you">
 ```
 Check if my PlanetScale Postgres database is ready to connect to Ardent.
 My connection string: [paste here]
@@ -24,57 +23,28 @@ Verify:
 After preflight passes, run:
 ardent connector create postgresql '<connection-string>'
 ```
+</Accordion>
 
----
+Two things matter here:
 
 <Steps>
 <Step title="Enable logical replication">
 
-In your PlanetScale dashboard, go to **Settings > Integrations** and enable **Logical Replication**. This allows Ardent to replicate your data for branching.
+In your PlanetScale dashboard, go to **Settings > Integrations** and enable **Logical Replication**. This is what lets Ardent replicate your data for branching.
 
 </Step>
 
-<Step title="Find your connection string">
+<Step title="Copy the connection string">
 
-Go to **Connect > Connect with: Postgres** in your PlanetScale dashboard and copy the connection string. It looks like:
+Go to **Connect > Connect with: Postgres** and copy the connection string. It looks like:
 
-```
+```text
 postgresql://user:[YOUR-PASSWORD]@aws.connect.psdb.cloud/mydb?sslmode=require
 ```
 
-Wrap the URI in single quotes when you use it in a shell. The `?sslmode=…` part must not be interpreted by the shell.
-
-</Step>
-
-<Step title="Run preflight">
-
-```bash
-ardent connector preflight postgresql 'postgresql://user:[YOUR-PASSWORD]@aws.connect.psdb.cloud/mydb?sslmode=require'
-```
-
-Preflight checks reachability, credentials, source writability, logical replication, permissions, and duplicate-source status without creating a connector or storing credentials.
-
-If preflight reports missing grants or configuration, fix those first and re-run preflight. Do not create the connector until preflight passes.
-
-</Step>
-
-<Step title="Connect your database">
-
-```bash
-ardent connector create postgresql 'postgresql://user:[YOUR-PASSWORD]@aws.connect.psdb.cloud/mydb?sslmode=require'
-```
-
-Ardent stores encrypted credentials, discovers your schema, snapshots selected tables, and starts continuous replication. Initial setup time depends on data size, write rate, and network throughput.
-
-</Step>
-
-<Step title="Create your first branch">
-
-```bash
-ardent branch create my-feature
-```
-
-Done. You now have an isolated copy of your PlanetScale database: schema, data, and all. The CLI returns a connection URL you can use anywhere.
+Wrap it in single quotes in your shell — the `?sslmode=…` part must not be interpreted by the shell.
 
 </Step>
 </Steps>
+
+From here, continue with the [Quickstart](/quickstart): run preflight, fix anything it reports, then create the connector.
