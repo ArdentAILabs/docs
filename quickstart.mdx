@@ -10,7 +10,7 @@ description: "Branch your Postgres database in a few minutes"
 </Info>
 
 <Steps>
-<Step title="Install the CLI">
+<Step title="Install the CLI" id="install-the-cli">
 
 ```bash
 npm install -g ardent-cli
@@ -18,7 +18,7 @@ npm install -g ardent-cli
 
 </Step>
 
-<Step title="Log in">
+<Step title="Log in" id="log-in">
 
 ```bash
 ardent login
@@ -38,7 +38,7 @@ On a fresh account, create a project first: `ardent project create my-app`. If y
 
 </Step>
 
-<Step title="Get your connection string">
+<Step title="Get your connection string" id="get-your-connection-string">
 
 Save it in your shell so the next two commands can reuse it:
 
@@ -67,7 +67,7 @@ Make sure `wal_level = logical` in your Postgres config (needs a restart if you 
 
 </Step>
 
-<Step title="Preflight your database">
+<Step title="Preflight your database" id="preflight-your-database">
 
 ```bash
 ardent connector preflight postgresql "$ARDENT_DB_URL"
@@ -83,7 +83,7 @@ If a check fails:
 
 </Step>
 
-<Step title="Connect your database">
+<Step title="Connect your database" id="connect-your-database">
 
 When preflight passes:
 
@@ -97,7 +97,7 @@ This copies your data into Ardent once. Small databases take minutes; large ones
 
 </Step>
 
-<Step title="Create a branch and use it">
+<Step title="Create a branch and use it" id="create-a-branch-and-use-it">
 
 ```bash
 ardent branch create my-feature
@@ -114,7 +114,7 @@ Real data, real Postgres, and nothing you do here touches your source database.
 </Step>
 </Steps>
 
-## What's next
+## Next steps
 
 <CardGroup cols={3}>
   <Card title="Give it to a coding agent" icon="bot" href="/workflows/ai-agents">

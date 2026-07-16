@@ -38,7 +38,7 @@ ardent connector create postgresql '<connection-string>'
 RDS needs three things before preflight can pass:
 
 <Steps>
-<Step title="Enable logical replication">
+<Step title="Enable logical replication" id="enable-logical-replication">
 
 Create or modify a parameter group for your RDS Postgres major version and set:
 
@@ -58,7 +58,7 @@ Apply the parameter group to your instance.
 
 </Step>
 
-<Step title="Allow network access">
+<Step title="Allow network access" id="allow-network-access">
 
 In the RDS console, open **Databases > your instance > Connectivity & security** and confirm the endpoint and port. Allow Ardent's outbound IP to reach the instance on the Postgres port, usually `5432`. Ask your Ardent contact for the current outbound IP if you don't have it.
 
@@ -68,7 +68,7 @@ In the RDS console, open **Databases > your instance > Connectivity & security**
 
 </Step>
 
-<Step title="Grant the replication role">
+<Step title="Grant the replication role" id="grant-the-replication-role">
 
 Connect as a role with `rds_superuser` privileges and grant RDS's replication role to the user Ardent will connect as:
 
