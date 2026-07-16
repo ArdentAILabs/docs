@@ -54,16 +54,16 @@ Where to find it, and the one thing that usually blocks the next step:
 
 <Tabs>
 <Tab title="Supabase">
-In your Supabase dashboard, open **Connect** and copy the **direct connection** string — not the pooler one. The pooler can't do replication, and preflight will fail on it. Details: [Supabase setup](/connectors/supabase).
+In your Supabase dashboard, open **Connect** and copy the [**direct connection** string — not the pooler one](/connectors/supabase#use-the-direct-connection-not-the-pooler). The pooler can't do replication, and preflight will fail on it. Details: [Supabase setup](/connectors/supabase).
 </Tab>
 <Tab title="RDS / Aurora">
-Logical replication is usually off by default. Set `rds.logical_replication = 1` in your parameter group and reboot before running preflight. Details: [RDS setup](/connectors/rds).
+Logical replication is usually off by default. [Set `rds.logical_replication = 1` in your parameter group](/connectors/rds#enable-logical-replication) and reboot before running preflight. Details: [RDS setup](/connectors/rds).
 </Tab>
 <Tab title="PlanetScale">
-Use your Postgres connection string from the PlanetScale dashboard. Details: [PlanetScale setup](/connectors/planetscale).
+[Enable logical replication in the dashboard](/connectors/planetscale#enable-logical-replication), then use your Postgres connection string from **Connect**. Details: [PlanetScale setup](/connectors/planetscale).
 </Tab>
 <Tab title="Self-hosted">
-Make sure `wal_level = logical` in your Postgres config (needs a restart if you change it). Details: [Self-hosted setup](/connectors/self-hosted).
+Make sure [`wal_level = logical` in your Postgres config](/connectors/self-hosted#enable-logical-replication) (needs a restart if you change it). Details: [Self-hosted setup](/connectors/self-hosted).
 </Tab>
 </Tabs>
 
