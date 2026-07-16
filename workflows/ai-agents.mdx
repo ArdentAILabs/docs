@@ -7,47 +7,12 @@ Agents are only as good as the data they can work with. Mocked data misses edge 
 
 Ardent gives every agent run its own isolated copy of your real database: spun up in under 6 seconds, handed off as a connection URL, thrown away when the task is done.
 
-There are two ways to run it: you create the branch and hand the agent a URL, or the agent manages branches itself.
+## Install the ardent-cli skill
 
-## Drive it yourself: hand the agent a URL
-
-Your script or CI harness runs the CLI; the agent only ever sees a branch URL. The agent needs no Ardent token and can't touch anything but its branch.
-
-```bash
-# Create a branch for the agent task and capture its URL
-AGENT_DATABASE_URL="$(ardent branch create agent-task --print-url)"
-if [ -z "$AGENT_DATABASE_URL" ]; then
-  echo "branch creation did not return a database URL" >&2
-  exit 1
-fi
-
-# Hand the returned URL to your agent
-# → $AGENT_DATABASE_URL
-
-# Agent writes migrations, runs queries, tests against real data
-# When it's done, clean up
-ardent branch delete agent-task
-```
-
-Nothing reads `AGENT_DATABASE_URL` automatically — pass the URL in the agent's prompt, or export it as `DATABASE_URL` if your app reads that.
-
-## Let the agent drive: set it up once
-
-The agent runs the Ardent CLI itself — creating, using, and deleting its own branches:
+Point your agent at Ardent once, and every later task can use it:
 
 <AccordionGroup>
-<Accordion defaultOpen={false} title="One-off AI directions: copy/paste">
-
-For a single task, paste this into Claude Code or Cursor:
-
-```
-I'm working on [describe task]. Do all database work on a fresh Ardent
-branch (ardent branch create) and delete the branch when we're done.
-Never touch the main connection string.
-```
-
-</Accordion>
-<Accordion defaultOpen={false} title="Permanent AI skill: install with npx">
+<Accordion defaultOpen={false} title="Install with npx">
 
 If your agents touch the database every day, install this as a skill instead of pasting per task. Once installed, Claude Code loads it automatically whenever a task involves Ardent.
 
@@ -58,7 +23,7 @@ npx skills add ArdentAILabs/docs --skill ardent-cli
 ```
 
 </Accordion>
-<Accordion defaultOpen={false} title="Permanent AI skill: manual SKILL.md and CLAUDE.md">
+<Accordion defaultOpen={false} title="Manual install: SKILL.md and CLAUDE.md">
 
 If your agents touch the database every day, install this as a skill instead of pasting per task. Install into your project (or into `~/.claude/skills/` to use it everywhere) and Claude Code loads it automatically whenever a task involves Ardent:
 
@@ -143,6 +108,48 @@ current reference for the task first:
 ```
 
 The skill deliberately contains no command arguments. It tells the agent to fetch the current reference from these docs before acting, so when the CLI or API changes, the docs update and every installed copy of the skill stays correct without being touched.
+
+</Accordion>
+</AccordionGroup>
+
+There are two ways to run it: you create the branch and hand the agent a URL, or the agent manages branches itself.
+
+## Drive it yourself: hand the agent a URL
+
+Your script or CI harness runs the CLI; the agent only ever sees a branch URL. The agent needs no Ardent token and can't touch anything but its branch.
+
+```bash
+# Create a branch for the agent task and capture its URL
+AGENT_DATABASE_URL="$(ardent branch create agent-task --print-url)"
+if [ -z "$AGENT_DATABASE_URL" ]; then
+  echo "branch creation did not return a database URL" >&2
+  exit 1
+fi
+
+# Hand the returned URL to your agent
+# → $AGENT_DATABASE_URL
+
+# Agent writes migrations, runs queries, tests against real data
+# When it's done, clean up
+ardent branch delete agent-task
+```
+
+Nothing reads `AGENT_DATABASE_URL` automatically — pass the URL in the agent's prompt, or export it as `DATABASE_URL` if your app reads that.
+
+## Let the agent drive: set it up once
+
+The agent runs the Ardent CLI itself — creating, using, and deleting its own branches:
+
+<AccordionGroup>
+<Accordion defaultOpen={false} title="One-off AI directions: copy/paste">
+
+For a single task, paste this into Claude Code or Cursor:
+
+```
+I'm working on [describe task]. Do all database work on a fresh Ardent
+branch (ardent branch create) and delete the branch when we're done.
+Never touch the main connection string.
+```
 
 </Accordion>
 </AccordionGroup>
