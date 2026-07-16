@@ -28,24 +28,15 @@ No more shared staging databases. No more hand-maintained fixtures. An instant d
   Branch your Postgres database in a few commands.
 </Card>
 
-<AccordionGroup>
-<Accordion defaultOpen={false} title="Set up with the ardent-cli skill">
-Install the [ardent-cli skill](/workflows/ai-agents#let-the-agent-drive-set-it-up-once) once:
-
-```bash
-npx skills add ArdentAILabs/docs --skill ardent-cli
-```
-
-Then a short ask is enough — the skill fetches the current docs and works through setup:
+<Accordion defaultOpen={false} title="Using Claude Code or Cursor? It can set Ardent up for you">
+With the [ardent-cli skill](/workflows/ai-agents#let-the-agent-drive-set-it-up-once) installed, a short ask is enough — the skill fetches the current docs and works through setup:
 
 ```
 Set up Ardent for database branching on this project.
 My connection string: [paste here]
 ```
-</Accordion>
 
-<Accordion defaultOpen={false} title="Set up without the skill">
-Paste the full directions into your agent:
+Without the skill, paste the full directions:
 
 ```
 Set up Ardent for database branching. Act like a teammate at my keyboard:
@@ -82,7 +73,6 @@ Run these in order:
 If a command errors, fix it. Docs: https://docs.tryardent.com/quickstart
 ```
 </Accordion>
-</AccordionGroup>
 
 ## How it works
 

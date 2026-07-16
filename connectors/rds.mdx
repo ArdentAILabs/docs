@@ -5,24 +5,15 @@ description: "The RDS-specific parts of connecting to Ardent"
 
 Ardent works with AWS RDS for PostgreSQL. This page covers only what's specific to RDS — the full walkthrough is the [Quickstart](/quickstart).
 
-<AccordionGroup>
-<Accordion defaultOpen={false} title="Run the checks with the ardent-cli skill">
-Install the [ardent-cli skill](/workflows/ai-agents#let-the-agent-drive-set-it-up-once) once:
-
-```bash
-npx skills add ArdentAILabs/docs --skill ardent-cli
-```
-
-Then a short ask is enough — the skill fetches this page and runs the checks:
+<Accordion defaultOpen={false} title="Using Claude Code or Cursor? It can do the checks for you">
+With the [ardent-cli skill](/workflows/ai-agents#let-the-agent-drive-set-it-up-once) installed, a short ask is enough — the skill fetches this page and runs the checks:
 
 ```
 Check if my AWS RDS Postgres database is ready to connect to Ardent.
 My connection string: [paste here]
 ```
-</Accordion>
 
-<Accordion defaultOpen={false} title="Run the checks without the skill">
-Paste the full directions into your agent:
+Without the skill, paste the full directions:
 
 ```
 Check if my AWS RDS Postgres database is ready to connect to Ardent.
@@ -43,7 +34,6 @@ After preflight passes, run:
 ardent connector create postgresql '<connection-string>'
 ```
 </Accordion>
-</AccordionGroup>
 
 RDS needs three things before preflight can pass:
 
