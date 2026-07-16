@@ -131,6 +131,8 @@ The workflow mirrors git:
 - **`ardent branch info`** — see the connection URL and status
 - **`ardent branch delete`** — clean up when you're done
 
+A branch is frozen at creation: it does not receive replication from production afterwards, and nothing you do on a branch flows back to production or other branches. Want fresher data? Create a new branch — it comes from the always-current replica in seconds. Full details: [Branch behavior](/branches).
+
 Branches suspend after 5 minutes of inactivity and wake instantly on reconnect. You pay storage only for the changes you make on a branch — so create as many as you need and throw them away freely.
 
 ## Next steps
