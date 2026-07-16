@@ -15,56 +15,14 @@ ardent connector preflight postgresql 'postgresql://user:[YOUR-PASSWORD]@host:54
   Preflight is fast and non-destructive — it stores no credentials and creates nothing. It prints a pass/fail checklist and a **Grant script** with the exact SQL for your database and schemas.
 </Info>
 
-<AccordionGroup>
-<Accordion defaultOpen={false} title="Set up the ardent-cli skill with npx">
-Install the skill once:
-
-```bash
-npx skills add ArdentAILabs/docs --skill ardent-cli
-```
-
-Then a short ask is enough — the skill fetches this page and runs the checks:
+<Accordion defaultOpen={false} title="Run the checks with the ardent-cli skill">
+[Install the ardent-cli skill](/workflows/ai-agents#install-the-ardent-cli-skill) once, and a short ask is enough — the skill fetches this page and runs the checks:
 
 ```
 Check whether my self-hosted Postgres database is ready to connect to Ardent.
 My connection string: [paste here]
 ```
 </Accordion>
-
-<Accordion defaultOpen={false} title="Set up the ardent-cli skill manually: SKILL.md and CLAUDE.md">
-Install into your project (or into `~/.claude/skills/` to use it everywhere) and Claude Code loads it automatically whenever a task involves Ardent:
-
-```bash
-mkdir -p .claude/skills/ardent-cli
-tmp_skill="$(mktemp)"
-if curl -fsS https://docs.tryardent.com/skills/ardent-cli-skill.txt -o "$tmp_skill"; then
-  mv "$tmp_skill" .claude/skills/ardent-cli/SKILL.md
-else
-  rm -f "$tmp_skill"
-  exit 1
-fi
-```
-
-To guarantee it's used, add this to your project's `CLAUDE.md`, which Claude Code reads every session:
-
-```
-Before touching the database in this repo — Postgres in any form, including
-Supabase, RDS, PlanetScale, and self-hosted — for migrations, schema changes,
-seeds, or queries against real data, use the ardent-cli skill and work on an
-Ardent branch. Never use the main connection string unless the user
-explicitly asks to change the real database.
-```
-
-Then a short ask is enough — the skill fetches this page and runs the checks:
-
-```
-Check whether my self-hosted Postgres database is ready to connect to Ardent.
-My connection string: [paste here]
-```
-
-Self-update behavior, pinning, and the full skill contents: [AI agents](/workflows/ai-agents#install-the-ardent-cli-skill).
-</Accordion>
-</AccordionGroup>
 
 Without the skill, paste the full directions into your agent:
 
