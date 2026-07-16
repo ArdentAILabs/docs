@@ -1,0 +1,49 @@
+---
+title: "Branch behavior"
+description: "What a branch contains, how it behaves after creation, and its lifecycle"
+---
+
+A branch is a full, isolated Postgres database cloned from your connected source. This page covers what's in it, what happens to it over time, and what it costs to keep around.
+
+## Branches are frozen at creation
+
+**A branch does not receive replication after it's created.** Ardent keeps a read replica continuously in sync with your source database; a branch captures that replica's state at the moment you run `ardent branch create`, and from then on it's on its own:
+
+- Writes to your source database after that moment **do not appear** on the branch — no WAL, no DDL, nothing streams in.
+- Writes to the branch **never flow back** to your source database or to other branches.
+
+This is by design: tests and migrations need a database that doesn't shift underneath them mid-run.
+
+**Want fresher data? Create a new branch.** Branches are created in seconds from the always-current replica, so the cheapest way to "refresh" is to delete the old branch and cut a new one.
+
+## What a branch contains
+
+Each branch is real Postgres — not a schema-only copy, not a subset:
+
+- Your schema and all your rows, as of creation time.
+- Grants, row-level security, functions, triggers, and supported extensions.
+- A few source features need an explicit choice during connector setup — [replica identity](/cli/connectors#replica-identity-decisions) for tables without a primary key, and a small set of provider-specific extensions. Ardent flags these before you can branch, so a branch never silently drops them.
+
+You can also configure per-connector defaults for new branches — the database name and any SQL to run on each new branch — in [connector settings](/cli/settings).
+
+## Lifecycle
+
+1. **Create.** `ardent branch create my-feature` clones from the replica in seconds, regardless of source size. The branch becomes your current branch and the CLI prints its connection URL.
+2. **Use.** Connect with the printed URL from psql, your app, an ORM, or an agent. Compute auto-scales with load.
+3. **Auto-suspend.** After 5 minutes of inactivity, the branch suspends on its own.
+4. **Resume.** Connecting again wakes it instantly — no command needed. Your data and any changes you made are exactly as you left them.
+5. **Delete.** `ardent branch delete my-feature` removes it. Cleanup isn't urgent on a laptop thanks to auto-suspend, but CI should always delete its branches.
+
+## Isolation and credentials
+
+Every branch gets its own connection string, routed through Ardent's proxy. It has no access to your source database — if a branch URL leaks (say, to an AI agent's logs), your production data and real credentials stay safe. Revoke access by deleting the branch.
+
+## Storage
+
+Branches share storage with the replica through copy-on-write. Creating a branch doesn't duplicate your data — you only pay storage for the rows you change on the branch. That's why "create one per task and move on" is the intended workflow, not something to ration.
+
+## Common questions
+
+- **Do branches stay in sync with production?** No — frozen at creation, see above.
+- **Does branching load my production database?** No. Branches are always cloned from the replica, never from your source directly.
+- **How many can I create?** As many as you need; see [Storage](#storage).
