@@ -47,7 +47,7 @@ Never touch the main connection string.
 ```
 
 </Accordion>
-<Accordion defaultOpen={false} title="Permanent AI skill: SKILL.md">
+<Accordion defaultOpen={false} title="Permanent AI skill: install with npx">
 
 If your agents touch the database every day, install this as a skill instead of pasting per task. Once installed, Claude Code loads it automatically whenever a task involves Ardent.
 
@@ -57,7 +57,10 @@ Install with the [skills CLI](https://skills.sh) — it works for Claude Code, C
 npx skills add ArdentAILabs/docs --skill ardent-cli
 ```
 
-Or without npm, curl it into your project (or into `~/.claude/skills/` to use it everywhere):
+</Accordion>
+<Accordion defaultOpen={false} title="Permanent AI skill: manual SKILL.md and CLAUDE.md">
+
+If your agents touch the database every day, install this as a skill instead of pasting per task. Install into your project (or into `~/.claude/skills/` to use it everywhere) and Claude Code loads it automatically whenever a task involves Ardent:
 
 ```bash
 mkdir -p .claude/skills/ardent-cli
