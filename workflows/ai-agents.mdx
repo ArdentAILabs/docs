@@ -49,7 +49,15 @@ Never touch the main connection string.
 </Accordion>
 <Accordion defaultOpen={false} title="Permanent AI skill: SKILL.md">
 
-If your agents touch the database every day, install this as a skill instead of pasting per task. Install into your project (or into `~/.claude/skills/` to use it everywhere) and Claude Code loads it automatically whenever a task involves Ardent:
+If your agents touch the database every day, install this as a skill instead of pasting per task. Once installed, Claude Code loads it automatically whenever a task involves Ardent.
+
+Install with the [skills CLI](https://skills.sh) — it works for Claude Code, Cursor, and other agents, and asks where to install:
+
+```bash
+npx skills add ArdentAILabs/docs --skill ardent-cli
+```
+
+Or without npm, curl it into your project (or into `~/.claude/skills/` to use it everywhere):
 
 ```bash
 mkdir -p .claude/skills/ardent-cli
@@ -83,7 +91,8 @@ This is what it installs:
 ```markdown
 ---
 name: ardent-cli
-description: Use whenever a task touches a Postgres database in any
+description: >-
+  Use whenever a task touches a Postgres database in any
   form — Supabase, RDS, PlanetScale, self-hosted — in a project that
   uses Ardent: migrations, schema changes, queries against real data,
   destructive tests, or any ardent CLI usage. Works on an isolated

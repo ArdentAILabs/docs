@@ -1,0 +1,24 @@
+name: Skill copies in sync
+
+# skills/ardent-cli-skill.txt is canonical: installed skills self-update
+# from https://docs.tryardent.com/skills/ardent-cli-skill.txt, so that
+# file must keep serving raw. skills/ardent-cli/SKILL.md is the same
+# content in the layout `npx skills` discovers. This check keeps the
+# two identical.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  diff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: SKILL.md matches ardent-cli-skill.txt
+        run: |
+          if ! diff -u skills/ardent-cli-skill.txt skills/ardent-cli/SKILL.md; then
+            echo "::error::skills/ardent-cli/SKILL.md is out of sync with skills/ardent-cli-skill.txt (canonical). Run: cp skills/ardent-cli-skill.txt skills/ardent-cli/SKILL.md"
+            exit 1
+          fi
