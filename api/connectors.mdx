@@ -13,7 +13,7 @@ A connector links Ardent to one Postgres source server. The safest API flow is t
 | Preflight source | [`POST /v1/connectors/preflight`](/api/connectors/preflight) | Checks source readiness without creating a connector |
 | Create connector | [`POST /v1/connectors`](/api/connectors/create) | Stores connector configuration and starts setup |
 | Discover schema | [`POST /v1/connectors/{connector_id}/discover`](/api/connectors/discover) | Starts async discovery when needed |
-| Select tables/schemas | [`POST /v1/connectors/{connector_id}/selection`](/api/connectors/selection) | Sets selected paths |
+| Select databases/schemas | [`POST /v1/connectors/{connector_id}/selection`](/api/connectors/selection) | Sets selected paths |
 | Submit replica decisions | [`PUT /v1/connectors/{connector_id}/replica-identity-decisions`](/api/connectors/replica-identity-decisions) | Resolves table identity choices |
 | Start setup | [`POST /v1/connectors/{connector_id}/engine-setup`](/api/connectors/engine-setup) | Starts async setup |
 | Inspect connector | [`GET /v1/connectors/{connector_id}`](/api/connectors/get) | Returns status and readiness information |
