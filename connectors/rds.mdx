@@ -5,15 +5,16 @@ description: "The RDS-specific parts of connecting to Ardent"
 
 Ardent works with AWS RDS for PostgreSQL. This page covers only what's specific to RDS — the full walkthrough is the [Quickstart](/quickstart).
 
-<Accordion defaultOpen={false} title="Using Claude Code or Cursor? It can do the checks for you">
-With the [ardent-cli skill](/workflows/ai-agents#let-the-agent-drive-set-it-up-once) installed, a short ask is enough — the skill fetches this page and runs the checks:
+<Accordion defaultOpen={false} title="Run the checks with the ardent-cli skill">
+[Install the ardent-cli skill](/workflows/ai-agents#install-the-ardent-cli-skill) once, and a short ask is enough — the skill fetches this page and runs the checks:
 
 ```
 Check if my AWS RDS Postgres database is ready to connect to Ardent.
 My connection string: [paste here]
 ```
+</Accordion>
 
-Without the skill, paste the full directions:
+Without the skill, paste the full directions into your agent:
 
 ```
 Check if my AWS RDS Postgres database is ready to connect to Ardent.
@@ -33,12 +34,11 @@ Verify:
 After preflight passes, run:
 ardent connector create postgresql '<connection-string>'
 ```
-</Accordion>
 
 RDS needs three things before preflight can pass:
 
 <Steps>
-<Step title="Enable logical replication">
+<Step title="Enable logical replication" id="enable-logical-replication">
 
 Create or modify a parameter group for your RDS Postgres major version and set:
 
@@ -58,7 +58,7 @@ Apply the parameter group to your instance.
 
 </Step>
 
-<Step title="Allow network access">
+<Step title="Allow network access" id="allow-network-access">
 
 In the RDS console, open **Databases > your instance > Connectivity & security** and confirm the endpoint and port. Allow Ardent's outbound IP to reach the instance on the Postgres port, usually `5432`. Ask your Ardent contact for the current outbound IP if you don't have it.
 
@@ -68,7 +68,7 @@ In the RDS console, open **Databases > your instance > Connectivity & security**
 
 </Step>
 
-<Step title="Grant the replication role">
+<Step title="Grant the replication role" id="grant-the-replication-role">
 
 Connect as a role with `rds_superuser` privileges and grant RDS's replication role to the user Ardent will connect as:
 

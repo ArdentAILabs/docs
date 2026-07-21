@@ -10,7 +10,7 @@ description: "Branch your Postgres database in a few minutes"
 </Info>
 
 <Steps>
-<Step title="Install the CLI">
+<Step title="Install the CLI" id="install-the-cli">
 
 ```bash
 npm install -g ardent-cli
@@ -18,7 +18,7 @@ npm install -g ardent-cli
 
 </Step>
 
-<Step title="Log in">
+<Step title="Log in" id="log-in">
 
 ```bash
 ardent login
@@ -36,9 +36,62 @@ Create one with: ardent project create <name>
 On a fresh account, create a project first: `ardent project create my-app`. If you already have exactly one project and connector, Ardent selects them for you.
 </Accordion>
 
+Prefer to hand it off? Everything after login — preflight, connecting your database, creating branches — can be done by Claude Code or Cursor with the ardent-cli skill:
+
+<AccordionGroup>
+<Accordion defaultOpen={false} title="Install the skill with npx">
+```bash
+npx skills add ArdentAILabs/docs --skill ardent-cli
+```
+
+Then ask:
+
+```
+Set up Ardent for database branching on this project.
+My connection string: [paste here]
+```
+</Accordion>
+
+<Accordion defaultOpen={false} title="Install the skill manually: SKILL.md and CLAUDE.md">
+Install into your project (or into `~/.claude/skills/` to use it everywhere) and Claude Code loads it automatically whenever a task involves Ardent:
+
+```bash
+mkdir -p .claude/skills/ardent-cli
+tmp_skill="$(mktemp)"
+if curl -fsS https://docs.tryardent.com/skills/ardent-cli-skill.txt -o "$tmp_skill"; then
+  mv "$tmp_skill" .claude/skills/ardent-cli/SKILL.md
+else
+  rm -f "$tmp_skill"
+  exit 1
+fi
+```
+
+To guarantee it's used, add this to your project's `CLAUDE.md`, which Claude Code reads every session:
+
+```
+Before touching the database in this repo — Postgres in any form, including
+Supabase, RDS, PlanetScale, and self-hosted — for migrations, schema changes,
+seeds, or queries against real data, use the ardent-cli skill and work on an
+Ardent branch. Never use the main connection string unless the user
+explicitly asks to change the real database.
+```
+
+Then ask:
+
+```
+Set up Ardent for database branching on this project.
+My connection string: [paste here]
+```
+
+Self-update behavior, pinning, and the full skill contents: [AI agents](/workflows/ai-agents#install-the-ardent-cli-skill).
+</Accordion>
+</AccordionGroup>
+
 </Step>
 
-<Step title="Get your connection string">
+<Step title="Get your connection string" id="get-your-connection-string">
+
+This is the Postgres URL of the database you want to branch — your source database's **writable primary**, not a read replica or pooler endpoint.
 
 Save it in your shell so the next two commands can reuse it:
 
@@ -52,22 +105,22 @@ Where to find it, and the one thing that usually blocks the next step:
 
 <Tabs>
 <Tab title="Supabase">
-In your Supabase dashboard, open **Connect** and copy the **direct connection** string — not the pooler one. The pooler can't do replication, and preflight will fail on it. Details: [Supabase setup](/connectors/supabase).
+In your Supabase dashboard, open **Connect** and copy the [**direct connection** string — not the pooler one](/connectors/supabase#use-the-direct-connection-not-the-pooler). The pooler can't do replication, and preflight will fail on it. Details: [Supabase setup](/connectors/supabase).
 </Tab>
 <Tab title="RDS / Aurora">
-Logical replication is usually off by default. Set `rds.logical_replication = 1` in your parameter group and reboot before running preflight. Details: [RDS setup](/connectors/rds).
+Logical replication is usually off by default. [Set `rds.logical_replication = 1` in your parameter group](/connectors/rds#enable-logical-replication) and reboot before running preflight. Details: [RDS setup](/connectors/rds).
 </Tab>
 <Tab title="PlanetScale">
-Use your Postgres connection string from the PlanetScale dashboard. Details: [PlanetScale setup](/connectors/planetscale).
+[Enable logical replication in the dashboard](/connectors/planetscale#enable-logical-replication), then use your Postgres connection string from **Connect**. Details: [PlanetScale setup](/connectors/planetscale).
 </Tab>
 <Tab title="Self-hosted">
-Make sure `wal_level = logical` in your Postgres config (needs a restart if you change it). Details: [Self-hosted setup](/connectors/self-hosted).
+Make sure [`wal_level = logical` in your Postgres config](/connectors/self-hosted#enable-logical-replication) (needs a restart if you change it). Details: [Self-hosted setup](/connectors/self-hosted).
 </Tab>
 </Tabs>
 
 </Step>
 
-<Step title="Preflight your database">
+<Step title="Preflight your database" id="preflight-your-database">
 
 ```bash
 ardent connector preflight postgresql "$ARDENT_DB_URL"
@@ -83,7 +136,7 @@ If a check fails:
 
 </Step>
 
-<Step title="Connect your database">
+<Step title="Connect your database" id="connect-your-database">
 
 When preflight passes:
 
@@ -97,7 +150,7 @@ This copies your data into Ardent once. Small databases take minutes; large ones
 
 </Step>
 
-<Step title="Create a branch and use it">
+<Step title="Create a branch and use it" id="create-a-branch-and-use-it">
 
 ```bash
 ardent branch create my-feature
@@ -114,7 +167,7 @@ Real data, real Postgres, and nothing you do here touches your source database.
 </Step>
 </Steps>
 
-## What's next
+## Next steps
 
 <CardGroup cols={3}>
   <Card title="Give it to a coding agent" icon="bot" href="/workflows/ai-agents">

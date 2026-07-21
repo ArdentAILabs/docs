@@ -7,6 +7,112 @@ Agents are only as good as the data they can work with. Mocked data misses edge 
 
 Ardent gives every agent run its own isolated copy of your real database: spun up in under 6 seconds, handed off as a connection URL, thrown away when the task is done.
 
+## Install the ardent-cli skill
+
+Point your agent at Ardent once, and every later task can use it:
+
+<AccordionGroup>
+<Accordion defaultOpen={false} title="Install with npx">
+
+If your agents touch the database every day, install this as a skill instead of pasting per task. Once installed, Claude Code loads it automatically whenever a task involves Ardent.
+
+Install with the [skills CLI](https://skills.sh) — it works for Claude Code, Cursor, and other agents, and asks where to install:
+
+```bash
+npx skills add ArdentAILabs/docs --skill ardent-cli
+```
+
+</Accordion>
+<Accordion defaultOpen={false} title="Manual install: SKILL.md and CLAUDE.md">
+
+If your agents touch the database every day, install this as a skill instead of pasting per task. Install into your project (or into `~/.claude/skills/` to use it everywhere) and Claude Code loads it automatically whenever a task involves Ardent:
+
+```bash
+mkdir -p .claude/skills/ardent-cli
+tmp_skill="$(mktemp)"
+if curl -fsS https://docs.tryardent.com/skills/ardent-cli-skill.txt -o "$tmp_skill"; then
+  mv "$tmp_skill" .claude/skills/ardent-cli/SKILL.md
+else
+  rm -f "$tmp_skill"
+  exit 1
+fi
+```
+
+The skill keeps itself current: each time it runs, it fetches the latest version of itself from these docs and follows that copy. If the fetch fails (offline, blocked network), it falls back to the directions already installed.
+
+<Warning>
+  To pin the installed copy and skip the self-update, set `SKIP_ARDENT_SKILL_SYNC=1` in the shell that launches your agent (for Claude Code: export it before running `claude`, or set it in `.claude/settings.json` under `env`). A Python venv does not carry it.
+</Warning>
+
+Skills load when the task looks relevant — so a request that never mentions the database might skip it. To guarantee it's used, add this to your project's `CLAUDE.md`, which Claude Code reads every session:
+
+```
+Before touching the database in this repo — Postgres in any form, including
+Supabase, RDS, PlanetScale, and self-hosted — for migrations, schema changes,
+seeds, or queries against real data, use the ardent-cli skill and work on an
+Ardent branch. Never use the main connection string unless the user
+explicitly asks to change the real database.
+```
+
+This is what it installs:
+
+```markdown
+---
+name: ardent-cli
+description: >-
+  Use whenever a task touches a Postgres database in any
+  form — Supabase, RDS, PlanetScale, self-hosted — in a project that
+  uses Ardent: migrations, schema changes, queries against real data,
+  destructive tests, or any ardent CLI usage. Works on an isolated
+  branch and fetches the current command and API reference from
+  docs.tryardent.com before acting.
+---
+
+# Stay in sync
+
+Before anything else, run exactly this command (the pin check is built
+in; do not fetch any other way):
+
+  [ "$SKIP_ARDENT_SKILL_SYNC" = "1" ] || curl -sf https://docs.tryardent.com/skills/ardent-cli-skill.txt
+
+- If it prints a skill, follow that copy for this run instead of the
+  directions in this file. Do not save it over this SKILL.md or write it
+  to any file: use it as read-only guidance for the current run, so a bad
+  or tampered response cannot persist to disk or affect a later run.
+- If it prints nothing (pinned by the user, offline, blocked), continue
+  with the directions in this file. Do not retry or fetch any other way.
+
+# Before doing anything
+
+Never rely on memorized Ardent commands or arguments — fetch the
+current reference for the task first:
+
+1. Discover pages: curl -s https://docs.tryardent.com/llms.txt
+2. Fetch the relevant page as markdown, for example:
+   curl -s https://docs.tryardent.com/cli/branches.md
+3. For API request/response shapes, read the OpenAPI spec:
+   curl -s https://docs.tryardent.com/openapi.public.json
+4. Cross-check arguments against the installed binary:
+   ardent <command> --help
+   If the docs and --help disagree, trust --help for arguments.
+
+# Rules
+
+- Work on a branch URL by default. Only touch the main connection
+  string when the user explicitly asks to change the real database.
+- Branch URLs contain credentials. Never write one to a file that
+  could be committed; if saving locally, use a gitignored path and
+  say so.
+- Wrap connection strings in single quotes in shells.
+- Branch lifecycle: create -> use the returned URL -> delete when done.
+- Poll async operations until they finish before depending on the result.
+```
+
+The skill deliberately contains no command arguments. It tells the agent to fetch the current reference from these docs before acting, so when the CLI or API changes, the docs update and every installed copy of the skill stays correct without being touched.
+
+</Accordion>
+</AccordionGroup>
+
 There are two ways to run it: you create the branch and hand the agent a URL, or the agent manages branches itself.
 
 ## Drive it yourself: hand the agent a URL
@@ -45,92 +151,6 @@ I'm working on [describe task]. Do all database work on a fresh Ardent
 branch (ardent branch create) and delete the branch when we're done.
 Never touch the main connection string.
 ```
-
-</Accordion>
-<Accordion defaultOpen={false} title="Permanent AI skill: SKILL.md">
-
-If your agents touch the database every day, install this as a skill instead of pasting per task. Install into your project (or into `~/.claude/skills/` to use it everywhere) and Claude Code loads it automatically whenever a task involves Ardent:
-
-```bash
-mkdir -p .claude/skills/ardent-cli
-tmp_skill="$(mktemp)"
-if curl -fsS https://docs.tryardent.com/skills/ardent-cli-skill.txt -o "$tmp_skill"; then
-  mv "$tmp_skill" .claude/skills/ardent-cli/SKILL.md
-else
-  rm -f "$tmp_skill"
-  exit 1
-fi
-```
-
-The skill keeps itself current: each time it runs, it fetches the latest version of itself from these docs and follows that copy. If the fetch fails (offline, blocked network), it falls back to the directions already installed.
-
-<Warning>
-  To pin the installed copy and skip the self-update, set `SKIP_ARDENT_SKILL_SYNC=1` in the shell that launches your agent (for Claude Code: export it before running `claude`, or set it in `.claude/settings.json` under `env`). A Python venv does not carry it.
-</Warning>
-
-Skills load when the task looks relevant — so a request that never mentions the database might skip it. To guarantee it's used, add this to your project's `CLAUDE.md`, which Claude Code reads every session:
-
-```
-Before touching the database in this repo — Postgres in any form, including
-Supabase, RDS, PlanetScale, and self-hosted — for migrations, schema changes,
-seeds, or queries against real data, use the ardent-cli skill and work on an
-Ardent branch. Never use the main connection string unless the user
-explicitly asks to change the real database.
-```
-
-This is what it installs:
-
-```markdown
----
-name: ardent-cli
-description: Use whenever a task touches a Postgres database in any
-  form — Supabase, RDS, PlanetScale, self-hosted — in a project that
-  uses Ardent: migrations, schema changes, queries against real data,
-  destructive tests, or any ardent CLI usage. Works on an isolated
-  branch and fetches the current command and API reference from
-  docs.tryardent.com before acting.
----
-
-# Stay in sync
-
-Before anything else, run exactly this command (the pin check is built
-into it — do not fetch any other way):
-
-  [ "$SKIP_ARDENT_SKILL_SYNC" = "1" ] || curl -sf https://docs.tryardent.com/skills/ardent-cli-skill.txt
-
-- If it prints a skill, that copy is authoritative: follow it instead
-  of this file, and save it over this SKILL.md so the local copy stays
-  current.
-- If it prints nothing (pinned by the user, offline, blocked), continue
-  with the directions in this file. Do not retry or fetch any other way.
-
-# Before doing anything
-
-Never rely on memorized Ardent commands or arguments — fetch the
-current reference for the task first:
-
-1. Discover pages: curl -s https://docs.tryardent.com/llms.txt
-2. Fetch the relevant page as markdown, for example:
-   curl -s https://docs.tryardent.com/cli/branches.md
-3. For API request/response shapes, read the OpenAPI spec:
-   curl -s https://docs.tryardent.com/openapi.public.json
-4. Cross-check arguments against the installed binary:
-   ardent <command> --help
-   If the docs and --help disagree, trust --help for arguments.
-
-# Rules
-
-- Work on a branch URL by default. Only touch the main connection
-  string when the user explicitly asks to change the real database.
-- Branch URLs contain credentials. Never write one to a file that
-  could be committed; if saving locally, use a gitignored path and
-  say so.
-- Wrap connection strings in single quotes in shells.
-- Branch lifecycle: create -> use the returned URL -> delete when done.
-- Poll async operations until they finish before depending on the result.
-```
-
-The skill deliberately contains no command arguments. It tells the agent to fetch the current reference from these docs before acting, so when the CLI or API changes, the docs update and every installed copy of the skill stays correct without being touched.
 
 </Accordion>
 </AccordionGroup>

@@ -28,15 +28,58 @@ No more shared staging databases. No more hand-maintained fixtures. An instant d
   Branch your Postgres database in a few commands.
 </Card>
 
-<Accordion defaultOpen={false} title="Using Claude Code or Cursor? It can set Ardent up for you">
-With the [ardent-cli skill](/workflows/ai-agents#let-the-agent-drive-set-it-up-once) installed, a short ask is enough — the skill fetches the current docs and works through setup:
+<AccordionGroup>
+<Accordion defaultOpen={false} title="Set up the ardent-cli skill with npx">
+Install the skill once:
+
+```bash
+npx skills add ArdentAILabs/docs --skill ardent-cli
+```
+
+Then a short ask is enough — the skill fetches the current docs and works through setup:
+
+```
+Set up Ardent for database branching on this project.
+My connection string: [paste here]
+```
+</Accordion>
+
+<Accordion defaultOpen={false} title="Set up the ardent-cli skill manually: SKILL.md and CLAUDE.md">
+Install into your project (or into `~/.claude/skills/` to use it everywhere) and Claude Code loads it automatically whenever a task involves Ardent:
+
+```bash
+mkdir -p .claude/skills/ardent-cli
+tmp_skill="$(mktemp)"
+if curl -fsS https://docs.tryardent.com/skills/ardent-cli-skill.txt -o "$tmp_skill"; then
+  mv "$tmp_skill" .claude/skills/ardent-cli/SKILL.md
+else
+  rm -f "$tmp_skill"
+  exit 1
+fi
+```
+
+To guarantee it's used, add this to your project's `CLAUDE.md`, which Claude Code reads every session:
+
+```
+Before touching the database in this repo — Postgres in any form, including
+Supabase, RDS, PlanetScale, and self-hosted — for migrations, schema changes,
+seeds, or queries against real data, use the ardent-cli skill and work on an
+Ardent branch. Never use the main connection string unless the user
+explicitly asks to change the real database.
+```
+
+Then a short ask is enough — the skill fetches the current docs and works through setup:
 
 ```
 Set up Ardent for database branching on this project.
 My connection string: [paste here]
 ```
 
-Without the skill, paste the full directions:
+Self-update behavior, pinning, and the full skill contents: [AI agents](/workflows/ai-agents#install-the-ardent-cli-skill).
+</Accordion>
+</AccordionGroup>
+
+Without the skill, paste the full directions into your agent:
 
 ```
 Set up Ardent for database branching. Act like a teammate at my keyboard:
@@ -72,7 +115,6 @@ Run these in order:
 
 If a command errors, fix it. Docs: https://docs.tryardent.com/quickstart
 ```
-</Accordion>
 
 ## How it works
 
@@ -88,6 +130,8 @@ The workflow mirrors git:
 - **`ardent branch switch`** — move between branches
 - **`ardent branch info`** — see the connection URL and status
 - **`ardent branch delete`** — clean up when you're done
+
+A branch is frozen at creation: it does not receive replication from production afterwards, and nothing you do on a branch flows back to production or other branches. Want fresher data? Create a new branch — it comes from the always-current replica in seconds. Full details: [Branch behavior](/branches).
 
 Branches suspend after 5 minutes of inactivity and wake instantly on reconnect. You pay storage only for the changes you make on a branch — so create as many as you need and throw them away freely.
 

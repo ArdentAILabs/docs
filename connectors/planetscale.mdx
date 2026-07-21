@@ -5,15 +5,16 @@ description: "The PlanetScale-specific parts of connecting to Ardent"
 
 Ardent works with PlanetScale Postgres. This page covers only what's specific to PlanetScale — the full walkthrough is the [Quickstart](/quickstart).
 
-<Accordion defaultOpen={false} title="Using Claude Code or Cursor? It can do the checks for you">
-With the [ardent-cli skill](/workflows/ai-agents#let-the-agent-drive-set-it-up-once) installed, a short ask is enough — the skill fetches this page and runs the checks:
+<Accordion defaultOpen={false} title="Run the checks with the ardent-cli skill">
+[Install the ardent-cli skill](/workflows/ai-agents#install-the-ardent-cli-skill) once, and a short ask is enough — the skill fetches this page and runs the checks:
 
 ```
 Check if my PlanetScale Postgres database is ready to connect to Ardent.
 My connection string: [paste here]
 ```
+</Accordion>
 
-Without the skill, paste the full directions:
+Without the skill, paste the full directions into your agent:
 
 ```
 Check if my PlanetScale Postgres database is ready to connect to Ardent.
@@ -32,18 +33,17 @@ Verify:
 After preflight passes, run:
 ardent connector create postgresql '<connection-string>'
 ```
-</Accordion>
 
 Two things matter here:
 
 <Steps>
-<Step title="Enable logical replication">
+<Step title="Enable logical replication" id="enable-logical-replication">
 
 In your PlanetScale dashboard, go to **Settings > Integrations** and enable **Logical Replication**. This is what lets Ardent replicate your data for branching.
 
 </Step>
 
-<Step title="Copy the connection string">
+<Step title="Copy the connection string" id="copy-the-connection-string">
 
 Go to **Connect > Connect with: Postgres** and copy the connection string. It looks like:
 

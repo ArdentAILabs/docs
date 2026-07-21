@@ -5,15 +5,16 @@ description: "The Supabase-specific parts of connecting to Ardent"
 
 Ardent works with Supabase Postgres. This page covers only what's specific to Supabase — the full walkthrough is the [Quickstart](/quickstart).
 
-<Accordion defaultOpen={false} title="Using Claude Code or Cursor? It can do the checks for you">
-With the [ardent-cli skill](/workflows/ai-agents#let-the-agent-drive-set-it-up-once) installed, a short ask is enough — the skill fetches this page and runs the checks:
+<Accordion defaultOpen={false} title="Run the checks with the ardent-cli skill">
+[Install the ardent-cli skill](/workflows/ai-agents#install-the-ardent-cli-skill) once, and a short ask is enough — the skill fetches this page and runs the checks:
 
 ```
 Check if my Supabase database is ready to connect to Ardent.
 My connection string: [paste here]
 ```
+</Accordion>
 
-Without the skill, paste the full directions:
+Without the skill, paste the full directions into your agent:
 
 ```
 Check if my Supabase database is ready to connect to Ardent.
@@ -33,12 +34,11 @@ Verify:
 After preflight passes, run:
 ardent connector create postgresql '<connection-string>'
 ```
-</Accordion>
 
 Three things matter here:
 
 <Steps>
-<Step title="Use the direct connection, not the pooler">
+<Step title="Use the direct connection, not the pooler" id="use-the-direct-connection-not-the-pooler">
 
 In your Supabase dashboard:
 
@@ -53,7 +53,7 @@ In your Supabase dashboard:
 
 </Step>
 
-<Step title="Check IPv4">
+<Step title="Check IPv4" id="check-ipv4">
 
 Scroll down in the Connect dialog to the **IPv4 compatible** indicator.
 
@@ -62,7 +62,7 @@ Scroll down in the Connect dialog to the **IPv4 compatible** indicator.
 
 </Step>
 
-<Step title="Copy the connection string">
+<Step title="Copy the connection string" id="copy-the-connection-string">
 
 It looks like:
 
