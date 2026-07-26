@@ -116,6 +116,14 @@
                 ]
               },
               {
+                "group": "Tags",
+                "icon": "tag",
+                "expanded": true,
+                "pages": [
+                  "cli/tags"
+                ]
+              },
+              {
                 "group": "Team",
                 "icon": "users",
                 "expanded": false,

@@ -1,0 +1,71 @@
+---
+title: "Tags"
+sidebarTitle: "Tags"
+description: "Label connectors and branches with org-wide tags"
+---
+
+Tags are labels shared across your organization — create one once, attach it to any number of connectors and branches, and filter lists by it. See the [Tags API](/api/tags) for the full lifecycle rules.
+
+## ardent tag create
+
+Create a tag. Names are 1–100 lowercase letters, digits, and hyphens, unique among your org's active tags.
+
+```bash
+ardent tag create prod-critical
+```
+
+## ardent tag apply
+
+Attach a tag. Name exactly one target: `--connector` or `--branch`. The bare flag targets your current selection; give it a value to name another.
+
+```bash
+ardent tag apply prod-critical --branch          # current branch
+ardent tag apply prod-critical --branch pr-42    # a named branch
+ardent tag apply prod-critical --connector       # current connector
+```
+
+Applying an already-attached tag changes nothing — safe to run more than once.
+
+## ardent tag remove
+
+Detach a tag. Same target flags as `apply`.
+
+```bash
+ardent tag remove prod-critical --branch pr-42
+```
+
+## ardent tag list
+
+List your org's active tags. `--all` includes deactivated ones.
+
+```bash
+ardent tag list
+```
+
+<Accordion defaultOpen={false} title="Example output">
+```text
+Tags:
+
+  prod-critical
+  team-payments
+```
+</Accordion>
+
+## ardent tag deactivate
+
+Retire a tag. It can no longer be attached and its name is free for a new tag; attached objects keep their history.
+
+```bash
+ardent tag deactivate prod-critical
+```
+
+## Filtering lists by tag
+
+`branch list` and `connector list` take `--tag <name>`:
+
+```bash
+ardent branch list --tag ci-ephemeral
+ardent connector list --tag prod-critical
+```
+
+An unknown tag name is an error, and a tag attached to nothing lists nothing.
