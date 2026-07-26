@@ -1,0 +1,34 @@
+---
+title: "Tags API"
+sidebarTitle: "Overview"
+description: "Label connectors and branches with org-wide tags"
+---
+
+Tags are labels shared across your organization. Create a tag once, then attach it to any number of connectors and branches — for example `prod-critical`, `team-payments`, or `ci-ephemeral`. Tag names follow the same rules as other resource names: 1–100 lowercase letters, digits, and hyphens.
+
+You never delete a tag directly. Deactivating a tag retires it: it can no longer be attached, and its name is free for a new tag. The tag and its history are kept — every change records who made it and when.
+
+A tag cleans up after itself in one case: when the last connector or branch using it is deleted, the tag and its history are removed with it. Detaching never does this — only deleting the underlying object.
+
+## Endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `POST` | [`/v1/tags`](/api/tags/create) | Create a tag |
+| `GET` | [`/v1/tags`](/api/tags/list) | List an organization's tags |
+| `POST` | [`/v1/tags/{tag_id}/deactivate`](/api/tags/deactivate) | Retire a tag |
+| `POST` | [`/v1/tags/{tag_id}/assignments`](/api/tags/attach) | Attach a tag to a connector or branch |
+| `DELETE` | [`/v1/tags/{tag_id}/assignments`](/api/tags/detach) | Detach a tag |
+
+## Filtering by tag
+
+The list endpoints accept an optional `tag` query parameter:
+
+- [`GET /v1/connectors?org_id=...&tag=prod-critical`](/api/connectors/list) — connectors the tag is attached to
+- [`GET /v1/branches/{connector_id}?tag=ci-ephemeral`](/api/branches/list) — a connector's branches the tag is attached to
+
+An unknown tag name returns `404`; a tag attached to nothing returns an empty list.
+
+## Permissions
+
+Anyone in the organization can read tags. Creating, attaching, detaching, and deactivating require the tag-management permission, which members have and viewers do not. Attaching also requires the right to update the target connector or branch.

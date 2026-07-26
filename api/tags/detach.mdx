@@ -1,0 +1,8 @@
+---
+title: "Detach a tag"
+sidebarTitle: "Detach tag"
+description: "Detach a tag from a connector or branch"
+openapi: "/openapi.public.json DELETE /v1/tags/{tag_id}/assignments"
+---
+
+Pass `scope_type` and `scope_id` as query parameters. Detaching keeps the assignment's history — re-attaching later continues the same record. Detaching an already-detached tag returns `200`; detaching a tag that was never attached to the target returns `404`.

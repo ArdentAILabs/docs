@@ -56,12 +56,37 @@ writing, and sweep for them when editing near a violation.
   (credential leaks, prod-touching mistakes, actions that force rebuilds).
   `<Tip>` only for optional shortcuts and easier alternatives — never for
   prescriptive guidance. Boxing routine content dilutes every other box.
+- **Progressive disclosure.** Page order: one-line orientation → the
+  command or endpoint → options and parameters → short task guidance →
+  folds. Accordions are always `defaultOpen={false}` and hold only four
+  kinds of content: example output, failure recovery ("If X…"), rationale
+  ("Why X…"), and minority-audience setups. Write the title so a reader
+  can decide without opening. Never fold warnings, required steps, options
+  tables, or the primary command/endpoint. Test: does every reader need
+  this on first read to complete the task? If yes it stays visible; if
+  only some readers need it — or need it at a different moment — fold it.
 - **First mention links.** The first prose mention of a concept documented
   elsewhere on the site links to that page (or anchor). No page should be
   reachable only through the sidebar.
 - **Literals are formatted.** Commands, flags, env vars, paths, config
   params, field names, and literal values get backticks in prose; anything
   a reader would copy gets a fenced block.
+- **Three consumers, separated.** The docs serve three readers; don't
+  collapse them. (1) People running commands themselves read the
+  reference pages (api/, cli/, connectors/) — those pages carry no
+  prompts, at most a use-case mention. (2) People piloting an AI read
+  /workflows/ai-agents — the prompts, skill install, and pin controls
+  are written FOR the human operator, in describing voice ("the skill
+  keeps itself current"), human-driven mode before agent-driven, AI
+  material in folds whose titles name it ("Using Claude Code or
+  Cursor? …"). (3) The AI itself never reads rendered pages — at run
+  time it fetches llms.txt, page .md endpoints, openapi.public.json,
+  and the raw skill file; the skill is the only text written TO the
+  agent, in command voice ("run exactly this command — do not fetch
+  any other way"), no room for judgment calls. The trap to avoid:
+  treating (2) as machine surface. Prompt and install content on pages
+  is human-facing writing about agents; the machine surface is the raw
+  fetch endpoints, nothing else.
 - **Agent prompts come in two sizes.** Wherever the docs offer a paste-in
   agent prompt, lead with the short with-skill ask (linking the skill's
   section on /workflows/ai-agents) and keep the full prompt below it for

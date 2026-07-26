@@ -1,0 +1,10 @@
+---
+title: "Attach a tag"
+sidebarTitle: "Attach tag"
+description: "Attach a tag to a connector or branch"
+openapi: "/openapi.public.json POST /v1/tags/{tag_id}/assignments"
+---
+
+`scope_type` is `connectors` or `branches`; `scope_id` is the target's ID. The target must belong to the same organization as the tag.
+
+Attaching is safe to run more than once: attaching an already-attached tag changes nothing, and attaching after a detach re-activates the original assignment. Either way the response is the active assignment. Attaching a deactivated tag returns `409`.
