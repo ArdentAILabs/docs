@@ -1,0 +1,10 @@
+---
+title: "Deactivate a tag"
+sidebarTitle: "Deactivate tag"
+description: "Retire a tag while keeping its history"
+openapi: "/openapi.public.json POST /v1/tags/{tag_id}/deactivate"
+---
+
+Deactivating retires a tag without deleting it. A deactivated tag can no longer be attached, its name becomes reusable, and its attach/detach history is kept. Safe to run more than once: deactivating an already-retired tag returns `200` with the current state.
+
+A tag is removed entirely only when the last connector or branch using it is deleted — see the [overview](/api/tags).

@@ -1,0 +1,8 @@
+---
+title: "Create a tag"
+sidebarTitle: "Create tag"
+description: "Create a tag in an organization"
+openapi: "/openapi.public.json POST /v1/tags"
+---
+
+Tag names are unique among an organization's active tags: creating a duplicate returns `409`. A deactivated tag's name can be reused — the new tag is a fresh tag with its own history.

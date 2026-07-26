@@ -183,6 +183,17 @@
                   "api/branches/list"
                 ]
               },
+              {
+                "group": "Tags",
+                "pages": [
+                  "api/tags",
+                  "api/tags/create",
+                  "api/tags/list",
+                  "api/tags/deactivate",
+                  "api/tags/attach",
+                  "api/tags/detach"
+                ]
+              },
               "api/operations"
             ]
           },
