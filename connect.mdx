@@ -8,12 +8,12 @@ Use the connection string that matches your driver. Each branch credential comes
 | Form | Use it for |
 | --- | --- |
 | `libpq` | psql, psycopg, pgx 5.7 or newer, asyncpg (with the setting below) |
-| `node` | node-postgres (`pg`), postgres.js, pgx older than 5.7 |
+| `node` | node-postgres (`pg`), postgres.js, pgx older than 5.7, Prisma 7 with the `pg` adapter |
 | `jdbc` | pgjdbc (Java, Kotlin, Scala) |
-| `prisma` | Prisma |
+| `prisma` | Prisma 6 and other Prisma releases that connect through the schema engine |
 
 <Warning>
-**Prisma users: use the `prisma` form.** With any other form, Prisma connects without checking the server's certificate, and it accepts a certificate for the wrong hostname. Anyone on the network path could read the session.
+**Prisma 6 users: use the `prisma` form.** With any other form, Prisma 6 connects without checking the server's certificate, and it accepts a certificate for the wrong hostname. Anyone on the network path could read the session. Prisma 7 with the `pg` adapter connects through node-postgres, so it uses the `node` form.
 </Warning>
 
 ## Get your connection string
@@ -26,7 +26,10 @@ Pick `libpq`, `node`, `jdbc` or `prisma` from the table above.
 </Step>
 <Step title="Print it from the CLI">
 
+Select the branch, then print its string. The command uses the branch the CLI has selected.
+
 ```bash
+ardent-beta branch switch <branch>
 ardent-beta branch connect --print --driver node
 ```
 
