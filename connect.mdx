@@ -1,0 +1,90 @@
+---
+title: "Connect your driver"
+description: "Use the connection string for your Postgres driver so it verifies the branch"
+---
+
+Use the connection string that matches your driver. Each branch credential comes in four forms, and each one makes its driver check the branch's certificate. No single string does that for every driver.
+
+| Form | Use it for |
+| --- | --- |
+| `libpq` | psql, psycopg, pgx 5.7 or newer, asyncpg (with the setting below) |
+| `node` | node-postgres (`pg`), postgres.js, pgx older than 5.7 |
+| `jdbc` | pgjdbc (Java, Kotlin, Scala) |
+| `prisma` | Prisma |
+
+<Warning>
+**Prisma users: use the `prisma` form.** With any other form, Prisma connects without checking the server's certificate, and it accepts a certificate for the wrong hostname. Anyone on the network path could read the session.
+</Warning>
+
+## Get your connection string
+
+<Steps>
+<Step title="Choose your driver's form">
+
+Pick `libpq`, `node`, `jdbc` or `prisma` from the table above.
+
+</Step>
+<Step title="Print it from the CLI">
+
+```bash
+ardent-beta branch connect --print --driver node
+```
+
+The command prints only the connection string, so you can capture it in a variable:
+
+```bash
+DATABASE_URL='...'   # paste the output here
+```
+
+The credential stays active after the command exits, until you revoke it.
+
+</Step>
+<Step title="Or read it from the API">
+
+A credential delivery returns every form under `connection_strings`:
+
+```json
+{
+  "uri": "postgresql://...?sslmode=verify-full&sslrootcert=system",
+  "connection_strings": {
+    "libpq": "postgresql://...?sslmode=verify-full&sslrootcert=system",
+    "node": "postgresql://...?sslmode=verify-full",
+    "jdbc": "jdbc:postgresql://...?user=...&password=...&sslmode=verify-full&sslfactory=org.postgresql.ssl.DefaultJavaSSLFactory",
+    "prisma": "postgresql://...?sslmode=require&sslaccept=strict"
+  }
+}
+```
+
+`uri` is the `libpq` form.
+
+</Step>
+<Step title="Use the string exactly as returned">
+
+Don't edit its TLS settings. Each form's settings are the ones that make its driver verify the branch.
+
+</Step>
+</Steps>
+
+## Drivers that need a setting in your code or environment
+
+1. **asyncpg.** Pass an SSL context; asyncpg reads `sslrootcert` only as a file path.
+
+   ```python
+   import ssl, asyncpg
+   conn = await asyncpg.connect(dsn, ssl=ssl.create_default_context())
+   ```
+
+2. **psycopg binary wheels** (`psycopg[binary]`, `psycopg2-binary`). Point `SSL_CERT_FILE` at your system's CA bundle. The wheel's bundled OpenSSL doesn't look in the system trust store.
+
+   ```bash
+   export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
+   ```
+
+3. **libpq 14 or 15** (the default on Ubuntu 22.04 and Debian 12). Install libpq 16 or newer. Older libpq can't check the branch against the system's trusted roots, and `ardent-beta branch connect` refuses it with a message saying so.
+
+   ```bash
+   # Ubuntu or Debian, from apt.postgresql.org
+   sudo apt install postgresql-client-17
+   # macOS
+   brew install libpq
+   ```

@@ -23,11 +23,9 @@ Branches are controlled through Ardent's control plane, so you can delete or rem
 
 ## Branch connection TLS
 
-Branch connection URLs include `?sslmode=require&channel_binding=disable`. Use the URL exactly as Ardent returns it.
+Branch connection strings make your driver verify the branch: they check its certificate against your system's trusted roots and check its hostname. Each driver family needs its own form of the string. [Connect your driver](/connect) lists them and the three drivers that need a setting in your code.
 
-Set SQL clients and IDEs to SSL mode `require`, and leave any root certificate, CA bundle, or `sslrootcert` field blank — including your source database's certificate bundle. A source CA can't verify an Ardent branch URL, and some clients treat `require` plus a configured certificate as full verification, which causes TLS errors like a secure channel mismatch. Without a custom certificate, `sslmode=require` keeps the connection encrypted.
-
-Keep `channel_binding=disable` in the URL. TLS ends at Ardent's routing layer, so clients that force channel binding can reject an otherwise valid branch connection. If your client exposes channel binding, set it to `disable` or `off`.
+Use the string for your driver exactly as Ardent returns it, and don't add a root certificate or CA bundle of your own.
 
 ## Branch anonymization
 
